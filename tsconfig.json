@@ -25,6 +25,7 @@
     "src/**/*.ts",
     "eslint.config.ts",
     "prettier.config.ts",
-    "vitest.config.ts"
+    "vitest.config.dev.ts",
+    "vitest.config.prod.ts"
   ]
 }
