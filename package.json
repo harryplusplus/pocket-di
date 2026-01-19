@@ -18,8 +18,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf dist",
-    "test:dev": "vitest --run -c vitest.config.dev.ts",
-    "test:prod": "vitest --run -c vitest.config.prod.ts",
+    "test:src": "vitest --run -c vitest.config.src.ts",
+    "test:dist": "vitest --run -c vitest.config.dist.ts",
     "lint": "eslint"
   },
   "devDependencies": {
