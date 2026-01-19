@@ -19,7 +19,8 @@
     "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf dist",
     "test": "vitest --run",
-    "lint": "eslint"
+    "lint": "eslint",
+    "coverage:local": "pnpm run clean && pnpm run build && pnpm run lint && pnpm run test"
   },
   "devDependencies": {
     "@eslint/compat": "2.0.1",
