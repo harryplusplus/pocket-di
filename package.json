@@ -16,7 +16,7 @@
     "!dist/**/*.test.d.ts"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf dist",
     "test": "vitest --run",
     "lint": "eslint"
