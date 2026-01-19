@@ -14,3 +14,5 @@ export * from './types/scope.ts'
 export * from './types/symbols.ts'
 export * from './types/token.ts'
 export * from './types/utils.ts'
+
+// test comment

@@ -1,23 +1,30 @@
 {
   "name": "pocket-di",
-  "version": "0.1.0",
+  "version": "0.1.0-development",
   "sideEffects": false,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
   "files": [
-    "dist"
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "!dist/**/*.test.js",
+    "!dist/**/*.test.d.ts"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "check-types": "tsc --noEmit",
-    "clean": "rimraf dist tsconfig.tsbuildinfo .turbo",
+    "build": "tsc",
+    "clean": "rimraf dist",
     "dev": "tsc --noEmit --watch",
     "test": "vitest --run"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "4.0.17",
+    "rimraf": "6.1.2",
+    "typescript": "5.9.3",
     "vitest": "4.0.17"
   },
   "publishConfig": {

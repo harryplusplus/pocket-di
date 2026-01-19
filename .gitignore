@@ -1,12 +1,14 @@
 # Node.js
 node_modules/
 
-# Coverage
+# JavaScript code coverage
 coverage/
 
-# Builds
-tsconfig.tsbuildinfo
+# Build
 dist/
 
 # macOS
 .DS_Store
+
+# VS Code
+.vscode/

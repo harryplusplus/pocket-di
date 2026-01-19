@@ -16,9 +16,9 @@
     // Builds
     "outDir": "dist",
     "incremental": true,
-    "removeComments": true,
-    "tsBuildInfoFile": "tsconfig.tsbuildinfo",
-    "declaration": true
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
   },
   "include": ["src/**/*.ts"]
 }
