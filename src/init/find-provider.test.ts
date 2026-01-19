@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { ContainerContext } from '../container-context.ts'
+import { ContainerImpl } from '../container.ts'
 import { createFindProvider, findProvider } from './find-provider.ts'
 
 describe('find-provider', () => {
@@ -41,7 +41,7 @@ describe('find-provider', () => {
     })
 
     it('should find provider in parent', () => {
-      const parent = new ContainerContext({
+      const parent = new ContainerImpl({
         providers: [
           {
             provide: 'parent-token',
@@ -102,7 +102,7 @@ describe('find-provider', () => {
     })
 
     it('should find provider in parent', () => {
-      const parent = new ContainerContext({
+      const parent = new ContainerImpl({
         providers: [
           {
             provide: 'parent-token',
@@ -127,7 +127,7 @@ describe('find-provider', () => {
     })
 
     it('should prioritize current providers over parent', () => {
-      const parent = new ContainerContext({
+      const parent = new ContainerImpl({
         providers: [
           {
             provide: 'test',

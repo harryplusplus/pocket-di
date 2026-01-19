@@ -1,9 +1,9 @@
-import type { ContainerContext, Providers } from '../container-context.ts'
+import type { ContainerImpl, Providers } from '../container.ts'
 import { type Providable, providableToProvider } from '../types/providable.ts'
 import { validateProvider } from './validate-provider.ts'
 
 export function parseProviders(input: {
-  parent: ContainerContext | null
+  parent: ContainerImpl | null
   override: boolean
   inputProviders: Providable[]
 }): Providers {

@@ -1,4 +1,4 @@
-import type { ContainerContext, Providers } from '../container-context.ts'
+import type { ContainerImpl, Providers } from '../container.ts'
 import type { Provider } from '../types/provider.ts'
 import type { InjectionToken } from '../types/token.ts'
 
@@ -8,7 +8,7 @@ export interface FindProvider {
 
 export function createFindProvider(input: {
   providers: Providers
-  parent: ContainerContext | null
+  parent: ContainerImpl | null
 }): FindProvider {
   const { providers, parent } = input
 
@@ -17,7 +17,7 @@ export function createFindProvider(input: {
 
 export function findProvider(input: {
   providers: Providers
-  parent: ContainerContext | null
+  parent: ContainerImpl | null
   token: InjectionToken
 }): Provider | null {
   const { providers, parent, token } = input

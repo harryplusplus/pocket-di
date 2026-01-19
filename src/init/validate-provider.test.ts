@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Providers } from '../container-context.ts'
-import { ContainerContext } from '../container-context.ts'
+import { ContainerImpl, type Providers } from '../container.ts'
 import { validateProvider } from './validate-provider.ts'
 
 describe('validate-provider', () => {
@@ -41,7 +40,7 @@ describe('validate-provider', () => {
   })
 
   it('should throw when exists in parent without override', () => {
-    const parent = new ContainerContext({
+    const parent = new ContainerImpl({
       providers: [
         {
           provide: 'test-token',
@@ -66,7 +65,7 @@ describe('validate-provider', () => {
   })
 
   it('should not throw when exists in parent with override', () => {
-    const parent = new ContainerContext({
+    const parent = new ContainerImpl({
       providers: [
         {
           provide: 'test-token',

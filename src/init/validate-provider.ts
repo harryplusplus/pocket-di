@@ -1,9 +1,9 @@
-import type { ContainerContext, Providers } from '../container-context.ts'
+import type { ContainerImpl, Providers } from '../container.ts'
 import { type InjectionToken, tokenToString } from '../types/token.ts'
 
 export function validateProvider(input: {
   providers: Providers
-  parent: ContainerContext | null
+  parent: ContainerImpl | null
   token: InjectionToken
   override: boolean
 }): void {

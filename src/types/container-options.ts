@@ -1,22 +1,21 @@
-import type { ContainerContext } from '../container-context.ts'
-import type { Providable } from './providable.ts'
-import type { Any } from './utils.ts'
+import type { ContainerImpl } from '../container.ts'
+import type { AnyProvidable } from './providable.ts'
 
 export interface ContainerOptions {
   /** Array of providers or injectable constructors to register */
-  providers: Providable<Any, Any, Any>[]
+  providers: AnyProvidable[]
 }
 
 export interface ChildContainerOptions {
   /** Array of providers or injectable constructors to register */
-  providers: Providable<Any, Any, Any>[]
+  providers: AnyProvidable[]
 
   /** Allow overriding providers from parent container */
   override?: boolean
 }
 
-export interface ContainerContextOptions {
-  providers: Providable<Any, Any, Any>[]
-  parent?: ContainerContext | null
+export interface ContainerImplOptions {
+  providers: AnyProvidable[]
+  parent?: ContainerImpl | null
   override?: boolean
 }

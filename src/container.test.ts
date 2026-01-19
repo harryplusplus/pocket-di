@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { ContainerContext, createContainer } from './container-context.ts'
+import { ContainerImpl, createContainer } from './container.ts'
 import { inject, postConstruct, preDestroy } from './types/symbols.ts'
 import { token } from './types/token.ts'
 
@@ -248,8 +248,8 @@ describe('container-context', () => {
       })
 
       await container.resolve(TestClass)
-      ;(container as ContainerContext).providers.clear()
-      ;(container as ContainerContext).parent = null
+      ;(container as ContainerImpl).providers.clear()
+      ;(container as ContainerImpl).parent = null
 
       await expect(container.destroy()).rejects.toThrow(
         'Internal error: provider for token "TestClass" not found during cleanup.',
@@ -746,7 +746,7 @@ describe('container-context', () => {
         ],
       })
 
-      expect((container as ContainerContext).hasProvider('test')).toBe(true)
+      expect((container as ContainerImpl).hasProvider('test')).toBe(true)
     })
 
     it('should return false when provider does not exist', () => {
@@ -754,7 +754,7 @@ describe('container-context', () => {
         providers: [],
       })
 
-      expect((container as ContainerContext).hasProvider('test')).toBe(false)
+      expect((container as ContainerImpl).hasProvider('test')).toBe(false)
     })
 
     it('should return true when provider exists in parent', () => {
@@ -771,7 +771,7 @@ describe('container-context', () => {
         providers: [],
       })
 
-      expect((child as ContainerContext).hasProvider('test')).toBe(true)
+      expect((child as ContainerImpl).hasProvider('test')).toBe(true)
     })
 
     it('should throw when container is destroyed', async () => {
@@ -781,7 +781,7 @@ describe('container-context', () => {
 
       await container.destroy()
 
-      expect(() => (container as ContainerContext).hasProvider('test')).toThrow(
+      expect(() => (container as ContainerImpl).hasProvider('test')).toThrow(
         'Container is destroyed.',
       )
     })

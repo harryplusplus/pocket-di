@@ -2,7 +2,7 @@ import { createAsyncLock } from './async-lock.ts'
 import { parse } from './init/parse.ts'
 import type {
   ChildContainerOptions,
-  ContainerContextOptions,
+  ContainerImplOptions,
   ContainerOptions,
 } from './types/container-options.ts'
 import {
@@ -38,15 +38,15 @@ export type DependencyMaybePromiseRecord = Record<
   MaybePromise<Injectable>
 >
 
-export class ContainerContext implements Container {
+export class ContainerImpl {
   lock = createAsyncLock()
-  children: ContainerContext[] = []
+  children: ContainerImpl[] = []
   singletons: Map<InjectionToken, Injectable> = new Map()
   providers: Map<InjectionToken, Provider>
-  parent: ContainerContext | null
+  parent: ContainerImpl | null
   destroyed = false
 
-  constructor(options: ContainerContextOptions) {
+  constructor(options: ContainerImplOptions) {
     const { providers, parent } = parse(options)
 
     this.providers = providers
@@ -144,7 +144,7 @@ export class ContainerContext implements Container {
   createChild(options: ChildContainerOptions): Container {
     this.ensureNotDestroyed()
 
-    const child = new ContainerContext({
+    const child = new ContainerImpl({
       ...options,
       parent: this,
     })
@@ -494,10 +494,10 @@ export class ContainerContext implements Container {
 }
 
 export type Container = Pick<
-  ContainerContext,
+  ContainerImpl,
   'resolve' | 'resolveSync' | 'destroy' | 'createChild'
 >
 
 export function createContainer(options: ContainerOptions): Container {
-  return new ContainerContext(options)
+  return new ContainerImpl(options)
 }

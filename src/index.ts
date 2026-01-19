@@ -1,6 +1,6 @@
 export * from './async-lock.ts'
 export * from './circular-dependency-checker.ts'
-export * from './container-context.ts'
+export * from './container.ts'
 export * from './types/container-options.ts'
 export * from './types/dependencies.ts'
 export * from './types/inject-declaration.ts'
