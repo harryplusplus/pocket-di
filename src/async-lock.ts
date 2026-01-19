@@ -1,5 +1,4 @@
-
-export class AsyncLockImpl  {
+export class AsyncLockImpl {
   promise = Promise.resolve()
 
   async acquire<T>(fn: () => Promise<T>): Promise<T> {

@@ -16,7 +16,10 @@ export class CircularDependencyCheckerImpl {
   }
 }
 
-export type CircularDependencyChecker = Pick<CircularDependencyCheckerImpl, 'push'>
+export type CircularDependencyChecker = Pick<
+  CircularDependencyCheckerImpl,
+  'push'
+>
 
 export function createCircularDependencyChecker(): CircularDependencyChecker {
   return new CircularDependencyCheckerImpl()
