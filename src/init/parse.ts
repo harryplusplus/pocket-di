@@ -1,11 +1,15 @@
 import { createCircularDependencyChecker } from '../circular-dependency-checker.ts'
 import type { ContainerImpl, Providers } from '../container.ts'
-import type { ContainerImplOptions } from '../types/container-options.ts'
+import type { AnyProvidable } from '../types/providable.ts'
 import { createFindProvider } from './find-provider.ts'
 import { parseProviders } from './parse-providers.ts'
 import { validateDeclarationRecursive } from './validate-declaration-recursive.ts'
 
-export function parse(input: ContainerImplOptions): {
+export function parse(input: {
+  providers: AnyProvidable[]
+  parent: ContainerImpl | null
+  override: boolean
+}): {
   providers: Providers
   parent: ContainerImpl | null
 } {

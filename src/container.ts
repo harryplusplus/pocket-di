@@ -47,10 +47,16 @@ export class ContainerImpl {
   destroyed = false
 
   constructor(options: ContainerImplOptions) {
-    const { providers, parent } = parse(options)
+    const { providers, parent = null, override = false } = options
 
-    this.providers = providers
-    this.parent = parent
+    const output = parse({
+      providers,
+      parent,
+      override,
+    })
+
+    this.providers = output.providers
+    this.parent = output.parent
   }
 
   async destroy(): Promise<void> {
