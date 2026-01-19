@@ -493,7 +493,10 @@ export class ContainerContext implements Container {
   }
 }
 
-export type Container = Pick<ContainerContext, 'resolve' | 'resolveSync' | 'destroy' | 'createChild'>
+export type Container = Pick<
+  ContainerContext,
+  'resolve' | 'resolveSync' | 'destroy' | 'createChild'
+>
 
 export function createContainer(options: ContainerOptions): Container {
   return new ContainerContext(options)
