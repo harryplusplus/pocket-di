@@ -1,10 +1,6 @@
 import { type InjectionToken, tokenToString } from './types/token.ts'
 
-export interface CircularDependencyChecker {
-  push(token: InjectionToken): void
-}
-
-class CircularDependencyCheckerImpl implements CircularDependencyChecker {
+export class CircularDependencyCheckerImpl {
   chain = new Set<InjectionToken>()
 
   push(token: InjectionToken): void {
@@ -19,6 +15,8 @@ class CircularDependencyCheckerImpl implements CircularDependencyChecker {
     this.chain.add(token)
   }
 }
+
+export type CircularDependencyChecker = Pick<CircularDependencyCheckerImpl, 'push'>
 
 export function createCircularDependencyChecker(): CircularDependencyChecker {
   return new CircularDependencyCheckerImpl()

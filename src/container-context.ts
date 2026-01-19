@@ -1,6 +1,5 @@
 import { createAsyncLock } from './async-lock.ts'
 import { parse } from './init/parse.ts'
-import type { Container } from './types/container.ts'
 import type {
   ChildContainerOptions,
   ContainerContextOptions,
@@ -493,6 +492,8 @@ export class ContainerContext implements Container {
     return instance
   }
 }
+
+export type Container = Pick<ContainerContext, 'resolve' | 'resolveSync' | 'destroy' | 'createChild'>
 
 export function createContainer(options: ContainerOptions): Container {
   return new ContainerContext(options)

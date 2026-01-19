@@ -1,8 +1,5 @@
-export interface AsyncLock {
-  acquire<T>(fn: () => Promise<T>): Promise<T>
-}
 
-class AsyncLockImpl implements AsyncLock {
+export class AsyncLockImpl  {
   promise = Promise.resolve()
 
   async acquire<T>(fn: () => Promise<T>): Promise<T> {
@@ -23,6 +20,8 @@ class AsyncLockImpl implements AsyncLock {
     }
   }
 }
+
+export type AsyncLock = Pick<AsyncLockImpl, 'acquire'>
 
 export function createAsyncLock(): AsyncLock {
   return new AsyncLockImpl()

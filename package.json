@@ -22,6 +22,7 @@
     "test": "vitest --run"
   },
   "devDependencies": {
+    "@types/node": "25.0.9",
     "@vitest/coverage-v8": "4.0.17",
     "rimraf": "6.1.2",
     "typescript": "5.9.3",
