@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    // Languages
+    "target": "es2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "erasableSyntaxOnly": true,
+    "rewriteRelativeImportExtensions": true,
+    "verbatimModuleSyntax": true,
+    "types": [],
+
+    // Types
+    "skipLibCheck": true,
+    "strict": true,
+
+    // Builds
+    "outDir": "dist",
+    "incremental": true,
+    "removeComments": true,
+    "tsBuildInfoFile": "tsconfig.tsbuildinfo",
+    "declaration": true
+  },
+  "include": ["src/**/*.ts"]
+}
