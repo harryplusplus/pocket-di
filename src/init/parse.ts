@@ -13,7 +13,7 @@ export function parse(input: {
   providers: Providers
   parent: ContainerImpl | null
 } {
-  const { parent = null, override = false } = input
+  const { parent, override } = input
 
   const providers = parseProviders({
     parent,
