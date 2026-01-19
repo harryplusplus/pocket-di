@@ -1,6 +1,6 @@
 {
   "name": "pocket-di",
-  "version": "0.1.0-development.0",
+  "version": "0.1.0-dev",
   "sideEffects": false,
   "type": "module",
   "exports": {
