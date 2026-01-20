@@ -12,3 +12,6 @@ dist/
 
 # VS Code
 .vscode/
+
+# Auto-copied files for npm publish
+/packages/pocket-di/README.md
