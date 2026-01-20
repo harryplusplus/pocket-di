@@ -16,10 +16,7 @@ import { inject } from './symbols.ts'
 describe('provider', () => {
   describe('defineProvider', () => {
     it('should return provider when called with provider', () => {
-      const provider: ValueProvider = {
-        provide: 'test',
-        useValue: 'value',
-      }
+      const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
       const result = defineProvider(provider)
 
@@ -29,10 +26,7 @@ describe('provider', () => {
     it('should return provider function when called without arguments', () => {
       const providerFn = defineProvider()
 
-      const provider: ValueProvider = {
-        provide: 'test',
-        useValue: 'value',
-      }
+      const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
       const result = providerFn(provider)
 
@@ -42,10 +36,7 @@ describe('provider', () => {
 
   describe('isValueProvider', () => {
     it('should return true for value provider', () => {
-      const provider: ValueProvider = {
-        provide: 'test',
-        useValue: 'value',
-      }
+      const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
       expect(isValueProvider(provider)).toBe(true)
     })
@@ -53,10 +44,7 @@ describe('provider', () => {
     it('should return false for class provider', () => {
       class TestClass {}
 
-      const provider: ClassProvider = {
-        provide: 'test',
-        useClass: TestClass,
-      }
+      const provider: ClassProvider = { provide: 'test', useClass: TestClass }
 
       expect(isValueProvider(provider)).toBe(false)
     })
@@ -75,19 +63,13 @@ describe('provider', () => {
     it('should return true for class provider', () => {
       class TestClass {}
 
-      const provider: ClassProvider = {
-        provide: 'test',
-        useClass: TestClass,
-      }
+      const provider: ClassProvider = { provide: 'test', useClass: TestClass }
 
       expect(isClassProvider(provider)).toBe(true)
     })
 
     it('should return false for value provider', () => {
-      const provider: ValueProvider = {
-        provide: 'test',
-        useValue: 'value',
-      }
+      const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
       expect(isClassProvider(provider)).toBe(false)
     })
@@ -113,10 +95,7 @@ describe('provider', () => {
     })
 
     it('should return false for value provider', () => {
-      const provider: ValueProvider = {
-        provide: 'test',
-        useValue: 'value',
-      }
+      const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
       expect(isFactoryProvider(provider)).toBe(false)
     })
@@ -124,10 +103,7 @@ describe('provider', () => {
     it('should return false for class provider', () => {
       class TestClass {}
 
-      const provider: ClassProvider = {
-        provide: 'test',
-        useClass: TestClass,
-      }
+      const provider: ClassProvider = { provide: 'test', useClass: TestClass }
 
       expect(isFactoryProvider(provider)).toBe(false)
     })
@@ -139,10 +115,7 @@ describe('provider', () => {
         static [inject] = ['dep1', 'dep2'] as const
       }
 
-      const provider: ClassProvider = {
-        provide: 'test',
-        useClass: TestClass,
-      }
+      const provider: ClassProvider = { provide: 'test', useClass: TestClass }
 
       const result = classProviderToDeclaration(provider)
 
@@ -152,10 +125,7 @@ describe('provider', () => {
     it('should return empty object when no inject declaration', () => {
       class TestClass {}
 
-      const provider: ClassProvider = {
-        provide: 'test',
-        useClass: TestClass,
-      }
+      const provider: ClassProvider = { provide: 'test', useClass: TestClass }
 
       const result = classProviderToDeclaration(provider)
 

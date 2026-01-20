@@ -1,9 +1,12 @@
+import path from 'node:path'
+
+import { includeIgnoreFile } from '@eslint/compat'
 import eslint from '@eslint/js'
 import { defineConfig } from 'eslint/config'
-import tseslint from 'typescript-eslint'
+import importPlugin from 'eslint-plugin-import'
 import prettierRecommended from 'eslint-plugin-prettier/recommended'
-import { includeIgnoreFile } from '@eslint/compat'
-import path from 'node:path'
+import simpleImportSort from 'eslint-plugin-simple-import-sort'
+import tseslint from 'typescript-eslint'
 
 const gitignorePath = path.resolve(import.meta.dirname, '.gitignore')
 
@@ -18,6 +21,20 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
     },
+  },
+  {
+    rules: {
+      'max-lines': [
+        'error',
+        { max: 300, skipBlankLines: true, skipComments: true },
+      ],
+      'max-lines-per-function': [
+        'error',
+        { max: 50, skipBlankLines: true, skipComments: true, IIFEs: true },
+      ],
+    },
+  },
+  {
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -28,6 +45,17 @@ export default defineConfig([
         },
       ],
     },
+  },
+  {
+    plugins: { 'simple-import-sort': simpleImportSort },
+    rules: {
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+    },
+  },
+  {
+    plugins: { import: importPlugin },
+    rules: { 'import/extensions': ['error', 'never', { ts: 'always' }] },
   },
   prettierRecommended,
 ])

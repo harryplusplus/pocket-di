@@ -1,20 +1,15 @@
 import type { ContainerImpl } from '../container.ts'
 import { destroyChildren } from './destroy-children.ts'
-import { destroySingletons } from './destroy-singletons.ts'
+import { destroySingletonRegistry } from './destroy-singleton-registry.ts'
 
-export async function destroyContainer(input: {
+export async function destroyContainer(context: {
   container: ContainerImpl
 }): Promise<void> {
-  const { container } = input
-  const { children, singletons, providers, parent } = container
+  const { container } = context
+  const { children, singletonRegistry, providerRegistry } = container
 
-  await destroyChildren({
-    children,
-  })
+  await destroyChildren({ children })
+  await destroySingletonRegistry({ singletonRegistry }, { providerRegistry })
 
-  await destroySingletons({
-    singletons,
-    providers,
-    parent,
-  })
+  providerRegistry.clear()
 }

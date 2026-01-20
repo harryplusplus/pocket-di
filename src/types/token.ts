@@ -20,9 +20,7 @@ export function tokenToString(token: InjectionToken): string {
 export type TypedToken<I extends Injectable = Injectable> = (
   | string
   | symbol
-) & {
-  [type]?: I
-}
+) & { [type]?: I }
 
 export function token<I extends Injectable>(
   token: string | symbol,

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { createAsyncLock } from './async-lock.ts'
+import { AsyncLock } from './async-lock.ts'
 
 describe('AsyncLock', () => {
   it('should execute functions sequentially', async () => {
-    const lock = createAsyncLock()
+    const lock = new AsyncLock()
     const results: number[] = []
 
     await Promise.all([
@@ -22,7 +22,7 @@ describe('AsyncLock', () => {
   })
 
   it('should return the result of the function', async () => {
-    const lock = createAsyncLock()
+    const lock = new AsyncLock()
 
     const result = await lock.acquire(async () => {
       await Promise.resolve()
@@ -33,7 +33,7 @@ describe('AsyncLock', () => {
   })
 
   it('should release lock even if function throws', async () => {
-    const lock = createAsyncLock()
+    const lock = new AsyncLock()
 
     await expect(
       lock.acquire(async () => {

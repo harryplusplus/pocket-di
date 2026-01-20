@@ -1,44 +1,36 @@
 import type { CircularDependencyChecker } from '../circular-dependency-checker.ts'
+import type { ProviderRegistry } from '../types/compositions.ts'
 import {
   classProviderToDeclaration,
   factoryProviderToDeclaration,
   isClassProvider,
-  isValueProvider,
+  isFactoryProvider,
   type Provider,
 } from '../types/provider.ts'
-import type { FindProvider } from './find-provider.ts'
 import { validateDeclaration } from './validate-declaration.ts'
 
 export function validateDeclarationRecursive(input: {
   provider: Provider
-  findProvider: FindProvider
+  providerRegistry: ProviderRegistry
   checker: CircularDependencyChecker
 }): void {
-  const { provider, findProvider, checker } = input
-
-  if (isValueProvider(provider)) {
-    // noop
-
-    return
-  }
+  const { provider, providerRegistry, checker } = input
 
   if (isClassProvider(provider)) {
     validateDeclaration({
       token: provider.provide,
       declaration: classProviderToDeclaration(provider),
-      findProvider,
+      providerRegistry,
       className: provider.useClass.name,
       checker,
     })
-
-    return
+  } else if (isFactoryProvider(provider)) {
+    validateDeclaration({
+      token: provider.provide,
+      declaration: factoryProviderToDeclaration(provider),
+      providerRegistry,
+      className: null,
+      checker,
+    })
   }
-
-  validateDeclaration({
-    token: provider.provide,
-    declaration: factoryProviderToDeclaration(provider),
-    findProvider,
-    className: null,
-    checker,
-  })
 }

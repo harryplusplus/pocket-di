@@ -1,19 +1,19 @@
 import type { CircularDependencyChecker } from '../circular-dependency-checker.ts'
+import type { ProviderRegistry } from '../types/compositions.ts'
 import type { InjectDeclarationItem } from '../types/inject-declaration.ts'
 import { type InjectionToken, tokenToString } from '../types/token.ts'
-import type { FindProvider } from './find-provider.ts'
 import { validateDeclarationRecursive } from './validate-declaration-recursive.ts'
 
 export function validateDeclarationItem(input: {
   item: InjectDeclarationItem
-  findProvider: FindProvider
+  providerRegistry: ProviderRegistry
   token: InjectionToken
   className: string | null
   checker: CircularDependencyChecker
 }): void {
-  const { item, findProvider, checker, token, className } = input
+  const { item, providerRegistry, checker, token, className } = input
 
-  const provider = findProvider(item)
+  const provider = providerRegistry.find(item)
   if (!provider) {
     const tokenName = tokenToString(token)
     const classInfo = className ? ` (class "${className}")` : ''
@@ -26,9 +26,5 @@ export function validateDeclarationItem(input: {
 
   checker.push(item)
 
-  validateDeclarationRecursive({
-    provider,
-    findProvider,
-    checker,
-  })
+  validateDeclarationRecursive({ provider, providerRegistry, checker })
 }

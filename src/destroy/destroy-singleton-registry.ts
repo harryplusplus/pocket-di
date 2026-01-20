@@ -1,23 +1,24 @@
-import type { ContainerImpl, Providers, Singletons } from '../container.ts'
+import type {
+  ProviderRegistry,
+  SingletonRegistry,
+} from '../types/compositions.ts'
 import { isPreDestroyable } from '../types/lifecycle-events.ts'
 import { isClassProvider, isFactoryProvider } from '../types/provider.ts'
 import { preDestroy } from '../types/symbols.ts'
 import { tokenToString } from '../types/token.ts'
 
-export async function destroySingletons(input: {
-  singletons: Singletons
-  providers: Providers
-  parent: ContainerImpl | null
-}): Promise<void> {
-  const { singletons, providers, parent } = input
+export async function destroySingletonRegistry(
+  context: { singletonRegistry: SingletonRegistry },
+  input: { providerRegistry: ProviderRegistry },
+): Promise<void> {
+  const { singletonRegistry } = context
+  const { providerRegistry } = input
 
-  const copiedSingletons = [...singletons.entries()]
+  const copiedSingletons = [...singletonRegistry.map.entries()]
   copiedSingletons.reverse()
 
   for (const [token, singleton] of copiedSingletons) {
-    const provider =
-      providers.get(token) ?? parent?.providers.get(token) ?? null
-
+    const provider = providerRegistry.find(token)
     if (!provider) {
       throw new Error(
         `Internal error: provider for token "${tokenToString(token)}" not found during cleanup.`,
@@ -38,4 +39,6 @@ export async function destroySingletons(input: {
       }
     }
   }
+
+  singletonRegistry.clear()
 }

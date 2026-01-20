@@ -24,9 +24,5 @@ export function fillContainerImplOptions(
   options: ContainerImplOptions,
 ): Omit<ContainerImplOptions, 'parent' | 'override'> &
   Pick<Required<ContainerImplOptions>, 'parent' | 'override'> {
-  return {
-    parent: null,
-    override: false,
-    ...options,
-  }
+  return { parent: null, override: false, ...options }
 }

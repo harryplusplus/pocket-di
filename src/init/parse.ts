@@ -1,44 +1,28 @@
-import { createCircularDependencyChecker } from '../circular-dependency-checker.ts'
-import type { ContainerImpl, Providers } from '../container.ts'
+import { CircularDependencyChecker } from '../circular-dependency-checker.ts'
+import type { ProviderRegistry } from '../types/compositions.ts'
 import type { AnyProvidable } from '../types/providable.ts'
-import { createFindProvider } from './find-provider.ts'
-import { parseProviders } from './parse-providers.ts'
+import { parseProviderRegistry } from './parse-provider-registry.ts'
 import { validateDeclarationRecursive } from './validate-declaration-recursive.ts'
 
 export function parse(input: {
-  providers: AnyProvidable[]
-  parent: ContainerImpl | null
+  providables: AnyProvidable[]
+  parentProviderRegistry: ProviderRegistry | null
   override: boolean
-}): {
-  providers: Providers
-  parent: ContainerImpl | null
-} {
-  const { parent, override } = input
+}): ProviderRegistry {
+  const { providables, parentProviderRegistry, override } = input
 
-  const providers = parseProviders({
-    parent,
+  const providerRegistry = parseProviderRegistry({
+    parentProviderRegistry,
     override,
-    inputProviders: input.providers,
+    providables,
   })
 
-  const findProvider = createFindProvider({
-    providers,
-    parent,
-  })
-
-  for (const provider of providers.values()) {
-    const checker = createCircularDependencyChecker()
+  for (const provider of providerRegistry.map.values()) {
+    const checker = new CircularDependencyChecker()
     checker.push(provider.provide)
 
-    validateDeclarationRecursive({
-      provider,
-      findProvider,
-      checker,
-    })
+    validateDeclarationRecursive({ provider, providerRegistry, checker })
   }
 
-  return {
-    providers,
-    parent,
-  }
+  return providerRegistry
 }
