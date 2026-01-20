@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 import {
   isInjectableConstructorProvidable,
   isProviderProvidable,
-  type Providable,
   providableToProvider,
 } from './providable.ts'
 import type { ClassProvider, ValueProvider } from './provider.ts'
