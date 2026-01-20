@@ -4,13 +4,15 @@
   "scripts": {
     "lint": "eslint",
     "test:src": "pnpm --filter=pocket-di test:src",
-    "test:dist": "pnpm --filter=pocket-di clean && pnpm --filter=pocket-di build && pnpm --filter=pocket-di test:dist"
+    "test:dist": "pnpm --filter=pocket-di clean && pnpm --filter=pocket-di build && pnpm --filter=pocket-di test:dist",
+    "gen:toc": "doctoc README.md README.ko.md"
   },
   "devDependencies": {
     "@eslint/compat": "2.0.1",
     "@eslint/js": "9.39.2",
     "@types/node": "25.0.9",
     "@vitest/coverage-v8": "4.0.17",
+    "doctoc": "2.2.1",
     "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import": "2.32.0",
