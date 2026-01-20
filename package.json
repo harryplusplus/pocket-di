@@ -2,7 +2,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:src": "pnpm --filter=pocket-di test:src",
+    "test:dist": "pnpm --filter=pocket-di clean && pnpm --filter=pocket-di build && pnpm --filter=pocket-di test:dist"
   },
   "devDependencies": {
     "@eslint/compat": "2.0.1",
