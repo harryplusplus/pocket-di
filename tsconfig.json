@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     // Languages
-    "target": "es2015",
+    "target": "es2017",
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "erasableSyntaxOnly": true,
     "rewriteRelativeImportExtensions": true,
     "verbatimModuleSyntax": true,
-    "types": ["node"],
-    "lib": ["es2015", "es2017.object", "es2019.object", "es2019.symbol"],
+    "types": [],
+    "lib": ["dom", "es2017", "es2019.symbol"],
 
     // Types
     "skipLibCheck": true,
