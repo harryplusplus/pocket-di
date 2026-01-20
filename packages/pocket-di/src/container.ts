@@ -81,6 +81,13 @@ export class ContainerImpl {
     return instance as I
   }
 
+  hasSingleton(
+    token: InjectionToken,
+    options?: { localOnly?: boolean },
+  ): boolean {
+    return this.singletonRegistry.find(token, options) !== null
+  }
+
   createChild(options: ChildContainerOptions): Container {
     this.ensureNotDestroyed()
 
@@ -100,7 +107,7 @@ export class ContainerImpl {
 
 export type Container = Pick<
   ContainerImpl,
-  'resolve' | 'resolveSync' | 'destroy' | 'createChild'
+  'resolve' | 'resolveSync' | 'destroy' | 'createChild' | 'hasSingleton'
 >
 
 export function createContainer(options: ContainerOptions): Container {
