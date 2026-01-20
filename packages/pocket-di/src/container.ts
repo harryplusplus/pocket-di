@@ -81,6 +81,13 @@ export class ContainerImpl {
     return instance as I
   }
 
+  hasProvider(
+    token: InjectionToken,
+    options?: { localOnly?: boolean },
+  ): boolean {
+    return this.providerRegistry.find(token, options) !== null
+  }
+
   hasSingleton(
     token: InjectionToken,
     options?: { localOnly?: boolean },
@@ -107,7 +114,12 @@ export class ContainerImpl {
 
 export type Container = Pick<
   ContainerImpl,
-  'resolve' | 'resolveSync' | 'destroy' | 'createChild' | 'hasSingleton'
+  | 'resolve'
+  | 'resolveSync'
+  | 'destroy'
+  | 'createChild'
+  | 'hasSingleton'
+  | 'hasProvider'
 >
 
 export function createContainer(options: ContainerOptions): Container {
