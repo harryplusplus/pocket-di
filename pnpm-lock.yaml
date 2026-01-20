@@ -6,7 +6,15 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  packages/examples:
+    dependencies:
+      pocket-di:
+        specifier: workspace:*
+        version: link:../pocket-di
+
+  packages/pocket-di:
     devDependencies:
       '@eslint/compat':
         specifier: 2.0.1

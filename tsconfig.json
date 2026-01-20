@@ -22,10 +22,9 @@
     "sourceMap": true
   },
   "include": [
-    "src/**/*.ts",
+    "packages/*/src/**/*.ts",
     "eslint.config.ts",
     "prettier.config.ts",
-    "vitest.config.src.ts",
-    "vitest.config.dist.ts"
+    "packages/*/vitest.config.*.ts"
   ]
 }
