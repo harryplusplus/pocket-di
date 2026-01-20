@@ -6,7 +6,7 @@ import type { Injectable } from '../types/injectable.ts'
 import { isPostConstructable } from '../types/lifecycle-events.ts'
 import { isClassProvider } from '../types/provider.ts'
 import { postConstruct } from '../types/symbols.ts'
-import { tokenToString, type InjectionToken } from '../types/token.ts'
+import { type InjectionToken, tokenToString } from '../types/token.ts'
 
 export async function resolveInstanceSync(input: {
   token: InjectionToken

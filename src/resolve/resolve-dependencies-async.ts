@@ -1,10 +1,10 @@
 import {
-  providerToDeclaration,
   type DependencyRecord,
   type DependencyTuple,
   type DependencyTupleOrRecord,
   type ProviderHasDependencies,
   type ProviderRegistry,
+  providerToDeclaration,
   type SingletonRegistry,
 } from '../types/compositions.ts'
 import { isTupleInjectDeclaration } from '../types/inject-declaration.ts'

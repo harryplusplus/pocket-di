@@ -2,11 +2,11 @@ import type { Registry } from '../registry.ts'
 import type { InjectDeclaration } from './inject-declaration.ts'
 import type { Injectable } from './injectable.ts'
 import {
+  type ClassProvider,
   classProviderToDeclaration,
+  type FactoryProvider,
   factoryProviderToDeclaration,
   isClassProvider,
-  type ClassProvider,
-  type FactoryProvider,
   type Provider,
 } from './provider.ts'
 import type { InjectionToken } from './token.ts'

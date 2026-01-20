@@ -5,7 +5,7 @@ import type {
 } from '../types/compositions.ts'
 import type { Injectable } from '../types/injectable.ts'
 import { isValueProvider } from '../types/provider.ts'
-import { tokenToString, type InjectionToken } from '../types/token.ts'
+import { type InjectionToken, tokenToString } from '../types/token.ts'
 
 export type ResolveInstanceOrProviderOutput =
   | { kind: 'instance'; instance: Injectable }

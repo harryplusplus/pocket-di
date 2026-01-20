@@ -9,83 +9,72 @@ import {
 import type { ClassProvider, ValueProvider } from './provider.ts'
 import { inject } from './symbols.ts'
 
-describe('providable', () => {
-  describe('isProviderProvidable', () => {
-    it('should return true for provider', () => {
-      const provider: ValueProvider = {
-        provide: 'test',
-        useValue: 'value',
-      }
+describe('isProviderProvidable', () => {
+  it('should return true for provider', () => {
+    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
-      expect(isProviderProvidable(provider)).toBe(true)
-    })
-
-    it('should return false for injectable constructor', () => {
-      class TestClass {}
-
-      expect(isProviderProvidable(TestClass)).toBe(false)
-    })
+    expect(isProviderProvidable(provider)).toBe(true)
   })
 
-  describe('isInjectableConstructorProvidable', () => {
-    it('should return true for injectable constructor', () => {
-      class TestClass {}
+  it('should return false for injectable constructor', () => {
+    class TestClass {}
 
-      expect(isInjectableConstructorProvidable(TestClass)).toBe(true)
-    })
+    expect(isProviderProvidable(TestClass)).toBe(false)
+  })
+})
 
-    it('should return false for provider', () => {
-      const provider: ValueProvider = {
-        provide: 'test',
-        useValue: 'value',
-      }
+describe('isInjectableConstructorProvidable', () => {
+  it('should return true for injectable constructor', () => {
+    class TestClass {}
 
-      expect(isInjectableConstructorProvidable(provider)).toBe(false)
-    })
+    expect(isInjectableConstructorProvidable(TestClass)).toBe(true)
   })
 
-  describe('providableToProvider', () => {
-    it('should return provider as is', () => {
-      const provider: ValueProvider = {
-        provide: 'test',
-        useValue: 'value',
-      }
+  it('should return false for provider', () => {
+    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
-      const result = providableToProvider(provider)
+    expect(isInjectableConstructorProvidable(provider)).toBe(false)
+  })
+})
 
-      expect(result).toBe(provider)
-    })
+describe('providableToProvider', () => {
+  it('should return provider as is', () => {
+    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
-    it('should convert injectable constructor to class provider', () => {
-      class TestClass {
-        static [inject] = ['dep'] as const
-      }
+    const result = providableToProvider(provider)
 
-      const result = providableToProvider(TestClass)
+    expect(result).toBe(provider)
+  })
 
-      expect(result).toEqual({
-        provide: TestClass,
-        useClass: TestClass,
-      } satisfies ClassProvider)
-    })
+  it('should convert injectable constructor to class provider', () => {
+    class TestClass {
+      static [inject] = ['dep'] as const
+    }
 
-    it('should convert injectable constructor without inject to class provider', () => {
-      class TestClass {}
+    const result = providableToProvider(TestClass)
 
-      const result = providableToProvider(TestClass)
+    expect(result).toEqual({
+      provide: TestClass,
+      useClass: TestClass,
+    } satisfies ClassProvider)
+  })
 
-      expect(result).toEqual({
-        provide: TestClass,
-        useClass: TestClass,
-      } satisfies ClassProvider)
-    })
+  it('should convert injectable constructor without inject to class provider', () => {
+    class TestClass {}
 
-    it('should throw error for unexpected providable', () => {
-      const invalidProvidable = {} as Providable
+    const result = providableToProvider(TestClass)
 
-      expect(() => providableToProvider(invalidProvidable)).toThrow(
-        'Unexpected providable.',
-      )
-    })
+    expect(result).toEqual({
+      provide: TestClass,
+      useClass: TestClass,
+    } satisfies ClassProvider)
+  })
+
+  it('should throw error for unexpected providable', () => {
+    const invalidProvidable = {} as Providable
+
+    expect(() => providableToProvider(invalidProvidable)).toThrow(
+      'Unexpected providable.',
+    )
   })
 })

@@ -13,148 +13,146 @@ import {
 } from './provider.ts'
 import { inject } from './symbols.ts'
 
-describe('provider', () => {
-  describe('defineProvider', () => {
-    it('should return provider when called with provider', () => {
-      const provider: ValueProvider = { provide: 'test', useValue: 'value' }
+describe('defineProvider', () => {
+  it('should return provider when called with provider', () => {
+    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
-      const result = defineProvider(provider)
+    const result = defineProvider(provider)
 
-      expect(result).toBe(provider)
-    })
-
-    it('should return provider function when called without arguments', () => {
-      const providerFn = defineProvider()
-
-      const provider: ValueProvider = { provide: 'test', useValue: 'value' }
-
-      const result = providerFn(provider)
-
-      expect(result).toBe(provider)
-    })
+    expect(result).toBe(provider)
   })
 
-  describe('isValueProvider', () => {
-    it('should return true for value provider', () => {
-      const provider: ValueProvider = { provide: 'test', useValue: 'value' }
+  it('should return provider function when called without arguments', () => {
+    const providerFn = defineProvider()
 
-      expect(isValueProvider(provider)).toBe(true)
-    })
+    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
-    it('should return false for class provider', () => {
-      class TestClass {}
+    const result = providerFn(provider)
 
-      const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    expect(result).toBe(provider)
+  })
+})
 
-      expect(isValueProvider(provider)).toBe(false)
-    })
+describe('isValueProvider', () => {
+  it('should return true for value provider', () => {
+    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
-    it('should return false for factory provider', () => {
-      const provider: FactoryProvider = {
-        provide: 'test',
-        useFactory: () => ({}),
-      }
-
-      expect(isValueProvider(provider)).toBe(false)
-    })
+    expect(isValueProvider(provider)).toBe(true)
   })
 
-  describe('isClassProvider', () => {
-    it('should return true for class provider', () => {
-      class TestClass {}
+  it('should return false for class provider', () => {
+    class TestClass {}
 
-      const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
 
-      expect(isClassProvider(provider)).toBe(true)
-    })
-
-    it('should return false for value provider', () => {
-      const provider: ValueProvider = { provide: 'test', useValue: 'value' }
-
-      expect(isClassProvider(provider)).toBe(false)
-    })
-
-    it('should return false for factory provider', () => {
-      const provider: FactoryProvider = {
-        provide: 'test',
-        useFactory: () => ({}),
-      }
-
-      expect(isClassProvider(provider)).toBe(false)
-    })
+    expect(isValueProvider(provider)).toBe(false)
   })
 
-  describe('isFactoryProvider', () => {
-    it('should return true for factory provider', () => {
-      const provider: FactoryProvider = {
-        provide: 'test',
-        useFactory: () => ({}),
-      }
+  it('should return false for factory provider', () => {
+    const provider: FactoryProvider = {
+      provide: 'test',
+      useFactory: () => ({}),
+    }
 
-      expect(isFactoryProvider(provider)).toBe(true)
-    })
+    expect(isValueProvider(provider)).toBe(false)
+  })
+})
 
-    it('should return false for value provider', () => {
-      const provider: ValueProvider = { provide: 'test', useValue: 'value' }
+describe('isClassProvider', () => {
+  it('should return true for class provider', () => {
+    class TestClass {}
 
-      expect(isFactoryProvider(provider)).toBe(false)
-    })
+    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
 
-    it('should return false for class provider', () => {
-      class TestClass {}
-
-      const provider: ClassProvider = { provide: 'test', useClass: TestClass }
-
-      expect(isFactoryProvider(provider)).toBe(false)
-    })
+    expect(isClassProvider(provider)).toBe(true)
   })
 
-  describe('classProviderToDeclaration', () => {
-    it('should return inject declaration from class', () => {
-      class TestClass {
-        static [inject] = ['dep1', 'dep2'] as const
-      }
+  it('should return false for value provider', () => {
+    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
-      const provider: ClassProvider = { provide: 'test', useClass: TestClass }
-
-      const result = classProviderToDeclaration(provider)
-
-      expect(result).toEqual(['dep1', 'dep2'])
-    })
-
-    it('should return empty object when no inject declaration', () => {
-      class TestClass {}
-
-      const provider: ClassProvider = { provide: 'test', useClass: TestClass }
-
-      const result = classProviderToDeclaration(provider)
-
-      expect(result).toEqual({})
-    })
+    expect(isClassProvider(provider)).toBe(false)
   })
 
-  describe('factoryProviderToDeclaration', () => {
-    it('should return inject declaration from factory', () => {
-      const provider: FactoryProvider = {
-        provide: 'test',
-        inject: ['dep1', 'dep2'] as const,
-        useFactory: () => ({}),
-      }
+  it('should return false for factory provider', () => {
+    const provider: FactoryProvider = {
+      provide: 'test',
+      useFactory: () => ({}),
+    }
 
-      const result = factoryProviderToDeclaration(provider)
+    expect(isClassProvider(provider)).toBe(false)
+  })
+})
 
-      expect(result).toEqual(['dep1', 'dep2'])
-    })
+describe('isFactoryProvider', () => {
+  it('should return true for factory provider', () => {
+    const provider: FactoryProvider = {
+      provide: 'test',
+      useFactory: () => ({}),
+    }
 
-    it('should return empty object when no inject declaration', () => {
-      const provider: FactoryProvider = {
-        provide: 'test',
-        useFactory: () => ({}),
-      }
+    expect(isFactoryProvider(provider)).toBe(true)
+  })
 
-      const result = factoryProviderToDeclaration(provider)
+  it('should return false for value provider', () => {
+    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
 
-      expect(result).toEqual({})
-    })
+    expect(isFactoryProvider(provider)).toBe(false)
+  })
+
+  it('should return false for class provider', () => {
+    class TestClass {}
+
+    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+
+    expect(isFactoryProvider(provider)).toBe(false)
+  })
+})
+
+describe('classProviderToDeclaration', () => {
+  it('should return inject declaration from class', () => {
+    class TestClass {
+      static [inject] = ['dep1', 'dep2'] as const
+    }
+
+    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+
+    const result = classProviderToDeclaration(provider)
+
+    expect(result).toEqual(['dep1', 'dep2'])
+  })
+
+  it('should return empty object when no inject declaration', () => {
+    class TestClass {}
+
+    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+
+    const result = classProviderToDeclaration(provider)
+
+    expect(result).toEqual({})
+  })
+})
+
+describe('factoryProviderToDeclaration', () => {
+  it('should return inject declaration from factory', () => {
+    const provider: FactoryProvider = {
+      provide: 'test',
+      inject: ['dep1', 'dep2'] as const,
+      useFactory: () => ({}),
+    }
+
+    const result = factoryProviderToDeclaration(provider)
+
+    expect(result).toEqual(['dep1', 'dep2'])
+  })
+
+  it('should return empty object when no inject declaration', () => {
+    const provider: FactoryProvider = {
+      provide: 'test',
+      useFactory: () => ({}),
+    }
+
+    const result = factoryProviderToDeclaration(provider)
+
+    expect(result).toEqual({})
   })
 })

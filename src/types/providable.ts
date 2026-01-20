@@ -28,10 +28,7 @@ export function providableToProvider(x: Providable): Provider {
   }
 
   if (isInjectableConstructorProvidable(x)) {
-    return {
-      provide: x,
-      useClass: x,
-    }
+    return { provide: x, useClass: x }
   }
 
   const _: never = x
