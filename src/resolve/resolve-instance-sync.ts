@@ -8,11 +8,11 @@ import { isClassProvider } from '../types/provider.ts'
 import { postConstruct } from '../types/symbols.ts'
 import { type InjectionToken, tokenToString } from '../types/token.ts'
 
-export async function resolveInstanceSync(input: {
+export function resolveInstanceSync(input: {
   token: InjectionToken
   provider: ProviderHasDependencies
   dependencies: DependencyTupleOrRecord
-}): Promise<Injectable> {
+}): Injectable {
   const { token, provider, dependencies } = input
 
   if (isClassProvider(provider)) {
@@ -32,7 +32,7 @@ export async function resolveInstanceSync(input: {
   }
 
   const { useFactory } = provider
-  const instance = await useFactory(dependencies)
+  const instance = useFactory(dependencies)
   if (instance instanceof Promise) {
     throw new Error(
       `Cannot resolve "${tokenToString(token)}" synchronously: useFactory returns Promise.`,
