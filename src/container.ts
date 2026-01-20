@@ -1,9 +1,11 @@
 import { createAsyncLock } from './async-lock.ts'
+import { destroyContainer } from './destroy/destroy-container.ts'
 import { parse } from './init/parse.ts'
-import type {
-  ChildContainerOptions,
-  ContainerImplOptions,
-  ContainerOptions,
+import {
+  fillContainerImplOptions,
+  type ChildContainerOptions,
+  type ContainerImplOptions,
+  type ContainerOptions,
 } from './types/container-options.ts'
 import {
   isTupleInjectDeclaration,
@@ -11,25 +13,23 @@ import {
   type TupleInjectDeclaration,
 } from './types/inject-declaration.ts'
 import type { Injectable } from './types/injectable.ts'
-import {
-  isPostConstructable,
-  isPreDestroyable,
-} from './types/lifecycle-events.ts'
+import { isPostConstructable } from './types/lifecycle-events.ts'
 import {
   type ClassProvider,
   classProviderToDeclaration,
   type FactoryProvider,
   factoryProviderToDeclaration,
   isClassProvider,
-  isFactoryProvider,
   isValueProvider,
   type Provider,
 } from './types/provider.ts'
-import { postConstruct, preDestroy } from './types/symbols.ts'
+import { postConstruct } from './types/symbols.ts'
 import { type InjectionToken, tokenToString } from './types/token.ts'
 import type { MaybePromise } from './types/utils.ts'
 
 export type Providers = Map<InjectionToken, Provider>
+
+export type Singletons = Map<InjectionToken, Injectable>
 
 export type DependencyMaybePromises = MaybePromise<Injectable>[]
 
@@ -41,22 +41,22 @@ export type DependencyMaybePromiseRecord = Record<
 export class ContainerImpl {
   lock = createAsyncLock()
   children: ContainerImpl[] = []
-  singletons: Map<InjectionToken, Injectable> = new Map()
-  providers: Map<InjectionToken, Provider>
+  singletons: Singletons = new Map()
+  providers: Providers
   parent: ContainerImpl | null
   destroyed = false
 
   constructor(options: ContainerImplOptions) {
-    const { providers, parent = null, override = false } = options
+    const opts = fillContainerImplOptions(options)
 
-    const output = parse({
-      providers,
-      parent,
-      override,
+    const { providers, parent } = parse({
+      providers: opts.providers,
+      parent: opts.parent,
+      override: opts.override,
     })
 
-    this.providers = output.providers
-    this.parent = output.parent
+    this.providers = providers
+    this.parent = parent
   }
 
   async destroy(): Promise<void> {
@@ -71,51 +71,10 @@ export class ContainerImpl {
 
       this.destroyed = true
 
-      {
-        for (let i = this.children.length - 1; i >= 0; i--) {
-          try {
-            await this.children[i].destroy()
-          } catch (_e) {
-            // noop
-          }
-        }
+      await destroyContainer({ container: this })
 
-        this.children.length = 0
-      }
-
-      {
-        const copiedSingletons = [...this.singletons.entries()]
-        this.singletons.clear()
-        copiedSingletons.reverse()
-
-        for (const [token, singleton] of copiedSingletons) {
-          const provider =
-            this.providers.get(token) ??
-            this.parent?.providers.get(token) ??
-            null
-
-          if (!provider) {
-            throw new Error(
-              `Internal error: provider for token "${tokenToString(token)}" not found during cleanup.`,
-            )
-          }
-
-          if (isClassProvider(provider) && isPreDestroyable(singleton)) {
-            try {
-              await singleton[preDestroy]()
-            } catch (_e) {
-              // noop
-            }
-          } else if (isFactoryProvider(provider)) {
-            try {
-              await provider.preDestroy?.(singleton)
-            } catch (_e) {
-              // noop
-            }
-          }
-        }
-      }
-
+      this.children.length = 0
+      this.singletons.clear()
       this.providers.clear()
       this.parent = null
     })

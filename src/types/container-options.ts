@@ -19,3 +19,14 @@ export interface ContainerImplOptions {
   parent?: ContainerImpl | null
   override?: boolean
 }
+
+export function fillContainerImplOptions(
+  options: ContainerImplOptions,
+): Omit<ContainerImplOptions, 'parent' | 'override'> &
+  Pick<Required<ContainerImplOptions>, 'parent' | 'override'> {
+  return {
+    parent: null,
+    override: false,
+    ...options,
+  }
+}
