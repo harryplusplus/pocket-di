@@ -1,6 +1,25 @@
 {
   "private": true,
+  "type": "module",
   "scripts": {
-    "examples": "pnpm -F pocket-di build && tsc -p packages/examples/tsconfig.json"
+    "lint": "eslint"
+  },
+  "devDependencies": {
+    "@eslint/compat": "2.0.1",
+    "@eslint/js": "9.39.2",
+    "@types/node": "25.0.9",
+    "@vitest/coverage-v8": "4.0.17",
+    "eslint": "9.39.2",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-prettier": "5.5.5",
+    "eslint-plugin-simple-import-sort": "12.1.1",
+    "jiti": "2.6.1",
+    "prettier": "3.8.0",
+    "rimraf": "6.1.2",
+    "sort-package-json": "3.6.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.53.1",
+    "vitest": "4.0.17"
   }
 }
