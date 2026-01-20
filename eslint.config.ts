@@ -57,5 +57,9 @@ export default defineConfig([
     plugins: { import: importPlugin },
     rules: { 'import/extensions': ['error', 'never', { ts: 'always' }] },
   },
+  {
+    files: ['**/*.test.ts'],
+    rules: { '@typescript-eslint/unbound-method': 'off' },
+  },
   prettierRecommended,
 ])
