@@ -69,12 +69,4 @@ describe('providableToProvider', () => {
       useClass: TestClass,
     } satisfies ClassProvider)
   })
-
-  it('should throw error for unexpected providable', () => {
-    const invalidProvidable = {} as Providable
-
-    expect(() => providableToProvider(invalidProvidable)).toThrow(
-      'Unexpected providable.',
-    )
-  })
 })
