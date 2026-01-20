@@ -27,10 +27,5 @@ export function providableToProvider(x: Providable): Provider {
     return x
   }
 
-  if (isInjectableConstructorProvidable(x)) {
-    return { provide: x, useClass: x }
-  }
-
-  const _: never = x
-  throw new Error('Unexpected providable.')
+  return { provide: x, useClass: x }
 }
