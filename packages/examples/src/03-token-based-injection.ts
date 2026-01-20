@@ -1,5 +1,8 @@
+// packages/examples/src/03-token-based-injection.ts
+
 import { createContainer, inject, token } from 'pocket-di'
 
+// Interface definitions
 interface IEmailService {
   send(to: string, message: string): void
 }
@@ -8,10 +11,12 @@ interface INotificationService {
   notify(userId: string, text: string): void
 }
 
+// Create typed tokens
 const EMAIL_SERVICE = token<IEmailService>('EMAIL_SERVICE')
 const NOTIFICATION_SERVICE = token<INotificationService>('NOTIFICATION_SERVICE')
 const API_KEY = token<string>('API_KEY')
 
+// Implementation classes
 class EmailServiceImpl implements IEmailService {
   send(to: string, message: string) {
     console.log(`[EMAIL] To: ${to}, Message: ${message}`)
@@ -36,10 +41,10 @@ async function main() {
 
   const container = createContainer({
     providers: [
-      // useValue
+      // useValue - provide value directly
       { provide: API_KEY, useValue: 'secret-api-key-12345' },
 
-      // useFactory
+      // useFactory - create using factory function
       {
         provide: EMAIL_SERVICE,
         useFactory: () => {
@@ -48,7 +53,7 @@ async function main() {
         },
       },
 
-      // useClass
+      // useClass - create using class
       { provide: NOTIFICATION_SERVICE, useClass: NotificationServiceImpl },
     ],
   })

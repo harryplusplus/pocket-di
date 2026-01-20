@@ -1,5 +1,8 @@
+// packages/examples/src/02-basic-record-injection.ts
+
 import { createContainer, type InferDependencies, inject } from 'pocket-di'
 
+// Basic services
 class ConfigService {
   get(key: string) {
     return `config-value-for-${key}`
@@ -17,9 +20,12 @@ class CacheService {
   }
 }
 
+// Record-style dependency injection
 class ProductService {
+  // Declare dependencies using inject symbol (object form)
   static [inject] = { config: ConfigService, cache: CacheService }
 
+  // Type inference works automatically
   constructor(deps: InferDependencies<typeof ProductService>) {
     const apiUrl = deps.config.get('api.url')
     console.log('ProductService initialized with API URL:', apiUrl)
@@ -32,8 +38,9 @@ class ProductService {
   }
 }
 
+// Type check
 export type ProductServiceDeps = InferDependencies<typeof ProductService>
-// Types: { config: ConfigService; cache: CacheService }
+// Type: { config: ConfigService; cache: CacheService }
 
 async function main() {
   console.log('=== Record Injection Example ===\n')
