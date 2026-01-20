@@ -1,6 +1,12 @@
 // packages/examples/src/03-token-based-injection.ts
 
-import { createContainer, defineProvider, inject, token } from 'pocket-di'
+import {
+  createContainer,
+  defineProvider,
+  type InferDependencies,
+  inject,
+  token,
+} from 'pocket-di'
 
 // Interface definitions
 interface IEmailService {
@@ -31,7 +37,7 @@ class EmailServiceImpl implements IEmailService {
 class NotificationServiceImpl implements INotificationService {
   static [inject] = [EMAIL_SERVICE] as const
 
-  constructor(deps: [IEmailService]) {
+  constructor(deps: InferDependencies<typeof NotificationServiceImpl>) {
     const [emailService] = deps
     emailService.send('admin@example.com', 'Notification service started')
   }
