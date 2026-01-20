@@ -31,9 +31,9 @@ export async function destroySingletonRegistry(
       } catch (_e) {
         // noop
       }
-    } else if (isFactoryProvider(provider)) {
+    } else if (isFactoryProvider(provider) && provider.preDestroy) {
       try {
-        await provider.preDestroy?.(singleton)
+        await provider.preDestroy(singleton)
       } catch (_e) {
         // noop
       }
