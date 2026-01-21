@@ -20,6 +20,7 @@ export type { AnyProvidable, Providable } from './types/providable.ts'
 export {
   type ClassProvider,
   defineClassProvider,
+  defineFactoryProvider,
   type FactoryProvider,
   type ProviderBase,
   type SingletonFactoryProvider,
