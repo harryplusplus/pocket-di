@@ -13,13 +13,16 @@ class Foo {
  ******************************************************************************/
 
 const barProvider = defineFactoryProvider({
-  // 플레인 문자열을 인젝션 토큰으로 사용하면 useFactory의 반환 타입으로부터 추론됩니다.
+  // When using a plain string as the injection token, the type is inferred
+  // from the useFactory return type.
   provide: 'bar',
 
-  // 의존성 선언 객체를 정의합니다.
+  // Define the dependency declaration object.
   inject: { foo: Foo },
 
   useFactory: async ({ foo }) => {
+    /* type: { foo: Foo } */
+
     const bar = {
       fooFoo: () => {
         console.log('[Bar] fooFoo()')
@@ -30,13 +33,13 @@ const barProvider = defineFactoryProvider({
       },
     }
 
-    // 비동기 초기화 시뮬레이션
+    // Simulate async initialization.
     await Promise.resolve()
 
     return bar
   },
 
-  // container.destroy()에서 호출됩니다.
+  // Called in container.destroy().
   preDestroy: (instance) => {
     instance.close()
   },
@@ -62,8 +65,9 @@ interface Baz {
 const _bazToken = token<Baz>('baz')
 /** type: TypedToken<Baz> */
 
-// 추론 가능한 토큰 (typed token or class)을 provide에 사용할 경우, useFactory의 반환
-// 타입을 검증합니다.
+// When using an inferable token (typed token or class) in provide, the
+// useFactory return type is validated.
+
 // const bazProvider = defineFactoryProvider({
 //   provide: _bazToken,
 //   useFactory: () => {
