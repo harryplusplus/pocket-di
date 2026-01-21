@@ -1,6 +1,6 @@
 import { type InferDependencies, inject } from 'pocket-di'
 
-// Dependency class
+// Dependency class.
 class Foo {
   fooFoo() {}
 }
