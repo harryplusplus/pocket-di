@@ -88,16 +88,16 @@ const _bazToken = token<Baz>('baz')
 /*
 No overload matches this call.
   Overload 1 of 2, '(provider: FactoryProviderInput<PlainToken, {}, {}, 
-  InjectDeclaration>): FactoryProvider<TypedToken<{}>, {}, {}, 
-  InjectDeclaration>', gave the following error.
+  DependencyDeclaration>): FactoryProvider<TypedToken<{}>, {}, {}, 
+  DependencyDeclaration>', gave the following error.
     Type 'TypedToken<Baz>' is not assignable to type 'PlainToken'.
   Overload 2 of 2, '(provider: FactoryProviderInput<TypedToken<Baz>, Baz, Baz, 
-  InjectDeclaration>): FactoryProvider<TypedToken<Baz>, Baz, Baz, 
-  InjectDeclaration>', gave the following error.
+  DependencyDeclaration>): FactoryProvider<TypedToken<Baz>, Baz, Baz, 
+  DependencyDeclaration>', gave the following error.
     Type '() => {}' is not assignable to type 
-    '((dependencies: Dependencies<InjectDeclaration>) => MaybePromise<Baz>) | 
-    ((dependencies: Dependencies<InjectDeclaration>) => MaybePromise<...>)'.
+    '((dependencies: Dependencies<DependencyDeclaration>) => MaybePromise<Baz>) | 
+    ((dependencies: Dependencies<DependencyDeclaration>) => MaybePromise<...>)'.
       Type '() => {}' is not assignable to type 
-      '(dependencies: Dependencies<InjectDeclaration>) => MaybePromise<Baz>'.
+      '(dependencies: Dependencies<DependencyDeclaration>) => MaybePromise<Baz>'.
         Type '{}' is not assignable to type 'MaybePromise<Baz>'.ts(2769)
 */

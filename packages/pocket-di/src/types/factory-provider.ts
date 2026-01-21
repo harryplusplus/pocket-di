@@ -1,5 +1,5 @@
 import type { Dependencies } from './dependencies.ts'
-import type { InjectDeclaration } from './inject-declaration.ts'
+import type { DependencyDeclaration } from './dependency-declaration.ts'
 import type { Injectable } from './injectable.ts'
 import type { Singleton, Transient } from './scope.ts'
 import {
@@ -17,7 +17,7 @@ export interface SingletonFactoryProviderInput<
   T extends InjectionToken = InjectionToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
-  D extends InjectDeclaration = InjectDeclaration,
+  D extends DependencyDeclaration = DependencyDeclaration,
 > {
   provide: T
   inject?: D
@@ -30,7 +30,7 @@ export interface TransientFactoryProviderInput<
   T extends InjectionToken = InjectionToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
-  D extends InjectDeclaration = InjectDeclaration,
+  D extends DependencyDeclaration = DependencyDeclaration,
 > {
   provide: T
   inject?: D
@@ -43,7 +43,7 @@ export type FactoryProviderInput<
   T extends InjectionToken = InjectionToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
-  D extends InjectDeclaration = InjectDeclaration,
+  D extends DependencyDeclaration = DependencyDeclaration,
 > =
   | SingletonFactoryProviderInput<T, I, C, D>
   | TransientFactoryProviderInput<T, I, C, D>
@@ -52,7 +52,7 @@ export interface SingletonFactoryProvider<
   T extends InferableToken = InferableToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
-  D extends InjectDeclaration = InjectDeclaration,
+  D extends DependencyDeclaration = DependencyDeclaration,
 > {
   provide: T
   inject?: D
@@ -65,7 +65,7 @@ export interface TransientFactoryProvider<
   T extends InferableToken = InferableToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
-  D extends InjectDeclaration = InjectDeclaration,
+  D extends DependencyDeclaration = DependencyDeclaration,
 > {
   provide: T
   inject?: D
@@ -78,13 +78,13 @@ export type FactoryProvider<
   T extends InferableToken = InferableToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
-  D extends InjectDeclaration = InjectDeclaration,
+  D extends DependencyDeclaration = DependencyDeclaration,
 > = SingletonFactoryProvider<T, I, C, D> | TransientFactoryProvider<T, I, C, D>
 
 function defineFactoryProvider<
   T extends PlainToken,
   I extends Injectable,
-  D extends InjectDeclaration,
+  D extends DependencyDeclaration,
 >(
   provider: FactoryProviderInput<T, I, I, D>,
 ): FactoryProvider<TypedToken<I>, I, I, D>
@@ -92,7 +92,7 @@ function defineFactoryProvider<
 function defineFactoryProvider<
   T extends InferableToken,
   C extends InferInjectable<T>,
-  D extends InjectDeclaration,
+  D extends DependencyDeclaration,
 >(
   provider: FactoryProviderInput<T, InferInjectable<T>, C, D>,
 ): FactoryProvider<T, InferInjectable<T>, C, D>
@@ -112,6 +112,6 @@ export { defineFactoryProvider }
 
 export function factoryProviderToDeclaration(
   x: FactoryProvider,
-): InjectDeclaration {
+): DependencyDeclaration {
   return x.inject ?? {}
 }

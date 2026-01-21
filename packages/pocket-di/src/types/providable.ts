@@ -1,4 +1,4 @@
-import type { InjectDeclaration } from './inject-declaration.ts'
+import type { DependencyDeclaration } from './dependency-declaration.ts'
 import type { Injectable } from './injectable.ts'
 import type { InjectableConstructor } from './injectable-constructor.ts'
 import type { Provider } from './provider.ts'
@@ -9,7 +9,7 @@ export type Providable<
   T extends InferableToken = InferableToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
-  D extends InjectDeclaration = InjectDeclaration,
+  D extends DependencyDeclaration = DependencyDeclaration,
 > = Provider<T, I, C, D> | InjectableConstructor<I, D>
 
 export type AnyProvidable = Providable<Any, Any, Any, Any>

@@ -12,6 +12,12 @@ export type {
   Dependencies,
   InferConstructorParams,
 } from './types/dependencies.ts'
+export type {
+  DependencyDeclaration,
+  DependencyDeclarationItem,
+  RecordDependencyDeclaration,
+  TupleDependencyDeclaration,
+} from './types/dependency-declaration.ts'
 export {
   defineFactoryProvider,
   type FactoryProvider,
@@ -21,12 +27,6 @@ export {
   type TransientFactoryProvider,
   type TransientFactoryProviderInput,
 } from './types/factory-provider.ts'
-export type {
-  InjectDeclaration,
-  InjectDeclarationItem,
-  RecordInjectDeclaration,
-  TupleInjectDeclaration,
-} from './types/inject-declaration.ts'
 export type { Injectable } from './types/injectable.ts'
 export type { InjectableConstructor } from './types/injectable-constructor.ts'
 export type {

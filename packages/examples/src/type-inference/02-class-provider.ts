@@ -20,7 +20,7 @@ class Foo {
 // When using a plain string for provide, the type is inferred from the class
 // provided to useClass.
 const barProvider = defineClassProvider({ provide: 'bar', useClass: Foo })
-/** type: ClassProvider<TypedToken<Foo>, Foo, Foo, InjectDeclaration> */
+/** type: ClassProvider<TypedToken<Foo>, Foo, Foo, DependencyDeclaration> */
 
 // The type is bound to the token.
 const barToken = barProvider.provide
@@ -78,7 +78,7 @@ const _validBarProvider = defineClassProvider({
   provide: barToken,
   useClass: Qux,
 })
-/** type: ClassProvider<TypedToken<Foo>, Foo, Qux, InjectDeclaration */
+/** type: ClassProvider<TypedToken<Foo>, Foo, Qux, DependencyDeclaration */
 
 export class Quux {
   // no fooFoo() method
@@ -97,14 +97,14 @@ export class Quux {
 /**
 No overload matches this call.
   Overload 1 of 2, '(provider: ClassProviderInput<PlainToken, Quux, Quux, 
-  InjectDeclaration>): ClassProvider<TypedToken<Quux>, Quux, Quux, 
-  InjectDeclaration>', gave the following error.
+  DependencyDeclaration>): ClassProvider<TypedToken<Quux>, Quux, Quux, 
+  DependencyDeclaration>', gave the following error.
     Type 'TypedToken<Foo>' is not assignable to type 'PlainToken'.
   Overload 2 of 2, '(provider: ClassProviderInput<TypedToken<Foo>, Foo, Foo, 
-  InjectDeclaration>): ClassProvider<TypedToken<Foo>, Foo, Foo, 
-  InjectDeclaration>', gave the following error.
+  DependencyDeclaration>): ClassProvider<TypedToken<Foo>, Foo, Foo, 
+  DependencyDeclaration>', gave the following error.
     Type 'typeof Quux' is not assignable to type 'InjectableConstructor<Foo, 
-    InjectDeclaration>'.
+    DependencyDeclaration>'.
       Property 'fooFoo' is missing in type 'Quux' but required in type 
       'Foo'.ts(2769)
  */

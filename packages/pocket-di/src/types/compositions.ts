@@ -3,11 +3,11 @@ import {
   type ClassProvider,
   classProviderToDeclaration,
 } from './class-provider.ts'
+import type { DependencyDeclaration } from './dependency-declaration.ts'
 import {
   type FactoryProvider,
   factoryProviderToDeclaration,
 } from './factory-provider.ts'
-import type { InjectDeclaration } from './inject-declaration.ts'
 import type { Injectable } from './injectable.ts'
 import { isClassProvider, type Provider } from './provider.ts'
 import type { InjectionToken } from './token.ts'
@@ -20,7 +20,7 @@ export type ProviderHasDependencies = ClassProvider | FactoryProvider
 
 export function providerToDeclaration(
   provider: ProviderHasDependencies,
-): InjectDeclaration {
+): DependencyDeclaration {
   return isClassProvider(provider)
     ? classProviderToDeclaration(provider)
     : factoryProviderToDeclaration(provider)

@@ -1,23 +1,23 @@
 import type { CircularDependencyChecker } from '../circular-dependency-checker.ts'
 import type { ProviderRegistry } from '../types/compositions.ts'
 import {
-  type InjectDeclaration,
-  isTupleInjectDeclaration,
-} from '../types/inject-declaration.ts'
+  type DependencyDeclaration,
+  isTupleDependencyDeclaration,
+} from '../types/dependency-declaration.ts'
 import type { InjectionToken } from '../types/token.ts'
 import { validateDeclarationItem } from './validate-declaration-item.ts'
 import { validateDeclarationName } from './validate-declaration-name.ts'
 
 export function validateDeclaration(input: {
   token: InjectionToken
-  declaration: InjectDeclaration
+  declaration: DependencyDeclaration
   providerRegistry: ProviderRegistry
   checker: CircularDependencyChecker
   className: string | null
 }): void {
   const { token, declaration, providerRegistry, checker, className } = input
 
-  if (isTupleInjectDeclaration(declaration)) {
+  if (isTupleDependencyDeclaration(declaration)) {
     for (const item of declaration) {
       validateDeclarationItem({
         item,

@@ -17,7 +17,7 @@ class Bar {
 }
 
 const fooProvider = defineClassProvider({ provide: Foo, useClass: Bar })
-/** type: ClassProvider<typeof Foo, Foo, Bar, InjectDeclaration> */
+/** type: ClassProvider<typeof Foo, Foo, Bar, DependencyDeclaration> */
 
 const fooToken = fooProvider.provide
 /** type: typeof Foo */

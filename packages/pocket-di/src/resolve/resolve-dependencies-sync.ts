@@ -7,7 +7,7 @@ import {
   providerToDeclaration,
   type SingletonRegistry,
 } from '../types/compositions.ts'
-import { isTupleInjectDeclaration } from '../types/inject-declaration.ts'
+import { isTupleDependencyDeclaration } from '../types/dependency-declaration.ts'
 import { resolveRecursiveSync } from './resolve-recursive-sync.ts'
 
 export function resolveDependenciesSync(
@@ -21,7 +21,7 @@ export function resolveDependenciesSync(
   const { provider, providerRegistry } = input
 
   const declaration = providerToDeclaration(provider)
-  if (isTupleInjectDeclaration(declaration)) {
+  if (isTupleDependencyDeclaration(declaration)) {
     const dependencyTuple: DependencyTuple = []
     for (const item of declaration) {
       const instance = resolveRecursiveSync(
