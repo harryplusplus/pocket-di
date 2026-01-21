@@ -49,6 +49,6 @@ export class NoFoo {
 /**
  * Type 'typeof NoFoo' is not assignable to type
  * 'InjectableConstructor<Foo, InjectDeclaration>'.
- * Property 'fooFoo' is missing in type 'NoFoo' but required in type
- * 'Foo'.ts(2322)
+ *   Property 'fooFoo' is missing in type 'NoFoo' but required in type
+ *   'Foo'.ts(2322)
  */
