@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import { CircularDependencyChecker } from '../circular-dependency-checker.ts'
 import { Registry } from '../registry.ts'
+import type { ClassProvider } from '../types/class-provider.ts'
 import type { ProviderRegistry } from '../types/compositions.ts'
-import type { ClassProvider, ValueProvider } from '../types/provider.ts'
 import { inject } from '../types/symbols.ts'
+import { token } from '../types/token.ts'
+import type { ValueProvider } from '../types/value-provider.ts'
 import { validateDeclarationItem } from './validate-declaration-item.ts'
 
 describe('validateDeclarationItem errors', () => {
@@ -14,7 +16,7 @@ describe('validateDeclarationItem errors', () => {
 
     expect(() =>
       validateDeclarationItem({
-        item: 'missing-dep',
+        item: token('missing-dep'),
         providerRegistry,
         token: 'test',
         className: 'TestClass',
@@ -31,7 +33,7 @@ describe('validateDeclarationItem errors', () => {
 
     expect(() =>
       validateDeclarationItem({
-        item: 'missing-dep',
+        item: token('missing-dep'),
         providerRegistry,
         token: 'test',
         className: null,
@@ -45,7 +47,7 @@ describe('validateDeclarationItem errors', () => {
 
 describe('validateDeclarationItem success', () => {
   it('should push item to checker when dependency exists', () => {
-    const provider: ValueProvider = { provide: 'dep', useValue: {} }
+    const provider: ValueProvider = { provide: token('dep'), useValue: {} }
 
     const providerRegistry: ProviderRegistry = new Registry(null)
     providerRegistry.map.set('dep', provider)
@@ -53,7 +55,7 @@ describe('validateDeclarationItem success', () => {
     const checker = new CircularDependencyChecker()
 
     validateDeclarationItem({
-      item: 'dep',
+      item: token('dep'),
       providerRegistry,
       token: 'test',
       className: null,
@@ -67,10 +69,13 @@ describe('validateDeclarationItem success', () => {
 describe('validateDeclarationItem nested', () => {
   it('should validate nested dependencies', () => {
     class DepClass {
-      static [inject] = ['nested-dep'] as const
+      static [inject] = [token('nested-dep')] as const
     }
 
-    const depProvider: ClassProvider = { provide: 'dep', useClass: DepClass }
+    const depProvider: ClassProvider = {
+      provide: token('dep'),
+      useClass: DepClass,
+    }
 
     const providerRegistry: ProviderRegistry = new Registry(null)
     providerRegistry.map.set('dep', depProvider)
@@ -79,7 +84,7 @@ describe('validateDeclarationItem nested', () => {
 
     expect(() =>
       validateDeclarationItem({
-        item: 'dep',
+        item: token('dep'),
         providerRegistry,
         token: 'test',
         className: null,

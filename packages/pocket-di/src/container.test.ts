@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { createContainer } from './container.ts'
 import { inject, postConstruct, preDestroy } from './types/symbols.ts'
+import { token } from './types/token.ts'
 
 describe('createContainer', () => {
   it('should create container with providers', () => {
@@ -40,7 +41,7 @@ describe('Container resolve', () => {
     const dep = { value: 'dep' }
 
     class TestClass {
-      static [inject] = ['dep'] as const
+      static [inject] = [token('dep')] as const
       deps: unknown[]
       constructor(deps: unknown[]) {
         this.deps = deps
@@ -48,7 +49,7 @@ describe('Container resolve', () => {
     }
 
     const container = createContainer({
-      providers: [{ provide: 'dep', useValue: dep }, TestClass],
+      providers: [{ provide: token('dep'), useValue: dep }, TestClass],
     })
 
     const result = await container.resolve(TestClass)

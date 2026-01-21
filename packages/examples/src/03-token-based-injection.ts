@@ -3,7 +3,7 @@
 import {
   createContainer,
   defineProvider,
-  type InferDependencies,
+  type InferConstructorParams,
   inject,
   token,
 } from 'pocket-di'
@@ -37,7 +37,7 @@ class EmailServiceImpl implements IEmailService {
 class NotificationServiceImpl implements INotificationService {
   static [inject] = [EMAIL_SERVICE] as const
 
-  constructor(deps: InferDependencies<typeof NotificationServiceImpl>) {
+  constructor(deps: InferConstructorParams<typeof NotificationServiceImpl>) {
     const [emailService] = deps
     emailService.send('admin@example.com', 'Notification service started')
   }

@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import { Registry } from '../registry.ts'
+import type { ClassProvider } from '../types/class-provider.ts'
 import type { SingletonRegistry } from '../types/compositions.ts'
-import type { ClassProvider, FactoryProvider } from '../types/provider.ts'
+import type { FactoryProvider } from '../types/factory-provider.ts'
+import { token } from '../types/token.ts'
 import { updateSingletonRegistry } from './update-singleton-registry.ts'
 
 describe('updateSingletonRegistry with singleton scope', () => {
@@ -10,7 +12,7 @@ describe('updateSingletonRegistry with singleton scope', () => {
     class TestClass {}
 
     const provider: ClassProvider = {
-      provide: 'test',
+      provide: token('test'),
       useClass: TestClass,
       scope: 'singleton',
     }
@@ -28,7 +30,7 @@ describe('updateSingletonRegistry with singleton scope', () => {
 
   it('should add instance to registry for factory provider', () => {
     const provider: FactoryProvider = {
-      provide: 'test',
+      provide: token('test'),
       useFactory: () => ({}),
       scope: 'singleton',
     }
@@ -45,7 +47,10 @@ describe('updateSingletonRegistry with singleton scope', () => {
   })
 
   it('should add instance when scope is undefined (default)', () => {
-    const provider: ClassProvider = { provide: 'test', useClass: class {} }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: class {},
+    }
 
     const singletonRegistry: SingletonRegistry = new Registry(null)
     const instance = {}
@@ -62,7 +67,7 @@ describe('updateSingletonRegistry with singleton scope', () => {
 describe('updateSingletonRegistry with transient scope', () => {
   it('should not add instance to registry', () => {
     const provider: FactoryProvider = {
-      provide: 'test',
+      provide: token('test'),
       useFactory: () => ({}),
       scope: 'transient',
     }

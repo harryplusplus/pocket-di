@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import type { ClassProvider, FactoryProvider } from '../types/provider.ts'
+import type { ClassProvider } from '../types/class-provider.ts'
+import type { FactoryProvider } from '../types/factory-provider.ts'
 import { postConstruct } from '../types/symbols.ts'
+import { token } from '../types/token.ts'
 import { resolveInstanceSync } from './resolve-instance-sync.ts'
 
 describe('resolveInstanceSync with class provider', () => {
@@ -10,7 +12,10 @@ describe('resolveInstanceSync with class provider', () => {
       value = 'test'
     }
 
-    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: TestClass,
+    }
 
     const result = resolveInstanceSync({
       token: 'test',
@@ -31,7 +36,10 @@ describe('resolveInstanceSync with class provider', () => {
       }
     }
 
-    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: TestClass,
+    }
 
     resolveInstanceSync({ token: 'test', provider, dependencies: [] })
 
@@ -45,7 +53,10 @@ describe('resolveInstanceSync with class provider', () => {
       }
     }
 
-    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: TestClass,
+    }
 
     expect(() =>
       resolveInstanceSync({ token: 'test', provider, dependencies: [] }),
@@ -60,7 +71,7 @@ describe('resolveInstanceSync with factory provider', () => {
     const instance = { value: 'test' }
 
     const provider: FactoryProvider = {
-      provide: 'test',
+      provide: token('test'),
       useFactory: () => instance,
     }
 
@@ -75,7 +86,7 @@ describe('resolveInstanceSync with factory provider', () => {
 
   it('should throw error if factory returns Promise', () => {
     const provider: FactoryProvider = {
-      provide: 'test',
+      provide: token('test'),
       useFactory: () => Promise.resolve({}),
     }
 

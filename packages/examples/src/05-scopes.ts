@@ -1,6 +1,6 @@
 // packages/examples/src/05-scopes.ts
 
-import { createContainer, type InferDependencies, inject } from 'pocket-di'
+import { createContainer, type InferConstructorParams, inject } from 'pocket-di'
 
 let singletonInstanceCount = 0
 let transientInstanceCount = 0
@@ -36,7 +36,7 @@ class TransientService {
 class AppService {
   static [inject] = { singleton: SingletonService, transient: TransientService }
 
-  constructor(deps: InferDependencies<typeof AppService>) {
+  constructor(deps: InferConstructorParams<typeof AppService>) {
     console.log('[APP] Singleton ID:', deps.singleton.getId())
     console.log('[APP] Transient ID:', deps.transient.getId())
   }

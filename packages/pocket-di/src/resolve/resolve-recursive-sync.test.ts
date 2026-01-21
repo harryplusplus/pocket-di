@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import { Registry } from '../registry.ts'
+import type { ClassProvider } from '../types/class-provider.ts'
 import type {
   ProviderRegistry,
   SingletonRegistry,
 } from '../types/compositions.ts'
-import type { ClassProvider, ValueProvider } from '../types/provider.ts'
 import { inject } from '../types/symbols.ts'
+import { token } from '../types/token.ts'
+import type { ValueProvider } from '../types/value-provider.ts'
 import { resolveRecursiveSync } from './resolve-recursive-sync.ts'
 
 describe('resolveRecursiveSync with singleton', () => {
@@ -31,7 +33,7 @@ describe('resolveRecursiveSync with value provider', () => {
   it('should return value from provider', () => {
     const value = { data: 'test' }
 
-    const provider: ValueProvider = { provide: 'test', useValue: value }
+    const provider: ValueProvider = { provide: token('test'), useValue: value }
 
     const singletonRegistry: SingletonRegistry = new Registry(null)
     const providerRegistry: ProviderRegistry = new Registry(null)
@@ -52,7 +54,10 @@ describe('resolveRecursiveSync create instance', () => {
       value = 'test'
     }
 
-    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: TestClass,
+    }
 
     const singletonRegistry: SingletonRegistry = new Registry(null)
     const providerRegistry: ProviderRegistry = new Registry(null)
@@ -71,7 +76,7 @@ describe('resolveRecursiveSync create instance', () => {
     class TestClass {}
 
     const provider: ClassProvider = {
-      provide: 'test',
+      provide: token('test'),
       useClass: TestClass,
       scope: 'transient',
     }
@@ -93,17 +98,20 @@ describe('resolveRecursiveSync with dependencies', () => {
   it('should resolve dependencies recursively', () => {
     const dep = { value: 'dep' }
 
-    const depProvider: ValueProvider = { provide: 'dep', useValue: dep }
+    const depProvider: ValueProvider = { provide: token('dep'), useValue: dep }
 
     class TestClass {
-      static [inject] = ['dep'] as const
+      static [inject] = [token('dep')] as const
       deps: unknown[]
       constructor(deps: unknown[]) {
         this.deps = deps
       }
     }
 
-    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: TestClass,
+    }
 
     const singletonRegistry: SingletonRegistry = new Registry(null)
     const providerRegistry: ProviderRegistry = new Registry(null)

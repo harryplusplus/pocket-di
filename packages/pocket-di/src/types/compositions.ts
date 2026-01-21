@@ -1,14 +1,15 @@
 import type { Registry } from '../registry.ts'
-import type { InjectDeclaration } from './inject-declaration.ts'
-import type { Injectable } from './injectable.ts'
 import {
   type ClassProvider,
   classProviderToDeclaration,
+} from './class-provider.ts'
+import {
   type FactoryProvider,
   factoryProviderToDeclaration,
-  isClassProvider,
-  type Provider,
-} from './provider.ts'
+} from './factory-provider.ts'
+import type { InjectDeclaration } from './inject-declaration.ts'
+import type { Injectable } from './injectable.ts'
+import { isClassProvider, type Provider } from './provider.ts'
 import type { InjectionToken } from './token.ts'
 
 export type ProviderRegistry = Registry<InjectionToken, Provider>

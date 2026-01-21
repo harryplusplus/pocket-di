@@ -1,7 +1,7 @@
 import {
   createContainer,
   defineClassProvider,
-  type InferDependencies,
+  type InferConstructorParams,
   inject,
 } from 'pocket-di'
 
@@ -27,7 +27,7 @@ const barToken = barProvider.provide
 
 console.log('barToken:', barToken) // 'bar'
 
-type BazDeps = InferDependencies<typeof Baz>
+type BazDeps = InferConstructorParams<typeof Baz>
 /** type: { bar: Foo } */
 
 class Baz {

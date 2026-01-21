@@ -3,7 +3,7 @@
 import {
   createContainer,
   defineProvider,
-  type InferDependencies,
+  type InferConstructorParams,
   inject,
   token,
 } from 'pocket-di'
@@ -27,7 +27,7 @@ class OrderService {
     payment: PAYMENT_SERVICE, // PAYMENT_SERVICE is NOT registered!
   }
 
-  constructor(_deps: InferDependencies<typeof OrderService>) {
+  constructor(_deps: InferConstructorParams<typeof OrderService>) {
     console.log('OrderService created')
   }
 

@@ -1,12 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { Registry } from '../registry.ts'
+import type { ClassProvider } from '../types/class-provider.ts'
 import type {
   ProviderRegistry,
   SingletonRegistry,
 } from '../types/compositions.ts'
-import type { ClassProvider, FactoryProvider } from '../types/provider.ts'
+import type { FactoryProvider } from '../types/factory-provider.ts'
 import { preDestroy } from '../types/symbols.ts'
+import { token } from '../types/token.ts'
 import { destroySingletonRegistry } from './destroy-singleton-registry.ts'
 
 describe('destroySingletonRegistry with class provider', () => {
@@ -17,7 +19,10 @@ describe('destroySingletonRegistry with class provider', () => {
       [preDestroy] = preDestroyFn
     }
 
-    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: TestClass,
+    }
 
     const singletonRegistry: SingletonRegistry = new Registry(null)
     const singleton = new TestClass()
@@ -36,7 +41,10 @@ describe('destroySingletonRegistry with class provider', () => {
   it('should skip preDestroy if not defined', async () => {
     class TestClass {}
 
-    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: TestClass,
+    }
 
     const singletonRegistry: SingletonRegistry = new Registry(null)
     singletonRegistry.map.set('test', new TestClass())
@@ -55,7 +63,7 @@ describe('destroySingletonRegistry with factory provider', () => {
     const preDestroyFn = vi.fn()
 
     const provider: FactoryProvider = {
-      provide: 'test',
+      provide: token('test'),
       useFactory: () => ({}),
       preDestroy: preDestroyFn,
     }
@@ -87,9 +95,15 @@ describe('destroySingletonRegistry error handling', () => {
       [preDestroy] = preDestroy2
     }
 
-    const provider1: ClassProvider = { provide: 'test1', useClass: TestClass1 }
+    const provider1: ClassProvider = {
+      provide: token('test1'),
+      useClass: TestClass1,
+    }
 
-    const provider2: ClassProvider = { provide: 'test2', useClass: TestClass2 }
+    const provider2: ClassProvider = {
+      provide: token('test2'),
+      useClass: TestClass2,
+    }
 
     const singletonRegistry: SingletonRegistry = new Registry(null)
     singletonRegistry.map.set('test1', new TestClass1())
@@ -135,9 +149,15 @@ describe('destroySingletonRegistry order', () => {
       })
     }
 
-    const provider1: ClassProvider = { provide: 'test1', useClass: TestClass1 }
+    const provider1: ClassProvider = {
+      provide: token('test1'),
+      useClass: TestClass1,
+    }
 
-    const provider2: ClassProvider = { provide: 'test2', useClass: TestClass2 }
+    const provider2: ClassProvider = {
+      provide: token('test2'),
+      useClass: TestClass2,
+    }
 
     const singletonRegistry: SingletonRegistry = new Registry(null)
     singletonRegistry.map.set('test1', new TestClass1())

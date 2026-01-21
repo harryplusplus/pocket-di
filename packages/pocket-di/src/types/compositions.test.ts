@@ -1,16 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
+import type { ClassProvider } from './class-provider.ts'
 import { providerToDeclaration } from './compositions.ts'
-import type { ClassProvider, FactoryProvider } from './provider.ts'
+import type { FactoryProvider } from './factory-provider.ts'
 import { inject } from './symbols.ts'
+import { token } from './token.ts'
 
 describe('providerToDeclaration', () => {
   it('should return declaration from class provider', () => {
     class TestClass {
-      static [inject] = ['dep1', 'dep2'] as const
+      static [inject] = [token('dep1'), token('dep2')] as const
     }
 
-    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: TestClass,
+    }
 
     const result = providerToDeclaration(provider)
 
@@ -20,7 +25,10 @@ describe('providerToDeclaration', () => {
   it('should return empty object from class provider without inject', () => {
     class TestClass {}
 
-    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: TestClass,
+    }
 
     const result = providerToDeclaration(provider)
 
@@ -29,8 +37,8 @@ describe('providerToDeclaration', () => {
 
   it('should return declaration from factory provider', () => {
     const provider: FactoryProvider = {
-      provide: 'test',
-      inject: { dep1: 'dep1', dep2: 'dep2' },
+      provide: token('test'),
+      inject: { dep1: token('dep1'), dep2: token('dep2') },
       useFactory: () => ({}),
     }
 
@@ -41,7 +49,7 @@ describe('providerToDeclaration', () => {
 
   it('should return empty object from factory provider without inject', () => {
     const provider: FactoryProvider = {
-      provide: 'test',
+      provide: token('test'),
       useFactory: () => ({}),
     }
 

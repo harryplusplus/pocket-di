@@ -1,4 +1,4 @@
-import { type InferDependencies, inject } from 'pocket-di'
+import { type InferConstructorParams, inject } from 'pocket-di'
 
 // dependency class
 class Foo {
@@ -11,9 +11,9 @@ class Bar {
   // NOTE: dependency object 형태와 비교했을 때 name을 지정할 필요가 없다는 것이 장점
   static [inject] = [Foo] as const
 
-  // InferDependencies<typeof $self>을 사용해 class의 constructor parameter를
+  // InferConstructorParams<typeof $self>을 사용해 class의 constructor parameter를
   // inject symbol로부터 추론
-  constructor(dependencies: InferDependencies<typeof Bar>) {
+  constructor(dependencies: InferConstructorParams<typeof Bar>) {
     // type safely dependency instance를 사용
     // NOTE: dependency object 형태와 비교했을 때 name이 없기 때문에 index로 접근하는 것이
     // NOTE: 단점 (하지만 밑의 tuple destructuring을 사용하면 간소화할 수 있음)
@@ -22,7 +22,7 @@ class Bar {
 }
 
 // InferDependencies가 장황할 경우 type alias를 정의
-type BazDeps = InferDependencies<typeof Baz>
+type BazDeps = InferConstructorParams<typeof Baz>
 
 class Baz {
   static [inject] = [Foo] as const
@@ -39,12 +39,12 @@ class Qux {
 
   // tuple destructuring을 사용해 class의 constructor parameter의 이름 참조없이 직접
   // dependency instance에 접근
-  constructor([foo]: InferDependencies<typeof Qux>) {
+  constructor([foo]: InferConstructorParams<typeof Qux>) {
     foo.fooFoo()
   }
 }
 
-type QuuxDeps = InferDependencies<typeof Quux>
+type QuuxDeps = InferConstructorParams<typeof Quux>
 
 class Quux {
   static [inject] = [Foo] as const

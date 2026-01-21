@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import type { ValueProvider } from '../types/provider.ts'
 import { inject } from '../types/symbols.ts'
+import { token } from '../types/token.ts'
 import type { Any } from '../types/utils.ts'
+import type { ValueProvider } from '../types/value-provider.ts'
 import { parse } from './parse.ts'
 
 describe('parse basic', () => {
   it('should parse providables and validate', () => {
-    const provider: ValueProvider = { provide: 'test', useValue: {} }
+    const provider: ValueProvider = { provide: token('test'), useValue: {} }
 
     const result = parse({
       providables: [provider],

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import type { ClassProvider, FactoryProvider } from '../types/provider.ts'
+import type { ClassProvider } from '../types/class-provider.ts'
+import type { FactoryProvider } from '../types/factory-provider.ts'
 import { postConstruct } from '../types/symbols.ts'
+import { token } from '../types/token.ts'
 import { resolveInstanceAsync } from './resolve-instance-async.ts'
 
 describe('resolveInstanceAsync with class provider', () => {
@@ -10,7 +12,10 @@ describe('resolveInstanceAsync with class provider', () => {
       value = 'test'
     }
 
-    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: TestClass,
+    }
 
     const result = await resolveInstanceAsync({ provider, dependencies: [] })
 
@@ -27,7 +32,10 @@ describe('resolveInstanceAsync with class provider', () => {
       }
     }
 
-    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: TestClass,
+    }
 
     await resolveInstanceAsync({ provider, dependencies: [] })
 
@@ -44,7 +52,10 @@ describe('resolveInstanceAsync with class provider', () => {
       }
     }
 
-    const provider: ClassProvider = { provide: 'test', useClass: TestClass }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: TestClass,
+    }
 
     await resolveInstanceAsync({ provider, dependencies: [] })
 
@@ -57,7 +68,7 @@ describe('resolveInstanceAsync with factory provider', () => {
     const instance = { value: 'test' }
 
     const provider: FactoryProvider = {
-      provide: 'test',
+      provide: token('test'),
       useFactory: () => instance,
     }
 
@@ -70,7 +81,7 @@ describe('resolveInstanceAsync with factory provider', () => {
     const instance = { value: 'test' }
 
     const provider: FactoryProvider = {
-      provide: 'test',
+      provide: token('test'),
       useFactory: async () => Promise.resolve(instance),
     }
 

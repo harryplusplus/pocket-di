@@ -1,4 +1,4 @@
-import { createContainer, type InferDependencies, inject } from 'pocket-di'
+import { createContainer, type InferConstructorParams, inject } from 'pocket-di'
 
 // Dependency class.
 class Foo {
@@ -13,7 +13,7 @@ class Foo {
  ******************************************************************************/
 
 // Infer dependency types from the static inject declaration.
-type BarDeps = InferDependencies<typeof Bar>
+type BarDeps = InferConstructorParams<typeof Bar>
 /** type: { foo: Foo } */
 
 class Bar {
@@ -35,7 +35,7 @@ class Bar {
 
 // Infer dependency types from the static inject declaration as a Context for
 // the instance.
-type BazContext = InferDependencies<typeof Baz>
+type BazContext = InferConstructorParams<typeof Baz>
 /** type: { foo: Foo } */
 
 class Baz {

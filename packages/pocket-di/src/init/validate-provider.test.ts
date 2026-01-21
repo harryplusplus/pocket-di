@@ -2,13 +2,17 @@ import { describe, expect, it } from 'vitest'
 
 import { Registry } from '../registry.ts'
 import type { ProviderRegistry } from '../types/compositions.ts'
-import type { ValueProvider } from '../types/provider.ts'
+import { token } from '../types/token.ts'
+import type { ValueProvider } from '../types/value-provider.ts'
 import { validateProvider } from './validate-provider.ts'
 
 describe('validateProvider with parent', () => {
   it('should throw error when token exists in parent without override', () => {
     const parent: ProviderRegistry = new Registry(null)
-    const parentProvider: ValueProvider = { provide: 'test', useValue: {} }
+    const parentProvider: ValueProvider = {
+      provide: token('test'),
+      useValue: {},
+    }
     parent.map.set('test', parentProvider)
 
     const providerRegistry: ProviderRegistry = new Registry(parent)
@@ -22,7 +26,10 @@ describe('validateProvider with parent', () => {
 
   it('should not throw when token exists in parent with override', () => {
     const parent: ProviderRegistry = new Registry(null)
-    const parentProvider: ValueProvider = { provide: 'test', useValue: {} }
+    const parentProvider: ValueProvider = {
+      provide: token('test'),
+      useValue: {},
+    }
     parent.map.set('test', parentProvider)
 
     const providerRegistry: ProviderRegistry = new Registry(parent)
@@ -36,7 +43,10 @@ describe('validateProvider with parent', () => {
 describe('validateProvider local duplicate', () => {
   it('should throw error when token exists in same container', () => {
     const providerRegistry: ProviderRegistry = new Registry(null)
-    const localProvider: ValueProvider = { provide: 'test', useValue: {} }
+    const localProvider: ValueProvider = {
+      provide: token('test'),
+      useValue: {},
+    }
     providerRegistry.map.set('test', localProvider)
 
     expect(() =>
@@ -48,7 +58,10 @@ describe('validateProvider local duplicate', () => {
 
   it('should throw error even with override for local duplicate', () => {
     const providerRegistry: ProviderRegistry = new Registry(null)
-    const localProvider: ValueProvider = { provide: 'test', useValue: {} }
+    const localProvider: ValueProvider = {
+      provide: token('test'),
+      useValue: {},
+    }
     providerRegistry.map.set('test', localProvider)
 
     expect(() =>

@@ -11,13 +11,13 @@ import { token } from './token.ts'
 
 describe('isTupleInjectDeclaration', () => {
   it('should return true for array declaration', () => {
-    const declaration = ['dep1', 'dep2'] as const
+    const declaration = [token('dep1'), token('dep2')] as const
 
     expect(isTupleInjectDeclaration(declaration)).toBe(true)
   })
 
   it('should return false for object declaration', () => {
-    const declaration = { dep1: 'dep1', dep2: 'dep2' }
+    const declaration = { dep1: token('dep1'), dep2: token('dep2') }
 
     expect(isTupleInjectDeclaration(declaration)).toBe(false)
   })
@@ -31,13 +31,13 @@ describe('isTupleInjectDeclaration', () => {
 
 describe('isRecordInjectDeclaration', () => {
   it('should return true for object declaration', () => {
-    const declaration = { dep1: 'dep1', dep2: 'dep2' }
+    const declaration = { dep1: token('dep1'), dep2: token('dep2') }
 
     expect(isRecordInjectDeclaration(declaration)).toBe(true)
   })
 
   it('should return false for array declaration', () => {
-    const declaration = ['dep1', 'dep2'] as const
+    const declaration = [token('dep1'), token('dep2')] as const
 
     expect(isRecordInjectDeclaration(declaration)).toBe(false)
   })
@@ -51,13 +51,13 @@ describe('isRecordInjectDeclaration', () => {
 
 describe('isTypedTokenInjectDeclarationItem', () => {
   it('should return true for string token', () => {
-    const item: InjectDeclarationItem = 'test-token'
+    const item: InjectDeclarationItem = token('test-token')
 
     expect(isTypedTokenInjectDeclarationItem(item)).toBe(true)
   })
 
   it('should return true for symbol token', () => {
-    const item: InjectDeclarationItem = Symbol('test')
+    const item: InjectDeclarationItem = token(Symbol('test'))
 
     expect(isTypedTokenInjectDeclarationItem(item)).toBe(true)
   })
@@ -85,13 +85,13 @@ describe('isInjectableConstructorInjectDeclarationItem', () => {
   })
 
   it('should return false for string token', () => {
-    const item: InjectDeclarationItem = 'test-token'
+    const item: InjectDeclarationItem = token('test-token')
 
     expect(isInjectableConstructorInjectDeclarationItem(item)).toBe(false)
   })
 
   it('should return false for symbol token', () => {
-    const item: InjectDeclarationItem = Symbol('test')
+    const item: InjectDeclarationItem = token(Symbol('test'))
 
     expect(isInjectableConstructorInjectDeclarationItem(item)).toBe(false)
   })

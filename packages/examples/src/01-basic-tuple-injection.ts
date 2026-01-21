@@ -1,6 +1,6 @@
 // packages/examples/src/01-basic-tuple-injection.ts
 
-import { createContainer, type InferDependencies, inject } from 'pocket-di'
+import { createContainer, type InferConstructorParams, inject } from 'pocket-di'
 
 // Basic service without dependencies
 class LoggerService {
@@ -23,7 +23,7 @@ class UserService {
   static [inject] = [LoggerService, DatabaseService] as const
 
   // Type inference works automatically
-  constructor(deps: InferDependencies<typeof UserService>) {
+  constructor(deps: InferConstructorParams<typeof UserService>) {
     const [logger, database] = deps
 
     logger.log('UserService created')
@@ -37,7 +37,7 @@ class UserService {
 }
 
 // Type check (not used in practice, just for demonstration)
-export type UserServiceDeps = InferDependencies<typeof UserService>
+export type UserServiceDeps = InferConstructorParams<typeof UserService>
 // Type: [LoggerService, DatabaseService]
 
 async function main() {

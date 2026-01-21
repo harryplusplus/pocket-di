@@ -1,8 +1,8 @@
 import type { CircularDependencyChecker } from '../circular-dependency-checker.ts'
+import { classProviderToDeclaration } from '../types/class-provider.ts'
 import type { ProviderRegistry } from '../types/compositions.ts'
+import { factoryProviderToDeclaration } from '../types/factory-provider.ts'
 import {
-  classProviderToDeclaration,
-  factoryProviderToDeclaration,
   isClassProvider,
   isFactoryProvider,
   type Provider,

@@ -1,6 +1,6 @@
 // packages/examples/src/07-child-container.ts
 
-import { createContainer, type InferDependencies, inject } from 'pocket-di'
+import { createContainer, type InferConstructorParams, inject } from 'pocket-di'
 
 // Shared services (registered in parent container)
 class DatabaseService {
@@ -38,7 +38,7 @@ class RequestHandler {
     context: RequestContext,
   }
 
-  constructor(deps: InferDependencies<typeof RequestHandler>) {
+  constructor(deps: InferConstructorParams<typeof RequestHandler>) {
     console.log(
       `[HANDLER] Handler created for request: ${deps.context.getRequestId()}`,
     )

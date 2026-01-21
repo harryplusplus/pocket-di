@@ -1,16 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
+import type { ClassProvider } from './class-provider.ts'
 import {
   isInjectableConstructorProvidable,
   isProviderProvidable,
   providableToProvider,
 } from './providable.ts'
-import type { ClassProvider, ValueProvider } from './provider.ts'
 import { inject } from './symbols.ts'
+import { token } from './token.ts'
+import type { ValueProvider } from './value-provider.ts'
 
 describe('isProviderProvidable', () => {
   it('should return true for provider', () => {
-    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
+    const provider: ValueProvider = {
+      provide: token('test'),
+      useValue: 'value',
+    }
 
     expect(isProviderProvidable(provider)).toBe(true)
   })
@@ -30,7 +35,10 @@ describe('isInjectableConstructorProvidable', () => {
   })
 
   it('should return false for provider', () => {
-    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
+    const provider: ValueProvider = {
+      provide: token('test'),
+      useValue: 'value',
+    }
 
     expect(isInjectableConstructorProvidable(provider)).toBe(false)
   })
@@ -38,7 +46,10 @@ describe('isInjectableConstructorProvidable', () => {
 
 describe('providableToProvider', () => {
   it('should return provider as is', () => {
-    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
+    const provider: ValueProvider = {
+      provide: token('test'),
+      useValue: 'value',
+    }
 
     const result = providableToProvider(provider)
 
@@ -47,7 +58,7 @@ describe('providableToProvider', () => {
 
   it('should convert injectable constructor to class provider', () => {
     class TestClass {
-      static [inject] = ['dep'] as const
+      static [inject] = [token('dep')] as const
     }
 
     const result = providableToProvider(TestClass)

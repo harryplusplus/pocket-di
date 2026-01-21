@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import { Registry } from '../registry.ts'
+import type { ClassProvider } from '../types/class-provider.ts'
 import type {
   ProviderRegistry,
   SingletonRegistry,
 } from '../types/compositions.ts'
-import type { ClassProvider, ValueProvider } from '../types/provider.ts'
+import { token } from '../types/token.ts'
+import type { ValueProvider } from '../types/value-provider.ts'
 import { resolveInstanceOrProvider } from './resolve-singleton-or-value.ts'
 
 describe('resolveInstanceOrProvider with singleton', () => {
@@ -29,7 +31,7 @@ describe('resolveInstanceOrProvider with singleton', () => {
 describe('resolveInstanceOrProvider with value provider', () => {
   it('should return value from value provider', () => {
     const value = { data: 'test' }
-    const provider: ValueProvider = { provide: 'test', useValue: value }
+    const provider: ValueProvider = { provide: token('test'), useValue: value }
 
     const singletonRegistry: SingletonRegistry = new Registry(null)
     const providerRegistry: ProviderRegistry = new Registry(null)
@@ -47,7 +49,10 @@ describe('resolveInstanceOrProvider with value provider', () => {
 
 describe('resolveInstanceOrProvider with class provider', () => {
   it('should return provider for class provider', () => {
-    const provider: ClassProvider = { provide: 'test', useClass: class {} }
+    const provider: ClassProvider = {
+      provide: token('test'),
+      useClass: class {},
+    }
 
     const singletonRegistry: SingletonRegistry = new Registry(null)
     const providerRegistry: ProviderRegistry = new Registry(null)
