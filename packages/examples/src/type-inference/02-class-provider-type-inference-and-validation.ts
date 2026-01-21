@@ -3,6 +3,7 @@ import {
   defineClassProvider,
   type InferConstructorParams,
   inject,
+  tokenToString,
 } from 'pocket-di'
 
 // Dependency class.
@@ -30,6 +31,8 @@ console.log('barToken:', barToken)
 //   Symbol(pocket-di:plainToken): 'bar',
 //   Symbol(pocket-di:type): undefined
 // }
+
+console.log('tokenToString:', tokenToString(barToken)) // bar
 
 type BazParams = InferConstructorParams<typeof Baz>
 /** type: { bar: Foo } */
