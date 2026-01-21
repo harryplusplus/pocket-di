@@ -11,6 +11,8 @@ export type InferableToken<I extends Injectable = Injectable> =
   | TypedToken<I>
   | InjectableConstructor<I>
 
+export type ExtractTokenType<T> = T extends InferableToken<infer I> ? I : never
+
 export function tokenToString(token: InjectionToken): string {
   if (typeof token === 'function') {
     return token.name
