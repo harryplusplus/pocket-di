@@ -13,7 +13,7 @@ class Foo {
  ******************************************************************************/
 
 // Infer dependency types from the static inject declaration.
-type BarDeps = InferConstructorParams<typeof Bar>
+type BarParams = InferConstructorParams<typeof Bar>
 /** type: { foo: Foo } */
 
 class Bar {
@@ -21,7 +21,7 @@ class Bar {
   // object.
   static [inject] = { foo: Foo }
 
-  constructor({ foo }: BarDeps) {
+  constructor({ foo }: BarParams) {
     console.log('[Bar] Constructor')
 
     // Use the dependency object type safely.

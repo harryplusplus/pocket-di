@@ -1,9 +1,4 @@
-import {
-  createContainer,
-  defineFactoryProvider,
-  type PlainToken,
-  token,
-} from 'pocket-di'
+import { createContainer, defineFactoryProvider, token } from 'pocket-di'
 
 // Dependency class.
 class Foo {
@@ -64,12 +59,37 @@ interface Baz {
   bazBaz(): void
 }
 
-const bazToken = token<Baz>('baz')
+const _bazToken = token<Baz>('baz')
 /** type: TypedToken<Baz> */
 
-const bazProvider = defineFactoryProvider({
-  provide: bazToken,
-  useFactory: () => {
-    return {}
-  },
-})
+// 추론 가능한 토큰 (typed token or class)을 provide에 사용할 경우, useFactory의 반환
+// 타입을 검증합니다.
+// const bazProvider = defineFactoryProvider({
+//   provide: _bazToken,
+//   useFactory: () => {
+//     // const baz: Baz = {
+//     //   bazBaz: () => {
+//     //     console.log('[Baz] bazBaz()')
+//     //   },
+//     // }
+//     // return baz
+//     return {}
+//   },
+// })
+
+/*
+No overload matches this call.
+  Overload 1 of 2, '(provider: FactoryProviderInput<PlainToken, {}, {}, 
+  InjectDeclaration>): FactoryProvider<TypedToken<{}>, {}, {}, 
+  InjectDeclaration>', gave the following error.
+    Type 'TypedToken<Baz>' is not assignable to type 'PlainToken'.
+  Overload 2 of 2, '(provider: FactoryProviderInput<TypedToken<Baz>, Baz, Baz, 
+  InjectDeclaration>): FactoryProvider<TypedToken<Baz>, Baz, Baz, 
+  InjectDeclaration>', gave the following error.
+    Type '() => {}' is not assignable to type 
+    '((dependencies: Dependencies<InjectDeclaration>) => MaybePromise<Baz>) | 
+    ((dependencies: Dependencies<InjectDeclaration>) => MaybePromise<...>)'.
+      Type '() => {}' is not assignable to type 
+      '(dependencies: Dependencies<InjectDeclaration>) => MaybePromise<Baz>'.
+        Type '{}' is not assignable to type 'MaybePromise<Baz>'.ts(2769)
+*/

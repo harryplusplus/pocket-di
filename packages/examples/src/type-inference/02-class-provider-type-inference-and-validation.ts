@@ -19,22 +19,26 @@ class Foo {
 // When using a plain string for provide, the type is inferred from the class
 // provided to useClass.
 const barProvider = defineClassProvider({ provide: 'bar', useClass: Foo })
-/** type: ClassProvider<Foo, Foo, InjectDeclaration> */
+/** type: ClassProvider<TypedToken<Foo>, Foo, Foo, InjectDeclaration> */
 
 // The type is bound to the token.
 const barToken = barProvider.provide
-/** type: InjectionToken<Foo> */
+/** type: TypedToken<Foo> */
 
-console.log('barToken:', barToken) // 'bar'
+console.log('barToken:', barToken)
+// barToken: {
+//   Symbol(pocket-di:plainToken): 'bar',
+//   Symbol(pocket-di:type): undefined
+// }
 
-type BazDeps = InferConstructorParams<typeof Baz>
+type BazParams = InferConstructorParams<typeof Baz>
 /** type: { bar: Foo } */
 
 class Baz {
   // Define dependency injection using the type-bound token.
   static [inject] = { bar: barToken }
 
-  constructor({ bar }: BazDeps) {
+  constructor({ bar }: BazParams) {
     console.log('[Baz] Constructor')
 
     // Use the dependency instance with type safety.
@@ -71,7 +75,7 @@ const _validBarProvider = defineClassProvider({
   provide: barToken,
   useClass: Qux,
 })
-/** type: ClassProvider<Foo, Qux, InjectDeclaration> */
+/** type: ClassProvider<TypedToken<Foo>, Foo, Qux, InjectDeclaration */
 
 export class Quux {
   // no fooFoo() method
@@ -88,16 +92,16 @@ export class Quux {
 // })
 
 /**
- * No overload matches this call.
-  Overload 1 of 2, '(provider: ClassProviderInput<Quux, InjectDeclaration>): 
-    ClassProvider<Quux, Quux, InjectDeclaration>', gave the following error.
-    Type 'InjectionToken<Foo>' is not assignable to type 'string | symbol'.
-      Type 'InjectableConstructor<Foo, InjectDeclaration>' is not assignable to 
-        type 'string | symbol'.
-  Overload 2 of 2, '(provider: ClassProvider<Foo, Foo, InjectDeclaration>): 
-    ClassProvider<Foo, Foo, InjectDeclaration>', gave the following error.
-    Type 'typeof Quux' is not assignable to type 
-      'InjectableConstructor<Foo, InjectDeclaration>'.
+No overload matches this call.
+  Overload 1 of 2, '(provider: ClassProviderInput<PlainToken, Quux, Quux, 
+  InjectDeclaration>): ClassProvider<TypedToken<Quux>, Quux, Quux, 
+  InjectDeclaration>', gave the following error.
+    Type 'TypedToken<Foo>' is not assignable to type 'PlainToken'.
+  Overload 2 of 2, '(provider: ClassProviderInput<TypedToken<Foo>, Foo, Foo, 
+  InjectDeclaration>): ClassProvider<TypedToken<Foo>, Foo, Foo, 
+  InjectDeclaration>', gave the following error.
+    Type 'typeof Quux' is not assignable to type 'InjectableConstructor<Foo, 
+    InjectDeclaration>'.
       Property 'fooFoo' is missing in type 'Quux' but required in type 
-        'Foo'.ts(2769)
+      'Foo'.ts(2769)
  */
