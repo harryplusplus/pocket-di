@@ -4,7 +4,7 @@ import type { Injectable } from './injectable.ts'
 import type { InjectableConstructor } from './injectable-constructor.ts'
 import type { Scope, Singleton, Transient } from './scope.ts'
 import { inject } from './symbols.ts'
-import { type InjectionToken } from './token.ts'
+import { type InferableToken } from './token.ts'
 import type { MaybePromise } from './utils.ts'
 
 export type Provider<
@@ -26,7 +26,7 @@ export interface ValueProviderInput<
 export interface ValueProvider<
   I extends Injectable = Injectable,
 > extends ValueProviderBase<I> {
-  provide: InjectionToken<I>
+  provide: InferableToken<I>
 }
 
 function defineValueProvider<I extends Injectable>(
@@ -67,7 +67,7 @@ export interface ClassProvider<
   C extends I = I,
   D extends InjectDeclaration = InjectDeclaration,
 > extends ClassProviderBase<C, D> {
-  provide: InjectionToken<I>
+  provide: InferableToken<I>
 }
 
 function defineClassProvider<I extends Injectable, D extends InjectDeclaration>(
@@ -120,7 +120,7 @@ export interface SingletonFactoryProvider<
   C extends I = I,
   D extends InjectDeclaration = InjectDeclaration,
 > extends SingletonFactoryProviderBase<C, D> {
-  provide: InjectionToken<I>
+  provide: InferableToken<I>
 }
 
 export interface TransientFactoryProviderBase<
@@ -145,7 +145,7 @@ export interface TransientFactoryProvider<
   C extends I = I,
   D extends InjectDeclaration = InjectDeclaration,
 > extends TransientFactoryProviderBase<C, D> {
-  provide: InjectionToken<I>
+  provide: InferableToken<I>
 }
 
 export type FactoryProvider<

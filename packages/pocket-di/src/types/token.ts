@@ -5,6 +5,9 @@ import type { type } from './symbols.ts'
 export type InjectionToken<I extends Injectable = Injectable> =
   | string
   | symbol
+  | InferableToken<I>
+
+export type InferableToken<I extends Injectable = Injectable> =
   | TypedToken<I>
   | InjectableConstructor<I>
 
