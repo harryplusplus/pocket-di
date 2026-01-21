@@ -2,15 +2,17 @@ import type { InjectDeclaration } from './inject-declaration.ts'
 import type { Injectable } from './injectable.ts'
 import type { InjectableConstructor } from './injectable-constructor.ts'
 import type { Provider } from './provider.ts'
+import type { InferInjectable, InjectionToken } from './token.ts'
 import type { Any } from './utils.ts'
 
 export type Providable<
-  I extends Injectable = Injectable,
+  T extends InjectionToken = InjectionToken,
+  I extends Injectable = InferInjectable<T>,
   C extends I = I,
   D extends InjectDeclaration = InjectDeclaration,
-> = Provider<I, C, D> | InjectableConstructor<I, D>
+> = Provider<T, I, C, D> | InjectableConstructor<I, D>
 
-export type AnyProvidable = Providable<Any, Any, Any>
+export type AnyProvidable = Providable<Any, Any, Any, Any>
 
 export function isProviderProvidable(x: Providable): x is Provider {
   return 'provide' in x

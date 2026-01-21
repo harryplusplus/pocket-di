@@ -21,6 +21,7 @@ export {
   type ClassProvider,
   defineClassProvider,
   defineFactoryProvider,
+  defineProvider,
   defineValueProvider,
   type FactoryProvider,
   type SingletonFactoryProvider,
