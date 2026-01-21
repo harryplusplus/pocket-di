@@ -29,5 +29,13 @@ export {
 } from './types/provider.ts'
 export type { Scope, Singleton, Transient } from './types/scope.ts'
 export { inject, postConstruct, preDestroy, type } from './types/symbols.ts'
-export { type InjectionToken, token, type TypedToken } from './types/token.ts'
+export {
+  type InferableToken,
+  type InferInjectable,
+  type InjectionToken,
+  type PlainToken,
+  token,
+  tokenToString,
+  type TypedToken,
+} from './types/token.ts'
 export type { Any, Constructor, MaybePromise } from './types/utils.ts'

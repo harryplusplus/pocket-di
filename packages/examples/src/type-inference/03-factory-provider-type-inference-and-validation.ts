@@ -1,4 +1,9 @@
-import { createContainer, defineFactoryProvider, token } from 'pocket-di'
+import {
+  createContainer,
+  defineFactoryProvider,
+  type PlainToken,
+  token,
+} from 'pocket-di'
 
 // Dependency class.
 class Foo {
