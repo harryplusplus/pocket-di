@@ -9,33 +9,9 @@ import type { MaybePromise } from './utils.ts'
 
 export type Provider<
   I extends Injectable = Injectable,
-  ID extends InjectDeclaration = InjectDeclaration,
   C extends I = I,
-> = ValueProvider<I> | ClassProvider<I, C> | FactoryProvider<I, ID, C>
-
-export interface ProviderFn<I extends Injectable> {
-  <ID extends InjectDeclaration, C extends I>(
-    provider: Provider<I, ID, C>,
-  ): Provider<I, ID, C>
-}
-
-function defineProvider<
-  I extends Injectable = Injectable,
-  ID extends InjectDeclaration = InjectDeclaration,
->(provider: Provider<I, ID, I>): Provider<I, ID, I>
-function defineProvider<I extends Injectable>(): ProviderFn<I>
-function defineProvider<
-  I extends Injectable = Injectable,
-  ID extends InjectDeclaration = InjectDeclaration,
->(provider?: Provider<I, ID, I>): Provider<I, ID, I> | ProviderFn<I> {
-  if (provider) {
-    return provider
-  }
-
-  return (provider) => provider
-}
-
-export { defineProvider }
+  D extends InjectDeclaration = InjectDeclaration,
+> = ValueProvider<I> | ClassProvider<I, C, D> | FactoryProvider<I, C, D>
 
 export interface ProviderBase<I extends Injectable> {
   provide: InjectionToken<I>
@@ -54,14 +30,17 @@ export function isValueProvider(x: Provider): x is ValueProvider {
 export interface ClassProvider<
   I extends Injectable = Injectable,
   C extends I = I,
+  D extends InjectDeclaration = InjectDeclaration,
 > extends ProviderBase<I> {
-  useClass: InjectableConstructor<C>
+  useClass: InjectableConstructor<C, D>
   scope?: Scope
 }
 
-export function defineClassProvider<I extends Injectable, C extends I>(
-  provider: ClassProvider<I, C>,
-): ClassProvider<I, C> {
+export function defineClassProvider<
+  I extends Injectable,
+  C extends I,
+  D extends InjectDeclaration,
+>(provider: ClassProvider<I, C, D>): ClassProvider<I, C, D> {
   return provider
 }
 
@@ -76,32 +55,61 @@ export function classProviderToDeclaration(
 }
 
 export interface SingletonFactoryProvider<
-  I extends Injectable,
-  ID extends InjectDeclaration,
-  C extends I,
+  I extends Injectable = Injectable,
+  C extends I = I,
+  D extends InjectDeclaration = InjectDeclaration,
 > extends ProviderBase<I> {
-  inject?: ID
-  useFactory: (dependencies: Dependencies<ID>) => MaybePromise<C>
+  inject?: D
+  useFactory: (dependencies: Dependencies<D>) => MaybePromise<C>
   scope?: Singleton
   preDestroy?: (instance: C) => MaybePromise<void>
 }
 
 export interface TransientFactoryProvider<
-  I extends Injectable,
-  ID extends InjectDeclaration,
-  C extends I,
+  I extends Injectable = Injectable,
+  C extends I = I,
+  D extends InjectDeclaration = InjectDeclaration,
 > extends ProviderBase<I> {
-  inject?: ID
-  useFactory: (dependencies: Dependencies<ID>) => MaybePromise<C>
+  inject?: D
+  useFactory: (dependencies: Dependencies<D>) => MaybePromise<C>
   scope: Transient
   preDestroy?: never
 }
 
 export type FactoryProvider<
   I extends Injectable = Injectable,
-  ID extends InjectDeclaration = InjectDeclaration,
   C extends I = I,
-> = SingletonFactoryProvider<I, ID, C> | TransientFactoryProvider<I, ID, C>
+  D extends InjectDeclaration = InjectDeclaration,
+> = SingletonFactoryProvider<I, C, D> | TransientFactoryProvider<I, C, D>
+
+export function defineFactoryProvider<
+  I extends Injectable,
+  C extends I,
+  D extends InjectDeclaration,
+>(provider: FactoryProvider<I, C, D>): FactoryProvider<I, C, D>
+export function defineFactoryProvider<I extends Injectable>(): <
+  C extends I,
+  D extends InjectDeclaration,
+>(
+  provider: FactoryProvider<I, C, D>,
+) => FactoryProvider<I, C, D>
+export function defineFactoryProvider<
+  I extends Injectable,
+  C extends I,
+  D extends InjectDeclaration,
+>(
+  provider?: FactoryProvider<I, C, D>,
+):
+  | FactoryProvider<I, C, D>
+  | (<C extends I, D extends InjectDeclaration>(
+      provider: FactoryProvider<I, C, D>,
+    ) => FactoryProvider<I, C, D>) {
+  if (provider) {
+    return provider
+  }
+
+  return (provider) => provider
+}
 
 export function isFactoryProvider(x: Provider): x is FactoryProvider {
   return 'useFactory' in x

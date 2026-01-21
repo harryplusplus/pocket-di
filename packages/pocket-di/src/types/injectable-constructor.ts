@@ -5,7 +5,7 @@ import type { Constructor } from './utils.ts'
 
 export interface InjectableConstructor<
   I extends Injectable = Injectable,
-  ID extends InjectDeclaration = InjectDeclaration,
+  D extends InjectDeclaration = InjectDeclaration,
 > extends Constructor<I> {
-  [inject]?: ID
+  [inject]?: D
 }

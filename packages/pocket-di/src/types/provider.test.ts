@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 import {
   type ClassProvider,
   classProviderToDeclaration,
-  defineProvider,
   type FactoryProvider,
   factoryProviderToDeclaration,
   isClassProvider,
@@ -12,26 +11,6 @@ import {
   type ValueProvider,
 } from './provider.ts'
 import { inject } from './symbols.ts'
-
-describe('defineProvider', () => {
-  it('should return provider when called with provider', () => {
-    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
-
-    const result = defineProvider(provider)
-
-    expect(result).toBe(provider)
-  })
-
-  it('should return provider function when called without arguments', () => {
-    const providerFn = defineProvider()
-
-    const provider: ValueProvider = { provide: 'test', useValue: 'value' }
-
-    const result = providerFn(provider)
-
-    expect(result).toBe(provider)
-  })
-})
 
 describe('isValueProvider', () => {
   it('should return true for value provider', () => {

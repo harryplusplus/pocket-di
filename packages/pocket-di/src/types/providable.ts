@@ -6,9 +6,9 @@ import type { Any } from './utils.ts'
 
 export type Providable<
   I extends Injectable = Injectable,
-  ID extends InjectDeclaration = InjectDeclaration,
   C extends I = I,
-> = Provider<I, ID, C> | InjectableConstructor<I, ID>
+  D extends InjectDeclaration = InjectDeclaration,
+> = Provider<I, C, D> | InjectableConstructor<I, D>
 
 export type AnyProvidable = Providable<Any, Any, Any>
 
