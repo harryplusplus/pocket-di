@@ -22,14 +22,14 @@ class Bar {
   static [inject] = { foo: fooToken }
 
   constructor({ foo }: BarParams) {
-    console.log(`[BAR] ${foo}`)
+    console.log(`[Bar] ${foo}`)
   }
 }
 
 const container = createContainer({ providers: [fooProvider, Bar] })
 
 await container.resolve(Bar)
-// [BAR] FOO!
+// [Bar] FOO!
 
 await container.destroy()
 
