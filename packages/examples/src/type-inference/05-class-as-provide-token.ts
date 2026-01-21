@@ -1,3 +1,5 @@
+// packages/examples/src/type-inference/05-class-as-provide-token.ts
+
 import {
   createContainer,
   defineClassProvider,

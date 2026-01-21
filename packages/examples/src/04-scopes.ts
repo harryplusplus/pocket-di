@@ -1,4 +1,4 @@
-// packages/examples/src/05-scopes.ts
+// packages/examples/src/04-scopes.ts
 
 import { createContainer, type InferConstructorParams, inject } from 'pocket-di'
 

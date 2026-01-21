@@ -1,8 +1,8 @@
-// packages/examples/src/06-missing-dependency-error.ts
+// packages/examples/src/05-missing-dependency-error.ts
 
 import {
   createContainer,
-  defineProvider,
+  defineFactoryProvider,
   type InferConstructorParams,
   inject,
   token,
@@ -37,9 +37,9 @@ class OrderService {
 }
 
 // Factory that depends on PAYMENT_SERVICE
-const notificationProvider = defineProvider({
+const notificationProvider = defineFactoryProvider({
   provide: 'NOTIFICATION_SERVICE',
-  inject: [PAYMENT_SERVICE], // PAYMENT_SERVICE is NOT registered!
+  inject: { payment: PAYMENT_SERVICE }, // PAYMENT_SERVICE is NOT registered!
   useFactory: (_deps) => {
     return { notify: (message: string) => console.log(message) }
   },

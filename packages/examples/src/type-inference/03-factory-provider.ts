@@ -1,3 +1,5 @@
+// packages/examples/src/type-inference/03-factory-provider.ts
+
 import { createContainer, defineFactoryProvider, token } from 'pocket-di'
 
 // Dependency class.

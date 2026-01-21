@@ -1,4 +1,4 @@
-// packages/examples/src/07-child-container.ts
+// packages/examples/src/06-child-container.ts
 
 import { createContainer, type InferConstructorParams, inject } from 'pocket-di'
 

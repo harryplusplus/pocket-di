@@ -1,3 +1,5 @@
+// packages/examples/src/type-inference/04-value-provider.ts
+
 import {
   createContainer,
   defineValueProvider,

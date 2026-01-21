@@ -1,8 +1,8 @@
-// packages/examples/src/04-lifecycle-events.ts
+// packages/examples/src/03-lifecycle-events.ts
 
 import {
   createContainer,
-  defineProvider,
+  defineFactoryProvider,
   postConstruct,
   type PostConstructable,
   preDestroy,
@@ -63,7 +63,7 @@ interface ILogger {
 const LOGGER_TOKEN = token<ILogger>('LOGGER')
 
 // Define provider outside container (token type is inferred from provide)
-const loggerProvider = defineProvider({
+const loggerProvider = defineFactoryProvider({
   provide: LOGGER_TOKEN,
   useFactory: () => {
     console.log('[LOGGER] Creating logger')

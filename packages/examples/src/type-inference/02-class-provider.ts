@@ -1,3 +1,5 @@
+// packages/examples/src/type-inference/02-class-provider.ts
+
 import {
   createContainer,
   defineClassProvider,

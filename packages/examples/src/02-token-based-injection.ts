@@ -1,8 +1,8 @@
-// packages/examples/src/03-token-based-injection.ts
+// packages/examples/src/02-token-based-injection.ts
 
 import {
   createContainer,
-  defineProvider,
+  defineFactoryProvider,
   type InferConstructorParams,
   inject,
   token,
@@ -34,12 +34,15 @@ class EmailServiceImpl implements IEmailService {
   }
 }
 
-class NotificationServiceImpl implements INotificationService {
-  static [inject] = [EMAIL_SERVICE] as const
+type NotificationServiceParams = InferConstructorParams<
+  typeof NotificationServiceImpl
+>
 
-  constructor(deps: InferConstructorParams<typeof NotificationServiceImpl>) {
-    const [emailService] = deps
-    emailService.send('admin@example.com', 'Notification service started')
+class NotificationServiceImpl implements INotificationService {
+  static [inject] = { email: EMAIL_SERVICE }
+
+  constructor({ email }: NotificationServiceParams) {
+    email.send('admin@example.com', 'Notification service started')
   }
 
   notify(userId: string, text: string) {
@@ -48,18 +51,18 @@ class NotificationServiceImpl implements INotificationService {
 }
 
 // Factory with dependencies - type inference works!
-const smsServiceFactory = defineProvider({
+const smsServiceFactory = defineFactoryProvider({
   provide: SMS_SERVICE,
   inject: { email: EMAIL_SERVICE, apiKey: API_KEY },
-  useFactory: (deps) => {
+  useFactory: ({ apiKey, email }) => {
     // deps type is inferred as { email: IEmailService; apiKey: string }
-    console.log('Creating SmsService via factory with API key:', deps.apiKey)
+    console.log('Creating SmsService via factory with API key:', apiKey)
 
     return {
       sendSms(phone: string, message: string) {
         console.log(`[SMS] To: ${phone}, Message: ${message}`)
         // Can use injected email service
-        deps.email.send('sms-log@example.com', `SMS sent to ${phone}`)
+        email.send('sms-log@example.com', `SMS sent to ${phone}`)
       },
     }
   },

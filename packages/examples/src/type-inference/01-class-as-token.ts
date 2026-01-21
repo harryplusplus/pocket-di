@@ -1,3 +1,5 @@
+// packages/examples/src/type-inference/01-class-as-token.ts
+
 import { createContainer, type InferConstructorParams, inject } from 'pocket-di'
 
 // Dependency class.
