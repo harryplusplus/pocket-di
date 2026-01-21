@@ -7,11 +7,7 @@ class Foo {
 
 // Infer dependency types from the static inject declaration.
 type BarDeps = InferDependencies<typeof Bar>
-/**
- * type: {
- *   foo: Foo;
- * }
- */
+/** type: { foo: Foo } */
 
 export class Bar {
   // Define a static inject symbol variable as a {<name>:<class>} declaration
@@ -27,6 +23,7 @@ export class Bar {
 // Infer dependency types from the static inject declaration as a Context for
 // the instance.
 type BazContext = InferDependencies<typeof Baz>
+/** type: { foo: Foo } */
 
 export class Baz {
   static [inject] = { foo: Foo }
