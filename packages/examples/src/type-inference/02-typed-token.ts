@@ -24,8 +24,12 @@ export class Bar {
   }
 }
 
+class Baz {}
+
 // A class compatible with the Foo interface.
 class RealFoo {
+  static [inject] = { baz: Baz }
+
   fooFoo() {}
 }
 
@@ -33,7 +37,7 @@ export const fooProvider = defineClassProvider({
   provide: fooToken,
   useClass: RealFoo,
 })
-/** type: ClassProvider<Foo, RealFoo> */
+/** type: ClassProvider<Foo, RealFoo, { baz: typeof Baz }> */
 
 export class NoFoo {
   // No fooFoo() method.
