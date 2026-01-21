@@ -21,7 +21,7 @@ describe('resolveDependenciesAsync with tuple', () => {
     const provider2: ValueProvider = { provide: token('dep2'), useValue: dep2 }
 
     class TestClass {
-      static [inject] = [token('dep1'), token('dep2')] as const
+      static [inject] = { dep1: token('dep1'), dep2: token('dep2') }
     }
 
     const provider: ClassProvider = {
@@ -44,7 +44,7 @@ describe('resolveDependenciesAsync with tuple', () => {
 
   it('should resolve empty tuple dependencies', async () => {
     class TestClass {
-      static [inject] = [] as const
+      static [inject] = {}
     }
 
     const provider: ClassProvider = {

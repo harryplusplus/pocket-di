@@ -26,8 +26,4 @@ export function providerToDeclaration(
     : factoryProviderToDeclaration(provider)
 }
 
-export type DependencyTuple = Injectable[]
-
 export type DependencyRecord = Record<string, Injectable>
-
-export type DependencyTupleOrRecord = DependencyTuple | DependencyRecord

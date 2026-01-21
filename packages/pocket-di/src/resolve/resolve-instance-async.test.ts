@@ -17,7 +17,7 @@ describe('resolveInstanceAsync with class provider', () => {
       useClass: TestClass,
     }
 
-    const result = await resolveInstanceAsync({ provider, dependencies: [] })
+    const result = await resolveInstanceAsync({ provider, dependencies: {} })
 
     expect(result).toBeInstanceOf(TestClass)
     expect((result as TestClass).value).toBe('test')
@@ -37,7 +37,7 @@ describe('resolveInstanceAsync with class provider', () => {
       useClass: TestClass,
     }
 
-    await resolveInstanceAsync({ provider, dependencies: [] })
+    await resolveInstanceAsync({ provider, dependencies: {} })
 
     expect(called).toBe(true)
   })
@@ -57,7 +57,7 @@ describe('resolveInstanceAsync with class provider', () => {
       useClass: TestClass,
     }
 
-    await resolveInstanceAsync({ provider, dependencies: [] })
+    await resolveInstanceAsync({ provider, dependencies: {} })
 
     expect(called).toBe(true)
   })
@@ -72,7 +72,7 @@ describe('resolveInstanceAsync with factory provider', () => {
       useFactory: () => instance,
     }
 
-    const result = await resolveInstanceAsync({ provider, dependencies: [] })
+    const result = await resolveInstanceAsync({ provider, dependencies: {} })
 
     expect(result).toBe(instance)
   })
@@ -85,7 +85,7 @@ describe('resolveInstanceAsync with factory provider', () => {
       useFactory: async () => Promise.resolve(instance),
     }
 
-    const result = await resolveInstanceAsync({ provider, dependencies: [] })
+    const result = await resolveInstanceAsync({ provider, dependencies: {} })
 
     expect(result).toBe(instance)
   })

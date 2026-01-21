@@ -15,7 +15,7 @@ describe('validateDeclarationRecursive with class provider', () => {
     class DepClass {}
 
     class TestClass {
-      static [inject] = [token('dep')] as const
+      static [inject] = { dep: token('dep') }
     }
 
     const depProvider: ClassProvider = {
@@ -40,7 +40,7 @@ describe('validateDeclarationRecursive with class provider', () => {
 
   it('should throw error for missing dependency in class', () => {
     class TestClass {
-      static [inject] = [token('missing')] as const
+      static [inject] = { dep: token('missing') }
     }
 
     const provider: ClassProvider = {
@@ -63,7 +63,7 @@ describe('validateDeclarationRecursive with factory provider', () => {
 
     const provider: FactoryProvider = {
       provide: token('test'),
-      inject: [token('dep')] as const,
+      inject: { dep: token('dep') },
       useFactory: () => ({}),
     }
 
@@ -80,7 +80,7 @@ describe('validateDeclarationRecursive with factory provider', () => {
   it('should throw error for missing dependency in factory', () => {
     const provider: FactoryProvider = {
       provide: token('test'),
-      inject: [token('missing')] as const,
+      inject: { dep: token('missing') },
       useFactory: () => ({}),
     }
 

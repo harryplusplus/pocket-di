@@ -1,19 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  type ClassProvider,
-  classProviderToDeclaration,
-} from './class-provider.ts'
-import {
-  type FactoryProvider,
-  factoryProviderToDeclaration,
-} from './factory-provider.ts'
+import { type ClassProvider } from './class-provider.ts'
+import { type FactoryProvider } from './factory-provider.ts'
 import {
   isClassProvider,
   isFactoryProvider,
   isValueProvider,
 } from './provider.ts'
-import { inject } from './symbols.ts'
 import { token } from './token.ts'
 import type { ValueProvider } from './value-provider.ts'
 
@@ -107,60 +100,5 @@ describe('isFactoryProvider', () => {
     }
 
     expect(isFactoryProvider(provider)).toBe(false)
-  })
-})
-
-describe('classProviderToDeclaration', () => {
-  it('should return inject declaration from class', () => {
-    class TestClass {
-      static [inject] = [token('dep1'), token('dep2')] as const
-    }
-
-    const provider: ClassProvider = {
-      provide: token('test'),
-      useClass: TestClass,
-    }
-
-    const result = classProviderToDeclaration(provider)
-
-    expect(result).toEqual(['dep1', 'dep2'])
-  })
-
-  it('should return empty object when no inject declaration', () => {
-    class TestClass {}
-
-    const provider: ClassProvider = {
-      provide: token('test'),
-      useClass: TestClass,
-    }
-
-    const result = classProviderToDeclaration(provider)
-
-    expect(result).toEqual({})
-  })
-})
-
-describe('factoryProviderToDeclaration', () => {
-  it('should return inject declaration from factory', () => {
-    const provider: FactoryProvider = {
-      provide: token('test'),
-      inject: [token('dep1'), token('dep2')] as const,
-      useFactory: () => ({}),
-    }
-
-    const result = factoryProviderToDeclaration(provider)
-
-    expect(result).toEqual(['dep1', 'dep2'])
-  })
-
-  it('should return empty object when no inject declaration', () => {
-    const provider: FactoryProvider = {
-      provide: token('test'),
-      useFactory: () => ({}),
-    }
-
-    const result = factoryProviderToDeclaration(provider)
-
-    expect(result).toEqual({})
   })
 })

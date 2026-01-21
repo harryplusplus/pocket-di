@@ -1,5 +1,5 @@
 import type {
-  DependencyTupleOrRecord,
+  DependencyRecord,
   ProviderHasDependencies,
 } from '../types/compositions.ts'
 import type { Injectable } from '../types/injectable.ts'
@@ -11,7 +11,7 @@ import { type InjectionToken, tokenToString } from '../types/token.ts'
 export function resolveInstanceSync(input: {
   token: InjectionToken
   provider: ProviderHasDependencies
-  dependencies: DependencyTupleOrRecord
+  dependencies: DependencyRecord
 }): Injectable {
   const { token, provider, dependencies } = input
 

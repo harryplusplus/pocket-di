@@ -1,5 +1,5 @@
 import type {
-  DependencyTupleOrRecord,
+  DependencyRecord,
   ProviderHasDependencies,
 } from '../types/compositions.ts'
 import type { Injectable } from '../types/injectable.ts'
@@ -9,7 +9,7 @@ import { postConstruct } from '../types/symbols.ts'
 
 export async function resolveInstanceAsync(input: {
   provider: ProviderHasDependencies
-  dependencies: DependencyTupleOrRecord
+  dependencies: DependencyRecord
 }): Promise<Injectable> {
   const { provider, dependencies } = input
 

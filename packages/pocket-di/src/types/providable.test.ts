@@ -6,7 +6,6 @@ import {
   isProviderProvidable,
   providableToProvider,
 } from './providable.ts'
-import { inject } from './symbols.ts'
 import { token } from './token.ts'
 import type { ValueProvider } from './value-provider.ts'
 
@@ -54,19 +53,6 @@ describe('providableToProvider', () => {
     const result = providableToProvider(provider)
 
     expect(result).toBe(provider)
-  })
-
-  it('should convert injectable constructor to class provider', () => {
-    class TestClass {
-      static [inject] = [token('dep')] as const
-    }
-
-    const result = providableToProvider(TestClass)
-
-    expect(result).toEqual({
-      provide: TestClass,
-      useClass: TestClass,
-    } satisfies ClassProvider)
   })
 
   it('should convert injectable constructor without inject to class provider', () => {

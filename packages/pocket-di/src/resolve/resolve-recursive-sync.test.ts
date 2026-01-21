@@ -101,7 +101,7 @@ describe('resolveRecursiveSync with dependencies', () => {
     const depProvider: ValueProvider = { provide: token('dep'), useValue: dep }
 
     class TestClass {
-      static [inject] = [token('dep')] as const
+      static [inject] = { dep: token('dep') }
       deps: unknown[]
       constructor(deps: unknown[]) {
         this.deps = deps

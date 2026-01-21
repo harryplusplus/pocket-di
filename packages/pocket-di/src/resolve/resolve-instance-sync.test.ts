@@ -20,7 +20,7 @@ describe('resolveInstanceSync with class provider', () => {
     const result = resolveInstanceSync({
       token: 'test',
       provider,
-      dependencies: [],
+      dependencies: {},
     })
 
     expect(result).toBeInstanceOf(TestClass)
@@ -41,7 +41,7 @@ describe('resolveInstanceSync with class provider', () => {
       useClass: TestClass,
     }
 
-    resolveInstanceSync({ token: 'test', provider, dependencies: [] })
+    resolveInstanceSync({ token: 'test', provider, dependencies: {} })
 
     expect(called).toBe(true)
   })
@@ -59,7 +59,7 @@ describe('resolveInstanceSync with class provider', () => {
     }
 
     expect(() =>
-      resolveInstanceSync({ token: 'test', provider, dependencies: [] }),
+      resolveInstanceSync({ token: 'test', provider, dependencies: {} }),
     ).toThrow(
       'Cannot resolve "test" (TestClass) synchronously: postConstruct returns Promise',
     )
@@ -78,7 +78,7 @@ describe('resolveInstanceSync with factory provider', () => {
     const result = resolveInstanceSync({
       token: 'test',
       provider,
-      dependencies: [],
+      dependencies: {},
     })
 
     expect(result).toBe(instance)
@@ -91,7 +91,7 @@ describe('resolveInstanceSync with factory provider', () => {
     }
 
     expect(() =>
-      resolveInstanceSync({ token: 'test', provider, dependencies: [] }),
+      resolveInstanceSync({ token: 'test', provider, dependencies: {} }),
     ).toThrow('Cannot resolve "test" synchronously: useFactory returns Promise')
   })
 })

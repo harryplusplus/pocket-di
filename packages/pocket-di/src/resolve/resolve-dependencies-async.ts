@@ -1,13 +1,10 @@
 import {
   type DependencyRecord,
-  type DependencyTuple,
-  type DependencyTupleOrRecord,
   type ProviderHasDependencies,
   type ProviderRegistry,
   providerToDeclaration,
   type SingletonRegistry,
 } from '../types/compositions.ts'
-import { isTupleDependencyDeclaration } from '../types/dependency-declaration.ts'
 import { resolveRecursiveAsync } from './resolve-recursive-async.ts'
 
 export async function resolveDependenciesAsync(
@@ -16,25 +13,11 @@ export async function resolveDependenciesAsync(
     providerRegistry: ProviderRegistry
     provider: ProviderHasDependencies
   },
-): Promise<DependencyTupleOrRecord> {
+): Promise<DependencyRecord> {
   const { singletonRegistry } = context
   const { provider, providerRegistry } = input
 
   const declaration = providerToDeclaration(provider)
-  if (isTupleDependencyDeclaration(declaration)) {
-    const dependencyTuple: DependencyTuple = []
-    for (const item of declaration) {
-      const instance = await resolveRecursiveAsync(
-        { singletonRegistry },
-        { token: item, providerRegistry },
-      )
-
-      dependencyTuple.push(instance)
-    }
-
-    return dependencyTuple
-  }
-
   const dependencyRecord: DependencyRecord = {}
   for (const [name, item] of Object.entries(declaration)) {
     const instance = await resolveRecursiveAsync(

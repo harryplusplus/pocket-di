@@ -69,7 +69,7 @@ describe('validateDeclarationItem success', () => {
 describe('validateDeclarationItem nested', () => {
   it('should validate nested dependencies', () => {
     class DepClass {
-      static [inject] = [token('nested-dep')] as const
+      static [inject] = { dep: token('nested-dep') }
     }
 
     const depProvider: ClassProvider = {

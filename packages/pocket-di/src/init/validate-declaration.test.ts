@@ -22,7 +22,7 @@ describe('validateDeclaration tuple', () => {
     expect(() =>
       validateDeclaration({
         token: 'test',
-        declaration: [token('dep1'), token('dep2')] as const,
+        declaration: { dep1: token('dep1'), dep2: token('dep2') },
         providerRegistry,
         checker,
         className: 'TestClass',
@@ -37,7 +37,7 @@ describe('validateDeclaration tuple', () => {
     expect(() =>
       validateDeclaration({
         token: 'test',
-        declaration: [token('missing')] as const,
+        declaration: { dep: token('missing') },
         providerRegistry,
         checker,
         className: 'TestClass',

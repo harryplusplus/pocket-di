@@ -15,8 +15,6 @@ export type {
 export type {
   DependencyDeclaration,
   DependencyDeclarationItem,
-  RecordDependencyDeclaration,
-  TupleDependencyDeclaration,
 } from './types/dependency-declaration.ts'
 export {
   defineFactoryProvider,

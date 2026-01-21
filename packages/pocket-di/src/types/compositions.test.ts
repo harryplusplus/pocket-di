@@ -3,25 +3,9 @@ import { describe, expect, it } from 'vitest'
 import type { ClassProvider } from './class-provider.ts'
 import { providerToDeclaration } from './compositions.ts'
 import type { FactoryProvider } from './factory-provider.ts'
-import { inject } from './symbols.ts'
 import { token } from './token.ts'
 
 describe('providerToDeclaration', () => {
-  it('should return declaration from class provider', () => {
-    class TestClass {
-      static [inject] = [token('dep1'), token('dep2')] as const
-    }
-
-    const provider: ClassProvider = {
-      provide: token('test'),
-      useClass: TestClass,
-    }
-
-    const result = providerToDeclaration(provider)
-
-    expect(result).toEqual(['dep1', 'dep2'])
-  })
-
   it('should return empty object from class provider without inject', () => {
     class TestClass {}
 

@@ -23,7 +23,7 @@ describe('parse basic', () => {
     class DepClass {}
 
     class TestClass {
-      static [inject] = [DepClass] as const
+      static [inject] = { dep: DepClass }
     }
 
     const result = parse({
