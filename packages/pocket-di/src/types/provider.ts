@@ -22,14 +22,12 @@ export interface ProviderFn<I extends Injectable> {
 function defineProvider<
   I extends Injectable = Injectable,
   ID extends InjectDeclaration = InjectDeclaration,
-  C extends I = I,
->(provider: Provider<I, ID, C>): Provider<I, ID, C>
+>(provider: Provider<I, ID, I>): Provider<I, ID, I>
 function defineProvider<I extends Injectable>(): ProviderFn<I>
 function defineProvider<
   I extends Injectable = Injectable,
   ID extends InjectDeclaration = InjectDeclaration,
-  C extends I = I,
->(provider?: Provider<I, ID, C>): Provider<I, ID, C> | ProviderFn<I> {
+>(provider?: Provider<I, ID, I>): Provider<I, ID, I> | ProviderFn<I> {
   if (provider) {
     return provider
   }
