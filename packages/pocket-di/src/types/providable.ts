@@ -2,11 +2,11 @@ import type { InjectDeclaration } from './inject-declaration.ts'
 import type { Injectable } from './injectable.ts'
 import type { InjectableConstructor } from './injectable-constructor.ts'
 import type { Provider } from './provider.ts'
-import type { InferInjectable, InjectionToken } from './token.ts'
+import type { InferableToken, InferInjectable } from './token.ts'
 import type { Any } from './utils.ts'
 
 export type Providable<
-  T extends InjectionToken = InjectionToken,
+  T extends InferableToken = InferableToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
   D extends InjectDeclaration = InjectDeclaration,

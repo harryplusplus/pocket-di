@@ -4,11 +4,17 @@ import type { Injectable } from './injectable.ts'
 import type { InjectableConstructor } from './injectable-constructor.ts'
 import type { Scope, Singleton, Transient } from './scope.ts'
 import { inject } from './symbols.ts'
-import { type InferInjectable, type InjectionToken } from './token.ts'
+import {
+  type InferableToken,
+  type InferInjectable,
+  type InjectionToken,
+  type PlainToken,
+  type TypedToken,
+} from './token.ts'
 import type { MaybePromise } from './utils.ts'
 
 export type Provider<
-  T extends InjectionToken = InjectionToken,
+  T extends InferableToken = InferableToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
   D extends InjectDeclaration = InjectDeclaration,
@@ -17,16 +23,7 @@ export type Provider<
   | ClassProvider<T, I, C, D>
   | FactoryProvider<T, I, C, D>
 
-export function defineProvider<
-  T extends InjectionToken = InjectionToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
-  D extends InjectDeclaration = InjectDeclaration,
->(provider: Provider<T, I, C, D>): Provider<T, I, C, D> {
-  return provider
-}
-
-export interface ValueProvider<
+export interface ValueProviderInput<
   T extends InjectionToken = InjectionToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
@@ -35,11 +32,27 @@ export interface ValueProvider<
   useValue: C
 }
 
-function defineValueProvider<
-  T extends InjectionToken = InjectionToken,
+export interface ValueProvider<
+  T extends InferableToken = InferableToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
->(provider: ValueProvider<T, I, C>): ValueProvider<T, I, C> {
+> {
+  provide: T
+  useValue: C
+}
+
+function defineValueProvider<T extends PlainToken, I extends Injectable>(
+  provider: ValueProviderInput<T, I, I>,
+): ValueProvider<TypedToken<I>, I, I>
+
+function defineValueProvider<
+  T extends InferableToken,
+  C extends InferInjectable<T>,
+>(
+  provider: ValueProviderInput<T, InferInjectable<T>, C>,
+): ValueProvider<T, InferInjectable<T>, C>
+
+function defineValueProvider(provider: ValueProviderInput): ValueProvider {
   return provider
 }
 
@@ -49,7 +62,7 @@ export function isValueProvider(x: Provider): x is ValueProvider {
   return 'useValue' in x
 }
 
-export interface ClassProvider<
+export interface ClassProviderInput<
   T extends InjectionToken = InjectionToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
@@ -60,12 +73,34 @@ export interface ClassProvider<
   scope?: Scope
 }
 
-function defineClassProvider<
-  T extends InjectionToken = InjectionToken,
+export interface ClassProvider<
+  T extends InferableToken = InferableToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
   D extends InjectDeclaration = InjectDeclaration,
->(provider: ClassProvider<T, I, C, D>): ClassProvider<T, I, C, D> {
+> {
+  provide: T
+  useClass: InjectableConstructor<C, D>
+  scope?: Scope
+}
+
+function defineClassProvider<
+  T extends PlainToken,
+  I extends Injectable,
+  D extends InjectDeclaration,
+>(
+  provider: ClassProviderInput<T, I, I, D>,
+): ClassProvider<TypedToken<I>, I, I, D>
+
+function defineClassProvider<
+  T extends InferableToken,
+  C extends InferInjectable<T>,
+  D extends InjectDeclaration,
+>(
+  provider: ClassProviderInput<T, InferInjectable<T>, C, D>,
+): ClassProvider<T, InferInjectable<T>, C, D>
+
+function defineClassProvider(provider: ClassProviderInput): ClassProvider {
   return provider
 }
 
@@ -81,7 +116,7 @@ export function classProviderToDeclaration(
   return x.useClass[inject] ?? {}
 }
 
-export interface SingletonFactoryProvider<
+export interface SingletonFactoryProviderInput<
   T extends InjectionToken = InjectionToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
@@ -94,7 +129,7 @@ export interface SingletonFactoryProvider<
   preDestroy?: (instance: C) => MaybePromise<void>
 }
 
-export interface TransientFactoryProvider<
+export interface TransientFactoryProviderInput<
   T extends InjectionToken = InjectionToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
@@ -107,19 +142,67 @@ export interface TransientFactoryProvider<
   preDestroy?: never
 }
 
-export type FactoryProvider<
+export type FactoryProviderInput<
   T extends InjectionToken = InjectionToken,
+  I extends Injectable = InferInjectable<T>,
+  C extends I = I,
+  D extends InjectDeclaration = InjectDeclaration,
+> =
+  | SingletonFactoryProviderInput<T, I, C, D>
+  | TransientFactoryProviderInput<T, I, C, D>
+
+export interface SingletonFactoryProvider<
+  T extends InferableToken = InferableToken,
+  I extends Injectable = InferInjectable<T>,
+  C extends I = I,
+  D extends InjectDeclaration = InjectDeclaration,
+> {
+  provide: T
+  inject?: D
+  useFactory: (dependencies: Dependencies<D>) => MaybePromise<C>
+  scope?: Singleton
+  preDestroy?: (instance: C) => MaybePromise<void>
+}
+
+export interface TransientFactoryProvider<
+  T extends InferableToken = InferableToken,
+  I extends Injectable = InferInjectable<T>,
+  C extends I = I,
+  D extends InjectDeclaration = InjectDeclaration,
+> {
+  provide: T
+  inject?: D
+  useFactory: (dependencies: Dependencies<D>) => MaybePromise<C>
+  scope: Transient
+  preDestroy?: never
+}
+
+export type FactoryProvider<
+  T extends InferableToken = InferableToken,
   I extends Injectable = InferInjectable<T>,
   C extends I = I,
   D extends InjectDeclaration = InjectDeclaration,
 > = SingletonFactoryProvider<T, I, C, D> | TransientFactoryProvider<T, I, C, D>
 
 function defineFactoryProvider<
-  T extends InjectionToken = InjectionToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
-  D extends InjectDeclaration = InjectDeclaration,
->(provider: FactoryProvider<T, I, C, D>): FactoryProvider<T, I, C, D> {
+  T extends PlainToken,
+  I extends Injectable,
+  D extends InjectDeclaration,
+>(
+  provider: FactoryProviderInput<T, I, I, D>,
+): FactoryProvider<TypedToken<I>, I, I, D>
+
+function defineFactoryProvider<
+  T extends InferableToken,
+  C extends InferInjectable<T>,
+  D extends InjectDeclaration,
+>(
+  provider: FactoryProviderInput<T, InferInjectable<T>, C, D>,
+): FactoryProvider<T, InferInjectable<T>, C, D>
+
+function defineFactoryProvider(
+  provider: FactoryProviderInput,
+): FactoryProvider {
   return provider
 }
 
