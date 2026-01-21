@@ -34,6 +34,9 @@ function defineValueProvider<I extends Injectable>(
 ): ValueProvider<I>
 function defineValueProvider<I extends Injectable>(
   provider: ValueProvider<I>,
+): ValueProvider<I>
+function defineValueProvider<I extends Injectable>(
+  provider: ValueProvider<I>,
 ): ValueProvider<I> {
   return provider
 }
@@ -70,6 +73,11 @@ export interface ClassProvider<
 function defineClassProvider<I extends Injectable, D extends InjectDeclaration>(
   provider: ClassProviderInput<I, D>,
 ): ClassProvider<I, I, D>
+function defineClassProvider<
+  I extends Injectable,
+  C extends I,
+  D extends InjectDeclaration,
+>(provider: ClassProvider<I, C, D>): ClassProvider<I, C, D>
 function defineClassProvider<
   I extends Injectable,
   C extends I,
