@@ -7,45 +7,6 @@ import { token } from '../types/token.ts'
 import type { ValueProvider } from '../types/value-provider.ts'
 import { validateDeclaration } from './validate-declaration.ts'
 
-describe('validateDeclaration tuple', () => {
-  it('should validate tuple declaration with registered dependencies', () => {
-    const provider1: ValueProvider = { provide: token('dep1'), useValue: {} }
-
-    const provider2: ValueProvider = { provide: token('dep2'), useValue: {} }
-
-    const providerRegistry: ProviderRegistry = new Registry(null)
-    providerRegistry.map.set('dep1', provider1)
-    providerRegistry.map.set('dep2', provider2)
-
-    const checker = new CircularDependencyChecker()
-
-    expect(() =>
-      validateDeclaration({
-        token: 'test',
-        declaration: { dep1: token('dep1'), dep2: token('dep2') },
-        providerRegistry,
-        checker,
-        className: 'TestClass',
-      }),
-    ).not.toThrow()
-  })
-
-  it('should throw error for missing dependency in tuple', () => {
-    const providerRegistry: ProviderRegistry = new Registry(null)
-    const checker = new CircularDependencyChecker()
-
-    expect(() =>
-      validateDeclaration({
-        token: 'test',
-        declaration: { dep: token('missing') },
-        providerRegistry,
-        checker,
-        className: 'TestClass',
-      }),
-    ).toThrow('dependency "missing" is not registered')
-  })
-})
-
 describe('validateDeclaration record', () => {
   it('should validate record declaration with registered dependencies', () => {
     const provider1: ValueProvider = { provide: token('dep1'), useValue: {} }

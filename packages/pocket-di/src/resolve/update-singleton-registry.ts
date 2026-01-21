@@ -1,6 +1,7 @@
-import type {
-  ProviderHasDependencies,
-  SingletonRegistry,
+import {
+  type ProviderHasDependencies,
+  type SingletonRegistry,
+  tokenToRegistryKey,
 } from '../types/compositions.ts'
 import type { Injectable } from '../types/injectable.ts'
 import type { InjectionToken } from '../types/token.ts'
@@ -19,6 +20,7 @@ export function updateSingletonRegistry(
   const { scope = 'singleton' } = provider
 
   if (scope === 'singleton') {
-    singletonRegistry.map.set(token, instance)
+    const key = tokenToRegistryKey(token)
+    singletonRegistry.map.set(key, instance)
   }
 }

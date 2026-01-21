@@ -20,15 +20,16 @@ describe('providerToDeclaration', () => {
   })
 
   it('should return declaration from factory provider', () => {
+    const deps = { dep1: token('dep1'), dep2: token('dep2') }
     const provider: FactoryProvider = {
       provide: token('test'),
-      inject: { dep1: token('dep1'), dep2: token('dep2') },
+      inject: deps,
       useFactory: () => ({}),
     }
 
     const result = providerToDeclaration(provider)
 
-    expect(result).toEqual({ dep1: 'dep1', dep2: 'dep2' })
+    expect(result).toEqual(deps)
   })
 
   it('should return empty object from factory provider without inject', () => {

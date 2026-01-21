@@ -54,7 +54,7 @@ describe('Container resolve', () => {
 
     const result = await container.resolve(TestClass)
 
-    expect(result.deps).toEqual([dep])
+    expect(result.deps).toEqual({ dep })
   })
 })
 

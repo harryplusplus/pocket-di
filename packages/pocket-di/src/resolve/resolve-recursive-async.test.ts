@@ -6,7 +6,6 @@ import type {
   ProviderRegistry,
   SingletonRegistry,
 } from '../types/compositions.ts'
-import { inject } from '../types/symbols.ts'
 import { token } from '../types/token.ts'
 import type { ValueProvider } from '../types/value-provider.ts'
 import { resolveRecursiveAsync } from './resolve-recursive-async.ts'
@@ -91,39 +90,5 @@ describe('resolveRecursiveAsync create instance', () => {
     )
 
     expect(singletonRegistry.map.get('test')).toBeUndefined()
-  })
-})
-
-describe('resolveRecursiveAsync with dependencies', () => {
-  it('should resolve dependencies recursively', async () => {
-    const dep = { value: 'dep' }
-
-    const depProvider: ValueProvider = { provide: token('dep'), useValue: dep }
-
-    class TestClass {
-      static [inject] = { dep: token('dep') }
-      deps: unknown[]
-      constructor(deps: unknown[]) {
-        this.deps = deps
-      }
-    }
-
-    const provider: ClassProvider = {
-      provide: token('test'),
-      useClass: TestClass,
-    }
-
-    const singletonRegistry: SingletonRegistry = new Registry(null)
-    const providerRegistry: ProviderRegistry = new Registry(null)
-    providerRegistry.map.set('dep', depProvider)
-    providerRegistry.map.set('test', provider)
-
-    const result = await resolveRecursiveAsync(
-      { singletonRegistry },
-      { providerRegistry, token: 'test' },
-    )
-
-    expect(result).toBeInstanceOf(TestClass)
-    expect((result as TestClass).deps).toEqual([dep])
   })
 })

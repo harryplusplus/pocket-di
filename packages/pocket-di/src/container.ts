@@ -4,9 +4,10 @@ import { parse } from './init/parse.ts'
 import { Registry } from './registry.ts'
 import { resolveRecursiveAsync } from './resolve/resolve-recursive-async.ts'
 import { resolveRecursiveSync } from './resolve/resolve-recursive-sync.ts'
-import type {
-  ProviderRegistry,
-  SingletonRegistry,
+import {
+  type ProviderRegistry,
+  type SingletonRegistry,
+  tokenToRegistryKey,
 } from './types/compositions.ts'
 import {
   type ChildContainerOptions,
@@ -85,14 +86,20 @@ export class ContainerImpl {
     token: InjectionToken,
     options?: { localOnly?: boolean },
   ): boolean {
-    return this.providerRegistry.find(token, options) !== null
+    this.ensureNotDestroyed()
+
+    const key = tokenToRegistryKey(token)
+    return this.providerRegistry.find(key, options) !== null
   }
 
   hasSingleton(
     token: InjectionToken,
     options?: { localOnly?: boolean },
   ): boolean {
-    return this.singletonRegistry.find(token, options) !== null
+    this.ensureNotDestroyed()
+
+    const key = tokenToRegistryKey(token)
+    return this.singletonRegistry.find(key, options) !== null
   }
 
   createChild(options: ChildContainerOptions): Container {

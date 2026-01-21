@@ -1,7 +1,8 @@
-import type {
-  ProviderHasDependencies,
-  ProviderRegistry,
-  SingletonRegistry,
+import {
+  type ProviderHasDependencies,
+  type ProviderRegistry,
+  type SingletonRegistry,
+  tokenToRegistryKey,
 } from '../types/compositions.ts'
 import type { Injectable } from '../types/injectable.ts'
 import { isValueProvider } from '../types/provider.ts'
@@ -18,12 +19,13 @@ export function resolveInstanceOrProvider(input: {
 }): ResolveInstanceOrProviderOutput {
   const { singletonRegistry, providerRegistry, token } = input
 
-  const singleton = singletonRegistry.find(token)
+  const key = tokenToRegistryKey(token)
+  const singleton = singletonRegistry.find(key)
   if (singleton) {
     return { kind: 'instance', instance: singleton }
   }
 
-  const provider = providerRegistry.find(token)
+  const provider = providerRegistry.find(key)
   if (!provider) {
     throw new Error(
       `Internal error: provider for token "${tokenToString(token)}" not found during resolve.`,

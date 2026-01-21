@@ -1,5 +1,8 @@
 import { CircularDependencyChecker } from '../circular-dependency-checker.ts'
-import type { ProviderRegistry } from '../types/compositions.ts'
+import {
+  type ProviderRegistry,
+  tokenToRegistryKey,
+} from '../types/compositions.ts'
 import type { AnyProvidable } from '../types/providable.ts'
 import { parseProviderRegistry } from './parse-provider-registry.ts'
 import { validateDeclarationRecursive } from './validate-declaration-recursive.ts'
@@ -19,7 +22,8 @@ export function parse(input: {
 
   for (const provider of providerRegistry.map.values()) {
     const checker = new CircularDependencyChecker()
-    checker.push(provider.provide)
+    const key = tokenToRegistryKey(provider.provide)
+    checker.push(key)
 
     validateDeclarationRecursive({ provider, providerRegistry, checker })
   }

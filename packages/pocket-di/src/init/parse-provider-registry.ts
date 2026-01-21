@@ -1,5 +1,8 @@
 import { Registry } from '../registry.ts'
-import type { ProviderRegistry } from '../types/compositions.ts'
+import {
+  type ProviderRegistry,
+  tokenToRegistryKey,
+} from '../types/compositions.ts'
 import { type Providable, providableToProvider } from '../types/providable.ts'
 import { validateProvider } from './validate-provider.ts'
 
@@ -17,7 +20,8 @@ export function parseProviderRegistry(input: {
 
     validateProvider({ providerRegistry, token, override })
 
-    providerRegistry.map.set(token, provider)
+    const key = tokenToRegistryKey(token)
+    providerRegistry.map.set(key, provider)
   }
 
   return providerRegistry
