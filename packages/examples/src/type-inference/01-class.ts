@@ -5,7 +5,7 @@ class Foo {
   fooFoo() {}
 }
 
-// Infer the type of the dependency declaration object.
+// Infer dependency types from the static inject declaration.
 type BarDeps = InferDependencies<typeof Bar>
 /**
  * type: {
@@ -24,8 +24,8 @@ export class Bar {
   }
 }
 
-// Infer the type of the dependency declaration object as Context for the
-// instance.
+// Infer dependency types from the static inject declaration as a Context for
+// the instance.
 type BazContext = InferDependencies<typeof Baz>
 
 export class Baz {
