@@ -63,7 +63,7 @@ class Baz {
 }
 
 /******************************************************************************
- * Validate the injected class type using a type-bound token.
+ * Validate the provided class type using a type-bound token.
  ******************************************************************************/
 
 class Qux {

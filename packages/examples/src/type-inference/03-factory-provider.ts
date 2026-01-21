@@ -58,6 +58,10 @@ bar.fooFoo()
 await container.destroy()
 // [Bar] close()
 
+/******************************************************************************
+ * Validate the provided factory type using a type-bound token.
+ ******************************************************************************/
+
 interface Baz {
   bazBaz(): void
 }
