@@ -4,14 +4,14 @@ import type { Injectable } from './injectable.ts'
 import type { InjectableConstructor } from './injectable-constructor.ts'
 import type { Scope, Singleton, Transient } from './scope.ts'
 import { inject } from './symbols.ts'
-import type { InjectionToken } from './token.ts'
+import { type InjectionToken } from './token.ts'
 import type { MaybePromise } from './utils.ts'
 
 export type Provider<
   I extends Injectable = Injectable,
   ID extends InjectDeclaration = InjectDeclaration,
   C extends I = I,
-> = ValueProvider<I> | ClassProvider<I> | FactoryProvider<I, ID, C>
+> = ValueProvider<I> | ClassProvider<I, C> | FactoryProvider<I, ID, C>
 
 export interface ProviderFn<I extends Injectable> {
   <ID extends InjectDeclaration, C extends I>(
@@ -53,9 +53,16 @@ export function isValueProvider(x: Provider): x is ValueProvider {
 
 export interface ClassProvider<
   I extends Injectable = Injectable,
+  C extends I = I,
 > extends ProviderBase<I> {
-  useClass: InjectableConstructor
+  useClass: InjectableConstructor<C>
   scope?: Scope
+}
+
+export function defineClassProvider<I extends Injectable, C extends I>(
+  provider: ClassProvider<I, C>,
+): ClassProvider<I, C> {
+  return provider
 }
 
 export function isClassProvider(x: Provider): x is ClassProvider {
