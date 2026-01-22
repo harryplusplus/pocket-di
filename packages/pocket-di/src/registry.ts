@@ -29,8 +29,4 @@ export class Registry<K, V> {
 
     return this.parent?.find(key)
   }
-
-  set(key: K, value: V): void {
-    this.map.set(key, value)
-  }
 }

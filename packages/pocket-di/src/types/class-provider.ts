@@ -7,15 +7,14 @@ import type {
 } from './injectable-constructor.ts'
 import type { Scope } from './scope.ts'
 import { type Key, type Token, token } from './token.ts'
-import type { Any } from './utils.ts'
 
 const DEFAULT_SCOPE = 'singleton'
 
 export interface ClassProvider<
-  K extends Key = Any,
-  I extends Injectable = Any,
-  C extends InjectableConstructor = Any,
-  D extends DependencyDeclaration = Any,
+  K extends Key = Key,
+  I extends Injectable = Injectable,
+  C extends InjectableConstructor = InjectableConstructor,
+  D extends DependencyDeclaration = DependencyDeclaration,
 > {
   token: Token<K, I>
   useClass: C

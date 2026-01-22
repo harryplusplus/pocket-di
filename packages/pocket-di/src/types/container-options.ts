@@ -10,8 +10,16 @@ export interface ChildContainerOptions<Ps extends Providers> {
   override?: boolean
 }
 
-export interface ContainerContextOptions {
+export interface ContextOptions {
   providers: Providers
   override?: boolean
   parent?: ContainerContext
 }
+
+export function fillContextOptions(options: ContextOptions) {
+  const { parent = null, override = false, ...rest } = options
+
+  return { ...rest, parent, override }
+}
+
+export type FilledContextOptions = ReturnType<typeof fillContextOptions>

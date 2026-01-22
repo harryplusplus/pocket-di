@@ -1,9 +1,8 @@
 import type { Injectable } from './injectable.ts'
-import type { Any } from './utils.ts'
 
 export type Key = string
 
-export interface Token<K extends Key = Any, I extends Injectable = Any> {
+export interface Token<K extends Key = Key, I extends Injectable = Injectable> {
   key: K
   _type: I
 }

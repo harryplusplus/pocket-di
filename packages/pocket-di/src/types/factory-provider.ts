@@ -5,17 +5,17 @@ import type {
 import type { Injectable } from './injectable.ts'
 import type { Scope, Singleton, Transient } from './scope.ts'
 import { type Key, type Token, token } from './token.ts'
-import type { Any, MaybePromise } from './utils.ts'
+import type { MaybePromise } from './utils.ts'
 
 const DEFAULT_SCOPE: Scope = 'singleton'
 const DEFAULT_PRE_DESTROY = () => {}
 const DEFAULT_INJECT: DependencyDeclaration = {}
 
 export interface FactoryProvider<
-  K extends Key = Any,
-  I extends Injectable = Any,
-  C extends I = Any,
-  D extends DependencyDeclaration = Any,
+  K extends Key = Key,
+  I extends Injectable = Injectable,
+  C extends I = I,
+  D extends DependencyDeclaration = DependencyDeclaration,
 > {
   token: Token<K, I>
   inject: D

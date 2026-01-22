@@ -2,11 +2,13 @@ import { AsyncLock } from './async-lock.ts'
 import { createContainerProxy } from './container-proxy.ts'
 import { Destroyer } from './destroyer.ts'
 import { Handler } from './handler.ts'
+import { Initializer } from './initializer.ts'
 import { Registry, type RegistryFindOptions } from './registry.ts'
 import type { Container } from './types/container.ts'
-import type {
-  ChildContainerOptions,
-  ContainerContextOptions,
+import {
+  type ChildContainerOptions,
+  type ContextOptions,
+  fillContextOptions,
 } from './types/container-options.ts'
 import type { Injectable } from './types/injectable.ts'
 import type { ExtractTypeInfo, Provider, Providers } from './types/provider.ts'
@@ -28,10 +30,11 @@ export class ContainerContext<T extends TypeInfo = TypeInfo> {
   destroyCalled = false
   _type = undefined as unknown as T
 
-  constructor(options: ContainerContextOptions) {
-    const { providers, parent, override = false } = options
+  constructor(options: ContextOptions) {
+    const filledOptions = fillContextOptions(options)
+    const { providers, parent } = filledOptions
 
-    this.keySet = new Set(providers.map((p) => p.token.key as Key))
+    this.keySet = new Set(providers.map((p) => p.token.key))
     this.providerRegistry = new Registry<string, Provider>(
       parent?.providerRegistry,
     )
@@ -41,6 +44,9 @@ export class ContainerContext<T extends TypeInfo = TypeInfo> {
     this.singletonRegistry = new Registry<string, Injectable>(
       parent?.singletonRegistry,
     )
+
+    const initializer = new Initializer(this, filledOptions)
+    initializer.init()
   }
 
   async $destroy(): Promise<void> {
@@ -104,7 +110,7 @@ export class ContainerContext<T extends TypeInfo = TypeInfo> {
 
     const handler = new Handler<I>(this, key)
 
-    this.handlerRegistry.set(key, handler)
+    this.handlerRegistry.map.set(key, handler)
 
     return handler
   }

@@ -1,11 +1,10 @@
 import type { Injectable } from './injectable.ts'
 import { type Key, type Token, token } from './token.ts'
-import type { Any } from './utils.ts'
 
 export interface ValueProvider<
-  K extends Key = Any,
-  I extends Injectable = Any,
-  C extends I = Any,
+  K extends Key = Key,
+  I extends Injectable = Injectable,
+  C extends I = I,
 > {
   token: Token<K, I>
   useValue: C
