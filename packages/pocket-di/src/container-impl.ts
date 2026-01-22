@@ -8,32 +8,53 @@ import type {
 } from './types/container-options.ts'
 import type { Handler, HasSingletonOptions } from './types/handler.ts'
 import type { Injectable } from './types/injectable.ts'
-import type { ExtractTypeInfo, Providers } from './types/provider.ts'
+import type { ExtractTypeInfo, Provider, Providers } from './types/provider.ts'
 import type { Key, TypeInfo } from './types/token.ts'
 
-export type Keys = Set<string>
-export type Handlers = Registry<string, Handler>
-export type Singletons = Registry<string, Injectable>
+export type Keys = Set<Key>
+export type HandlerRegistry = Registry<Key, Handler>
+export type SingletonRegistry = Registry<Key, Injectable>
+export type ProviderRegistry = Registry<Key, Provider>
 
 export class ContainerImpl<T extends TypeInfo = TypeInfo> {
   lock = new AsyncLock()
   children: ContainerImpl[] = []
   keys: Keys
-  handlers: Handlers
-  singletons: Singletons
+  providerRegistry: ProviderRegistry
+  handlerRegistry: HandlerRegistry
+  singletonRegistry: SingletonRegistry
   destroyCalled = false
   _type = undefined as unknown as T
 
   constructor(options: ContainerImplOptions) {
     const { providers, parent, override = false } = options
 
-    this.keys = new Set(providers.map((p) => p.token.key as string))
-    this.handlers = new Registry<string, Handler>(parent?.handlers)
-    this.singletons = new Registry<string, Injectable>(parent?.singletons)
+    this.keys = new Set(providers.map((p) => p.token.key as Key))
+    this.providerRegistry = new Registry<string, Provider>(
+      parent?.providerRegistry,
+    )
+    this.handlerRegistry = new Registry<string, Handler>(
+      parent?.handlerRegistry,
+    )
+    this.singletonRegistry = new Registry<string, Injectable>(
+      parent?.singletonRegistry,
+    )
   }
 
-  $destroy(): Promise<void> {
-    throw new Error('Method not implemented.')
+  async $destroy(): Promise<void> {
+    if (this.destroyCalled) {
+      return
+    }
+
+    await this.lock.acquire(async () => {
+      if (this.destroyCalled) {
+        return
+      }
+
+      this.destroyCalled = true
+
+      await destroyContainer({ container: this })
+    })
   }
 
   $createChild<const Ps extends Providers>(
@@ -69,7 +90,7 @@ export class ContainerImpl<T extends TypeInfo = TypeInfo> {
   $hasSingleton<K extends Key>(key: K, options?: HasSingletonOptions): boolean {
     this.$ensureNotDestroyed()
 
-    return this.singletons.find(key, options) !== undefined
+    return this.singletonRegistry.find(key, options) !== undefined
   }
 
   $getOrCreateHandler<K extends Key, I extends Injectable>(
@@ -77,7 +98,7 @@ export class ContainerImpl<T extends TypeInfo = TypeInfo> {
   ): Handler<I> | undefined {
     this.$ensureNotDestroyed()
 
-    const found = this.handlers.find(key)
+    const found = this.handlerRegistry.find(key)
     if (found) {
       return found as Handler<I>
     }
@@ -93,7 +114,7 @@ export class ContainerImpl<T extends TypeInfo = TypeInfo> {
       hasSingleton: (options) => this.$hasSingleton(key, options),
     }
 
-    this.handlers.set(key, handler)
+    this.handlerRegistry.set(key, handler)
 
     return handler
   }
