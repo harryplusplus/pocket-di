@@ -1,15 +1,10 @@
+import type {
+  ChildContainerOptions,
+  ContainerOptions,
+} from './container-options.ts'
 import type { Injectable } from './injectable.ts'
-import type { ExtractTypeInfo, ProviderList } from './provider.ts'
+import type { ExtractTypeInfo, Providers } from './provider.ts'
 import type { Key, TypeInfo } from './token.ts'
-
-export interface ContainerOptions<Ps extends ProviderList> {
-  providers: Ps
-}
-
-export interface ChildContainerOptions<Ps extends ProviderList> {
-  providers: Ps
-  override?: boolean
-}
 
 export interface Handler<I extends Injectable = Injectable> {
   resolve(): Promise<I>
@@ -22,13 +17,13 @@ export class ContainerImpl<T extends TypeInfo> {
   handlers: Map<Key, Handler> = new Map()
   _type = undefined as unknown as T
 
-  constructor(options: ContainerOptions<ProviderList>) {}
+  constructor(options: ContainerOptions<Providers>) {}
 
   $destroy(): Promise<void> {
     throw new Error('Method not implemented.')
   }
 
-  $createChild<const Ps extends ProviderList>(
+  $createChild<const Ps extends Providers>(
     options: ChildContainerOptions<Ps>,
   ): Container<T & ExtractTypeInfo<Ps>> {
     throw new Error('Method not implemented.')
@@ -54,7 +49,7 @@ const ALLOW_LIST = new Set<string>([
 
 const SKIP_LIST = new Set(['then', 'catch', 'finally'])
 
-export function createContainer<const Ps extends ProviderList>(
+export function createContainer<const Ps extends Providers>(
   options: ContainerOptions<Ps>,
 ): Container<ExtractTypeInfo<Ps>> {
   return new Proxy(new ContainerImpl<ExtractTypeInfo<Ps>>(options), {

@@ -21,12 +21,12 @@ export function isFactoryProvider(
   return 'useFactory' in provider
 }
 
-export type ProviderList = readonly Provider[]
+export type Providers = readonly Provider[]
 
-export type ExtractTokenList<Ps extends ProviderList> = {
+export type ExtractTokens<Ps extends Providers> = {
   [K in keyof Ps]: ExtractToken<Ps[K]>
 }
 
-export type ExtractTypeInfo<Ps extends ProviderList> = ToTypeInfo<
-  ExtractTokenList<Ps>
+export type ExtractTypeInfo<Ps extends Providers> = ToTypeInfo<
+  ExtractTokens<Ps>
 >
