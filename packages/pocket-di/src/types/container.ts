@@ -1,9 +1,9 @@
-import type { ContainerImpl } from '../container-impl.ts'
-import type { Handler } from './handler.ts'
+import type { ContainerContext } from '../container-context.ts'
+import type { Handler } from '../handler.ts'
 import type { TypeInfo } from './token.ts'
 
 export type ContainerPublicMethods<T extends TypeInfo = TypeInfo> = Pick<
-  ContainerImpl<T>,
+  ContainerContext<T>,
   '$createChild' | '$destroy'
 >
 

@@ -73,22 +73,3 @@ function defineClassProvider<
 }
 
 export { defineClassProvider }
-
-// class Foo {}
-
-// const fooProvider = defineClassProvider({ provide: 'foo', useClass: Foo })
-
-// class Bar {
-//   static [inject] = { foo: fooProvider.token }
-// }
-
-// const barProvider = defineClassProvider({ provide: 'bar', useClass: Bar })
-
-// class Foo2 {
-//   static [inject] = { bar: barProvider.token }
-// }
-
-// const foo2Provider = defineClassProvider({
-//   provide: fooProvider.token,
-//   useClass: Foo2,
-// })

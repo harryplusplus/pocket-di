@@ -1,4 +1,4 @@
-import type { ContainerImpl } from '../container-impl.ts'
+import type { ContainerContext } from '../container-context.ts'
 import type { Providers } from './provider.ts'
 
 export interface ContainerOptions<Ps extends Providers> {
@@ -10,8 +10,8 @@ export interface ChildContainerOptions<Ps extends Providers> {
   override?: boolean
 }
 
-export interface ContainerImplOptions {
+export interface ContainerContextOptions {
   providers: Providers
   override?: boolean
-  parent?: ContainerImpl
+  parent?: ContainerContext
 }

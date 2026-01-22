@@ -6,7 +6,6 @@ import type { Injectable } from './injectable.ts'
 import type { Scope, Singleton, Transient } from './scope.ts'
 import { type Key, type Token, token } from './token.ts'
 import type { Any, MaybePromise } from './utils.ts'
-import type { ValueProvider } from './value-provider.ts'
 
 const DEFAULT_SCOPE: Scope = 'singleton'
 const DEFAULT_PRE_DESTROY = () => {}
@@ -139,43 +138,3 @@ function defineFactoryProvider<
 }
 
 export { defineFactoryProvider }
-
-// const aProvider = defineFactoryProvider({
-//   provide: 'a',
-//   useFactory: () => {
-//     const a = { a(): void {} }
-//     return a
-//   },
-// })
-
-// type AKey = ExtractKey<typeof aProvider>
-// type AInjectable = ExtractInjectable<typeof aProvider>
-
-// const bProvider = defineFactoryProvider({
-//   provide: aProvider.token,
-//   useFactory: () => {
-//     const a = { a(): void {}, b(): void {} }
-//     return a
-//   },
-//   preDestroy: (instance) => {
-//     instance.a()
-//     instance.b()
-//   },
-// })
-
-// const cProvider = defineFactoryProvider({
-//   provide: 'c',
-//   inject: { a: aProvider.token, b: bProvider.token },
-//   useFactory: ({ a, b }) => {
-//     const c = { c(): void {}, a, b }
-//     return c
-//   },
-// })
-
-// const dProvider = defineFactoryProvider({
-//   provide: 'd',
-//   useFactory: () => {
-//     const d = { d(): void {} }
-//     return d
-//   },
-// })
