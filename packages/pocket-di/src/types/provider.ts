@@ -1,28 +1,32 @@
 import type { ClassProvider } from './class-provider.ts'
-import type { DependencyDeclaration } from './dependency-declaration.ts'
 import type { FactoryProvider } from './factory-provider.ts'
-import type { Injectable } from './injectable.ts'
-import { type InferableToken, type InferInjectable } from './token.ts'
+import type { ToTypeInfo } from './token.ts'
 import type { ValueProvider } from './value-provider.ts'
 
-export type Provider<
-  T extends InferableToken = InferableToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
-  D extends DependencyDeclaration = DependencyDeclaration,
-> =
-  | ValueProvider<T, I>
-  | ClassProvider<T, I, C, D>
-  | FactoryProvider<T, I, C, D>
+export type Provider = ValueProvider | ClassProvider | FactoryProvider
 
-export function isValueProvider(x: Provider): x is ValueProvider {
-  return 'useValue' in x
+export type ExtractToken<T extends Provider> = T['token']
+
+export function isValueProvider(provider: Provider): provider is ValueProvider {
+  return 'useValue' in provider
 }
 
-export function isClassProvider(x: Provider): x is ClassProvider {
-  return 'useClass' in x
+export function isClassProvider(provider: Provider): provider is ClassProvider {
+  return 'useClass' in provider
 }
 
-export function isFactoryProvider(x: Provider): x is FactoryProvider {
-  return 'useFactory' in x
+export function isFactoryProvider(
+  provider: Provider,
+): provider is FactoryProvider {
+  return 'useFactory' in provider
 }
+
+export type ProviderList = readonly Provider[]
+
+export type ExtractTokenList<Ps extends ProviderList> = {
+  [K in keyof Ps]: ExtractToken<Ps[K]>
+}
+
+export type ExtractTypeInfo<Ps extends ProviderList> = ToTypeInfo<
+  ExtractTokenList<Ps>
+>

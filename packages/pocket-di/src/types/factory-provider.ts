@@ -1,117 +1,181 @@
-import type { Dependencies } from './dependencies.ts'
-import type { DependencyDeclaration } from './dependency-declaration.ts'
+import type {
+  DependencyDeclaration,
+  ExtractDependencies,
+} from './dependency-declaration.ts'
 import type { Injectable } from './injectable.ts'
-import type { Singleton, Transient } from './scope.ts'
-import {
-  type InferableToken,
-  type InferInjectable,
-  type InjectionToken,
-  isPlainToken,
-  type PlainToken,
-  token,
-  type TypedToken,
-} from './token.ts'
-import type { MaybePromise } from './utils.ts'
+import type { Scope, Singleton, Transient } from './scope.ts'
+import { type Key, type Token, token } from './token.ts'
+import type { Any, MaybePromise } from './utils.ts'
+import type { ValueProvider } from './value-provider.ts'
 
-export interface SingletonFactoryProviderInput<
-  T extends InjectionToken = InjectionToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
-  D extends DependencyDeclaration = DependencyDeclaration,
+const DEFAULT_SCOPE: Scope = 'singleton'
+const DEFAULT_PRE_DESTROY = () => {}
+const DEFAULT_INJECT: DependencyDeclaration = {}
+
+export interface FactoryProvider<
+  K extends Key = Any,
+  I extends Injectable = Any,
+  C extends I = Any,
+  D extends DependencyDeclaration = Any,
 > {
-  provide: T
+  token: Token<K, I>
+  inject: D
+  useFactory: (dependencies: ExtractDependencies<D>) => MaybePromise<C>
+  scope: Scope
+  preDestroy: (instance: C) => MaybePromise<void>
+}
+
+export interface InferableSingletonFactoryProvider<
+  K extends Key,
+  C extends Injectable,
+  D extends DependencyDeclaration,
+> {
+  provide: K
   inject?: D
-  useFactory: (dependencies: Dependencies<D>) => MaybePromise<C>
+  useFactory: (dependencies: ExtractDependencies<D>) => MaybePromise<C>
   scope?: Singleton
   preDestroy?: (instance: C) => MaybePromise<void>
 }
 
-export interface TransientFactoryProviderInput<
-  T extends InjectionToken = InjectionToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
-  D extends DependencyDeclaration = DependencyDeclaration,
-> {
-  provide: T
-  inject?: D
-  useFactory: (dependencies: Dependencies<D>) => MaybePromise<C>
-  scope: Transient
-  preDestroy?: never
-}
-
-export type FactoryProviderInput<
-  T extends InjectionToken = InjectionToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
-  D extends DependencyDeclaration = DependencyDeclaration,
-> =
-  | SingletonFactoryProviderInput<T, I, C, D>
-  | TransientFactoryProviderInput<T, I, C, D>
-
-export interface SingletonFactoryProvider<
-  T extends InferableToken = InferableToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
-  D extends DependencyDeclaration = DependencyDeclaration,
-> {
-  provide: T
-  inject?: D
-  useFactory: (dependencies: Dependencies<D>) => MaybePromise<C>
-  scope?: Singleton
-  preDestroy?: (instance: C) => MaybePromise<void>
-}
-
-export interface TransientFactoryProvider<
-  T extends InferableToken = InferableToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
-  D extends DependencyDeclaration = DependencyDeclaration,
-> {
-  provide: T
-  inject?: D
-  useFactory: (dependencies: Dependencies<D>) => MaybePromise<C>
-  scope: Transient
-  preDestroy?: never
-}
-
-export type FactoryProvider<
-  T extends InferableToken = InferableToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
-  D extends DependencyDeclaration = DependencyDeclaration,
-> = SingletonFactoryProvider<T, I, C, D> | TransientFactoryProvider<T, I, C, D>
-
-function defineFactoryProvider<
-  T extends PlainToken,
+export interface ValidatableSingletonFactoryProvider<
+  K extends Key,
   I extends Injectable,
+  C extends I,
   D extends DependencyDeclaration,
->(
-  provider: FactoryProviderInput<T, I, I, D>,
-): FactoryProvider<TypedToken<I>, I, I, D>
+> {
+  provide: Token<K, I>
+  inject?: D
+  useFactory: (dependencies: ExtractDependencies<D>) => MaybePromise<C>
+  scope?: Singleton
+  preDestroy?: (instance: C) => MaybePromise<void>
+}
+
+export interface InferableTransientFactoryProvider<
+  K extends Key,
+  C extends Injectable,
+  D extends DependencyDeclaration,
+> {
+  provide: K
+  inject?: D
+  useFactory: (dependencies: ExtractDependencies<D>) => MaybePromise<C>
+  scope: Transient
+  preDestroy?: never
+}
+
+export interface ValidatableTransientFactoryProvider<
+  K extends Key,
+  I extends Injectable,
+  C extends I,
+  D extends DependencyDeclaration,
+> {
+  provide: Token<K, I>
+  inject?: D
+  useFactory: (dependencies: ExtractDependencies<D>) => MaybePromise<C>
+  scope: Transient
+  preDestroy?: never
+}
 
 function defineFactoryProvider<
-  T extends InferableToken,
-  C extends InferInjectable<T>,
+  K extends Key,
+  C extends Injectable,
   D extends DependencyDeclaration,
 >(
-  provider: FactoryProviderInput<T, InferInjectable<T>, C, D>,
-): FactoryProvider<T, InferInjectable<T>, C, D>
+  provider: InferableSingletonFactoryProvider<K, C, D>,
+): FactoryProvider<K, C, C, D>
 
-function defineFactoryProvider(
-  provider: FactoryProviderInput,
-): FactoryProvider {
-  const { provide, ...rest } = provider
-  if (isPlainToken(provide)) {
-    return { provide: token(provide), ...rest }
+function defineFactoryProvider<
+  K extends Key,
+  I extends Injectable,
+  C extends I,
+  D extends DependencyDeclaration,
+>(
+  provider: ValidatableSingletonFactoryProvider<K, I, C, D>,
+): FactoryProvider<K, I, C, D>
+
+function defineFactoryProvider<
+  K extends Key,
+  C extends Injectable,
+  D extends DependencyDeclaration,
+>(
+  provider: InferableTransientFactoryProvider<K, C, D>,
+): FactoryProvider<K, C, C, D>
+
+function defineFactoryProvider<
+  K extends Key,
+  I extends Injectable,
+  C extends I,
+  D extends DependencyDeclaration,
+>(
+  provider: ValidatableTransientFactoryProvider<K, I, C, D>,
+): FactoryProvider<K, I, C, D>
+
+function defineFactoryProvider<
+  K extends Key,
+  I extends Injectable,
+  C extends I,
+  D extends DependencyDeclaration,
+>(
+  provider:
+    | InferableSingletonFactoryProvider<K, C, D>
+    | ValidatableSingletonFactoryProvider<K, I, C, D>
+    | InferableTransientFactoryProvider<K, C, D>
+    | ValidatableTransientFactoryProvider<K, I, C, D>,
+): FactoryProvider<K, I, C, D> {
+  const {
+    provide,
+    scope = DEFAULT_SCOPE,
+    preDestroy = DEFAULT_PRE_DESTROY,
+    inject = DEFAULT_INJECT as D,
+    ...rest
+  } = provider
+
+  return {
+    token: typeof provide === 'string' ? token<I>()(provide) : provide,
+    scope,
+    preDestroy,
+    inject,
+    ...rest,
   }
-
-  return { provide, ...rest }
 }
 
 export { defineFactoryProvider }
 
-export function factoryProviderToDeclaration(
-  x: FactoryProvider,
-): DependencyDeclaration {
-  return x.inject ?? {}
-}
+// const aProvider = defineFactoryProvider({
+//   provide: 'a',
+//   useFactory: () => {
+//     const a = { a(): void {} }
+//     return a
+//   },
+// })
+
+// type AKey = ExtractKey<typeof aProvider>
+// type AInjectable = ExtractInjectable<typeof aProvider>
+
+// const bProvider = defineFactoryProvider({
+//   provide: aProvider.token,
+//   useFactory: () => {
+//     const a = { a(): void {}, b(): void {} }
+//     return a
+//   },
+//   preDestroy: (instance) => {
+//     instance.a()
+//     instance.b()
+//   },
+// })
+
+// const cProvider = defineFactoryProvider({
+//   provide: 'c',
+//   inject: { a: aProvider.token, b: bProvider.token },
+//   useFactory: ({ a, b }) => {
+//     const c = { c(): void {}, a, b }
+//     return c
+//   },
+// })
+
+// const dProvider = defineFactoryProvider({
+//   provide: 'd',
+//   useFactory: () => {
+//     const d = { d(): void {} }
+//     return d
+//   },
+// })

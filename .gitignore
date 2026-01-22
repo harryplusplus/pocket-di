@@ -15,3 +15,6 @@ dist/
 
 # Auto-copied files for npm publish
 /packages/pocket-di/README.md
+
+# Temporary files
+.temp/

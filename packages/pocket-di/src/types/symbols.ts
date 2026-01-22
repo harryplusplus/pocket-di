@@ -10,10 +10,6 @@ function desc(x: string): string {
 
 export const inject: unique symbol = Symbol(desc('inject'))
 
-export const type: unique symbol = Symbol(desc('type'))
-
-export const plainToken: unique symbol = Symbol(desc('plainToken'))
-
 export const postConstruct: unique symbol = Symbol(desc('postConstruct'))
 
 export const preDestroy: unique symbol = Symbol(desc('preDestroy'))

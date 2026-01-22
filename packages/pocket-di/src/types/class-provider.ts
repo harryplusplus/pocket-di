@@ -1,69 +1,94 @@
 import type { DependencyDeclaration } from './dependency-declaration.ts'
 import type { Injectable } from './injectable.ts'
-import type { InjectableConstructor } from './injectable-constructor.ts'
+import type {
+  ExtractDependencyDeclaration,
+  ExtractInjectable,
+  InjectableConstructor,
+} from './injectable-constructor.ts'
 import type { Scope } from './scope.ts'
-import { inject } from './symbols.ts'
-import {
-  type InferableToken,
-  type InferInjectable,
-  type InjectionToken,
-  isPlainToken,
-  type PlainToken,
-  token,
-  type TypedToken,
-} from './token.ts'
+import { type Key, type Token, token } from './token.ts'
+import type { Any } from './utils.ts'
 
-export interface ClassProviderInput<
-  T extends InjectionToken = InjectionToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
-  D extends DependencyDeclaration = DependencyDeclaration,
-> {
-  provide: T
-  useClass: InjectableConstructor<C, D>
-  scope?: Scope
-}
+const DEFAULT_SCOPE = 'singleton'
 
 export interface ClassProvider<
-  T extends InferableToken = InferableToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
-  D extends DependencyDeclaration = DependencyDeclaration,
+  K extends Key = Any,
+  I extends Injectable = Any,
+  C extends InjectableConstructor = Any,
+  D extends DependencyDeclaration = Any,
 > {
-  provide: T
-  useClass: InjectableConstructor<C, D>
+  token: Token<K, I>
+  useClass: C
+  scope: Scope
+  _dependencies: D
+}
+
+export interface InferableClassProvider<
+  K extends Key,
+  C extends InjectableConstructor,
+> {
+  provide: K
+  useClass: C
   scope?: Scope
 }
 
-function defineClassProvider<
-  T extends PlainToken,
+export interface ValidatableClassProvider<
+  K extends Key,
   I extends Injectable,
-  D extends DependencyDeclaration,
->(
-  provider: ClassProviderInput<T, I, I, D>,
-): ClassProvider<TypedToken<I>, I, I, D>
+  C extends InjectableConstructor<I>,
+> {
+  provide: Token<K, I>
+  useClass: C
+  scope?: Scope
+}
+
+function defineClassProvider<K extends Key, C extends InjectableConstructor>(
+  provider: InferableClassProvider<K, C>,
+): ClassProvider<K, ExtractInjectable<C>, C, ExtractDependencyDeclaration<C>>
 
 function defineClassProvider<
-  T extends InferableToken,
-  C extends InferInjectable<T>,
+  K extends Key,
+  I extends Injectable,
+  C extends InjectableConstructor<I>,
+>(
+  provider: ValidatableClassProvider<K, I, C>,
+): ClassProvider<K, I, C, ExtractDependencyDeclaration<C>>
+
+function defineClassProvider<
+  K extends Key,
+  I extends Injectable,
+  C extends InjectableConstructor<I>,
   D extends DependencyDeclaration,
 >(
-  provider: ClassProviderInput<T, InferInjectable<T>, C, D>,
-): ClassProvider<T, InferInjectable<T>, C, D>
+  provider: InferableClassProvider<K, C> | ValidatableClassProvider<K, I, C>,
+): ClassProvider<K, I, C, D> {
+  const { provide, scope = DEFAULT_SCOPE, ...rest } = provider
 
-function defineClassProvider(provider: ClassProviderInput): ClassProvider {
-  const { provide, ...rest } = provider
-  if (isPlainToken(provide)) {
-    return { provide: token(provide), ...rest }
+  return {
+    token: typeof provide === 'string' ? token<I>()(provide) : provide,
+    scope,
+    _dependencies: undefined as unknown as D,
+    ...rest,
   }
-
-  return { provide, ...rest }
 }
 
 export { defineClassProvider }
 
-export function classProviderToDeclaration(
-  x: ClassProvider,
-): DependencyDeclaration {
-  return x.useClass[inject] ?? {}
-}
+// class Foo {}
+
+// const fooProvider = defineClassProvider({ provide: 'foo', useClass: Foo })
+
+// class Bar {
+//   static [inject] = { foo: fooProvider.token }
+// }
+
+// const barProvider = defineClassProvider({ provide: 'bar', useClass: Bar })
+
+// class Foo2 {
+//   static [inject] = { bar: barProvider.token }
+// }
+
+// const foo2Provider = defineClassProvider({
+//   provide: fooProvider.token,
+//   useClass: Foo2,
+// })

@@ -1,50 +1,47 @@
 import type { Injectable } from './injectable.ts'
-import {
-  type InferableToken,
-  type InferInjectable,
-  type InjectionToken,
-  isPlainToken,
-  type PlainToken,
-  token,
-  type TypedToken,
-} from './token.ts'
-
-export interface ValueProviderInput<
-  T extends InjectionToken = InjectionToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
-> {
-  provide: T
-  useValue: C
-}
+import { type Key, type Token, token } from './token.ts'
+import type { Any } from './utils.ts'
 
 export interface ValueProvider<
-  T extends InferableToken = InferableToken,
-  I extends Injectable = InferInjectable<T>,
-  C extends I = I,
+  K extends Key = Any,
+  I extends Injectable = Any,
+  C extends I = Any,
 > {
-  provide: T
+  token: Token<K, I>
   useValue: C
 }
 
-function defineValueProvider<T extends PlainToken, I extends Injectable>(
-  provider: ValueProviderInput<T, I, I>,
-): ValueProvider<TypedToken<I>, I, I>
+export interface InferableValueProvider<K extends Key, C extends Injectable> {
+  provide: K
+  useValue: C
+}
 
-function defineValueProvider<
-  T extends InferableToken,
-  C extends InferInjectable<T>,
->(
-  provider: ValueProviderInput<T, InferInjectable<T>, C>,
-): ValueProvider<T, InferInjectable<T>, C>
+export interface ValidatableValueProvider<
+  K extends Key,
+  I extends Injectable,
+  C extends I,
+> {
+  provide: Token<K, I>
+  useValue: C
+}
 
-function defineValueProvider(provider: ValueProviderInput): ValueProvider {
+function defineValueProvider<K extends Key, C extends Injectable>(
+  provider: InferableValueProvider<K, C>,
+): ValueProvider<K, C, C>
+
+function defineValueProvider<K extends Key, I extends Injectable, C extends I>(
+  provider: ValidatableValueProvider<K, I, C>,
+): ValueProvider<K, I, C>
+
+function defineValueProvider<K extends Key, I extends Injectable, C extends I>(
+  provider: InferableValueProvider<K, C> | ValidatableValueProvider<K, I, C>,
+): ValueProvider<K, I, C> {
   const { provide, ...rest } = provider
-  if (isPlainToken(provide)) {
-    return { provide: token(provide), ...rest }
-  }
 
-  return { provide, ...rest }
+  return {
+    token: typeof provide === 'string' ? token<I>()(provide) : provide,
+    ...rest,
+  }
 }
 
 export { defineValueProvider }
