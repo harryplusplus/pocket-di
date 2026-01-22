@@ -1,9 +1,11 @@
 import { AsyncLock } from './async-lock.ts'
+import { AsyncResolver } from './async-resolver.ts'
 import { createContainerProxy } from './container-proxy.ts'
 import { Destroyer } from './destroyer.ts'
 import { Handler } from './handler.ts'
 import { Initializer } from './initializer.ts'
 import { Registry, type RegistryFindOptions } from './registry.ts'
+import { SyncResolver } from './sync-resolver.ts'
 import type { Container } from './types/container.ts'
 import {
   type ChildContainerOptions,
@@ -27,6 +29,8 @@ export class ContainerContext<T extends TypeInfo = TypeInfo> {
   providerRegistry: ProviderRegistry
   handlerRegistry: HandlerRegistry
   singletonRegistry: SingletonRegistry
+  asyncResolver = new AsyncResolver(this)
+  syncResolver = new SyncResolver(this)
   destroyCalled = false
   _type = undefined as unknown as T
 
@@ -45,8 +49,7 @@ export class ContainerContext<T extends TypeInfo = TypeInfo> {
       parent?.singletonRegistry,
     )
 
-    const initializer = new Initializer(this, filledOptions)
-    initializer.init()
+    new Initializer(this, filledOptions).init()
   }
 
   async $destroy(): Promise<void> {
@@ -65,16 +68,16 @@ export class ContainerContext<T extends TypeInfo = TypeInfo> {
     return createContainerProxy(child)
   }
 
-  $resolve<K extends Key, I extends Injectable>(key: K): Promise<I> {
-    this.$ensureNotDestroyed()
+  async $resolve<K extends Key, I extends Injectable>(key: K): Promise<I> {
+    const instance = await this.asyncResolver.resolve(key)
 
-    throw new Error('Method not implemented.')
+    return instance as I
   }
 
   $resolveSync<K extends Key, I extends Injectable>(key: K): I {
-    this.$ensureNotDestroyed()
+    const instance = this.syncResolver.resolve(key)
 
-    throw new Error('Method not implemented.')
+    return instance as I
   }
 
   $get<K extends Key, I extends Injectable>(key: K): I {
