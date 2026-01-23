@@ -7,7 +7,30 @@ import { inject, postConstruct } from '../types/symbols.ts'
 import { token } from '../types/token.ts'
 import { createContainer } from './proxy.ts'
 
-describe('sync-resolver - postConstruct async error', () => {
+describe('sync-resolver - postConstruct', () => {
+  it('should handle sync postConstruct successfully', () => {
+    class Service {
+      initialized = false
+
+      constructor(_deps: object) {}
+
+      [postConstruct]() {
+        this.initialized = true
+      }
+    }
+
+    const container = createContainer({
+      providers: [
+        defineClassProvider({ provide: 'service', useClass: Service }),
+      ],
+    })
+
+    const instance = container.service.resolveSync()
+
+    expect(instance).toBeInstanceOf(Service)
+    expect(instance.initialized).toBe(true)
+  })
+
   it('should throw error when class postConstruct returns Promise', () => {
     class Service {
       async [postConstruct]() {
