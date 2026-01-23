@@ -25,32 +25,27 @@ import { createContainerProxy } from './proxy.ts'
 import { ContainerSyncResolver } from './sync-resolver.ts'
 
 export class ContainerImpl<T extends ContainerType = ContainerType> {
-  private readonly lock = new AsyncLock()
-  private destroyCalled = false
-
-  private readonly _context: ContainerContext
-  get context(): ContainerContext {
-    return this._context
-  }
-
-  private readonly _type = undefined as unknown as T
+  private readonly $lock = new AsyncLock()
+  private $destroyCalled = false
+  readonly $context: ContainerContext
+  private readonly $type = undefined as unknown as T
 
   constructor(options: ContainerImplOptions) {
     const filledOptions = fillContainerImplOptions(options)
     const { parent } = filledOptions
 
-    this._context = {
+    this.$context = {
       children: new Set(),
       parent: parent ?? null,
       validKeySet: new Set(),
       providerRegistry: new Registry<string, Provider>(
-        parent?.context.providerRegistry,
+        parent?.$context.providerRegistry,
       ),
       handlerRegistry: new Registry<string, ContainerHandler>(
-        parent?.context.handlerRegistry,
+        parent?.$context.handlerRegistry,
       ),
       singletonRegistry: new Registry<string, Injectable>(
-        parent?.context.singletonRegistry,
+        parent?.$context.singletonRegistry,
       ),
       asyncResolver: new ContainerAsyncResolver(this),
       syncResolver: new ContainerSyncResolver(this),
@@ -60,16 +55,16 @@ export class ContainerImpl<T extends ContainerType = ContainerType> {
   }
 
   async $destroy(): Promise<void> {
-    if (this.destroyCalled) {
+    if (this.$destroyCalled) {
       return
     }
 
-    await this.lock.acquire(async () => {
-      if (this.destroyCalled) {
+    await this.$lock.acquire(async () => {
+      if (this.$destroyCalled) {
         return
       }
 
-      this.destroyCalled = true
+      this.$destroyCalled = true
 
       await new ContainerDestroyer(this).destroy()
     })
@@ -82,7 +77,7 @@ export class ContainerImpl<T extends ContainerType = ContainerType> {
 
     const child = new ContainerImpl<T & ExtractContainerType<Ps>>(options)
 
-    this.context.children.add(child)
+    this.$context.children.add(child)
 
     return createContainerProxy(child)
   }
@@ -90,7 +85,7 @@ export class ContainerImpl<T extends ContainerType = ContainerType> {
   async $resolve<K extends Key, I extends Injectable>(key: K): Promise<I> {
     this.$ensureNotDestroyed()
 
-    const instance = await this.context.asyncResolver.resolve(key)
+    const instance = await this.$context.asyncResolver.resolve(key)
 
     return instance as I
   }
@@ -98,7 +93,7 @@ export class ContainerImpl<T extends ContainerType = ContainerType> {
   $resolveSync<K extends Key, I extends Injectable>(key: K): I {
     this.$ensureNotDestroyed()
 
-    const instance = this.context.syncResolver.resolve(key)
+    const instance = this.$context.syncResolver.resolve(key)
 
     return instance as I
   }
@@ -106,7 +101,7 @@ export class ContainerImpl<T extends ContainerType = ContainerType> {
   $get<K extends Key, I extends Injectable>(key: K): I {
     this.$ensureNotDestroyed()
 
-    const singleton = this.context.singletonRegistry.find(key)
+    const singleton = this.$context.singletonRegistry.find(key)
     if (!singleton) {
       throw new Error(`No singleton found for key "${key}".`)
     }
@@ -117,7 +112,7 @@ export class ContainerImpl<T extends ContainerType = ContainerType> {
   $hasSingleton<K extends Key>(key: K, options?: HasSingletonOptions): boolean {
     this.$ensureNotDestroyed()
 
-    return this.context.singletonRegistry.find(key, options) !== undefined
+    return this.$context.singletonRegistry.find(key, options) !== undefined
   }
 
   $getOrCreateHandler<K extends Key, I extends Injectable>(
@@ -125,7 +120,7 @@ export class ContainerImpl<T extends ContainerType = ContainerType> {
   ): ContainerHandler<I> | undefined {
     this.$ensureNotDestroyed()
 
-    const { handlerRegistry, validKeySet } = this.context
+    const { handlerRegistry, validKeySet } = this.$context
     const found = handlerRegistry.find(key)
     if (found) {
       return found as ContainerHandler<I>
@@ -142,8 +137,12 @@ export class ContainerImpl<T extends ContainerType = ContainerType> {
     return handler
   }
 
+  $isValidKey(key: Key): boolean {
+    return this.$context.validKeySet.has(key)
+  }
+
   $ensureNotDestroyed(): void {
-    if (this.destroyCalled) {
+    if (this.$destroyCalled) {
       throw new Error('Container is destroyed.')
     }
   }

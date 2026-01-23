@@ -29,7 +29,7 @@ export class CommonResolver {
   }
 
   resolveInstanceOrProvider(key: Key): ResolveInstanceOrProviderOutput {
-    const { singletonRegistry, providerRegistry } = this.impl.context
+    const { singletonRegistry, providerRegistry } = this.impl.$context
 
     const singleton = singletonRegistry.find(key)
     if (singleton) {
@@ -54,7 +54,7 @@ export class CommonResolver {
     provider: ProviderHasDependencies
     instance: Injectable
   }): void {
-    const { singletonRegistry } = this.impl.context
+    const { singletonRegistry } = this.impl.$context
     const { provider, instance } = input
 
     const { scope = 'singleton' } = provider

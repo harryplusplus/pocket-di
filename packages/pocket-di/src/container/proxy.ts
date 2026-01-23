@@ -1,17 +1,11 @@
 import type {
   Container,
-  ContainerPublicProperties,
   ContainerType,
   ExtractContainerType,
 } from '../types/container.ts'
 import type { ContainerOptions } from '../types/container-options.ts'
 import type { Providers } from '../types/provider.ts'
 import { ContainerImpl } from './impl.ts'
-
-const PUBLIC_PROPERTIES = new Set<string>([
-  '$createChild',
-  '$destroy',
-] satisfies (keyof ContainerPublicProperties)[])
 
 const SKIPS = new Set(['then', 'catch', 'finally'])
 
@@ -24,11 +18,11 @@ export function createContainerProxy<T extends ContainerType>(
         return undefined
       }
 
-      if (PUBLIC_PROPERTIES.has(key)) {
-        return target[key as keyof ContainerPublicProperties]
+      if (target.$isValidKey(key)) {
+        return target.$getOrCreateHandler(key)
       }
 
-      return target.$getOrCreateHandler(key)
+      return target[key as keyof ContainerImpl<T>]
     },
   }) as Container<T>
 }

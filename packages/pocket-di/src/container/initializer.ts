@@ -25,7 +25,7 @@ export class ContainerInitializer {
   }
 
   validateDeclarations(): void {
-    const { providerRegistry } = this.impl.context
+    const { providerRegistry } = this.impl.$context
 
     for (const provider of providerRegistry.values()) {
       const checker = new CircularDependencyChecker()
@@ -79,7 +79,7 @@ export class ContainerInitializer {
     checker: CircularDependencyChecker
   }): void {
     const { key, className, token, checker } = input
-    const { providerRegistry } = this.impl.context
+    const { providerRegistry } = this.impl.$context
 
     const provider = providerRegistry.find(token.key)
     if (!provider) {
@@ -116,7 +116,7 @@ export class ContainerInitializer {
   }
 
   parseProviders(): void {
-    const { providerRegistry } = this.impl.context
+    const { providerRegistry } = this.impl.$context
     const { providers } = this.options
 
     for (const provider of providers) {
@@ -127,15 +127,11 @@ export class ContainerInitializer {
   }
 
   validateProvider(key: Key): void {
-    const { providerRegistry, validKeySet } = this.impl.context
+    const { providerRegistry, validKeySet } = this.impl.$context
     const { override } = this.options
 
-    if (override) {
-      validKeySet.delete(key)
-    }
-
     if (validKeySet.has(key)) {
-      return
+      throw new Error(`Cannot register key "${key}": already exists.`)
     }
 
     if (providerRegistry.find(key, { include: ['parent'] }) && !override) {

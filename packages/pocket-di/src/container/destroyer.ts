@@ -11,21 +11,21 @@ export class ContainerDestroyer {
   }
 
   async destroy(): Promise<void> {
-    const { context } = this.impl
+    const { $context } = this.impl
 
     await this.destroyChildren()
     await this.destroySingletonRegistry()
 
-    context.handlerRegistry.clear()
-    context.providerRegistry.clear()
-    context.validKeySet.clear()
+    $context.handlerRegistry.clear()
+    $context.providerRegistry.clear()
+    $context.validKeySet.clear()
 
-    context.parent?.context.children.delete(this.impl)
-    context.parent = null
+    $context.parent?.$context.children.delete(this.impl)
+    $context.parent = null
   }
 
   async destroyChildren(): Promise<void> {
-    const { children } = this.impl.context
+    const { children } = this.impl.$context
 
     const copiedChildren = [...children]
     copiedChildren.reverse()
@@ -41,7 +41,7 @@ export class ContainerDestroyer {
   }
 
   async destroySingletonRegistry(): Promise<void> {
-    const { singletonRegistry, providerRegistry } = this.impl.context
+    const { singletonRegistry, providerRegistry } = this.impl.$context
 
     const copiedSingletons = [...singletonRegistry.entries()]
     copiedSingletons.reverse()
