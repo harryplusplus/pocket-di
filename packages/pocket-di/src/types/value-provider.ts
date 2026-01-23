@@ -24,15 +24,21 @@ export interface ValidatableValueProvider<
   useValue: C
 }
 
-function defineValueProvider<K extends Key, C extends Injectable>(
+function defineValueProvider<const K extends Key, C extends Injectable>(
   provider: InferableValueProvider<K, C>,
 ): ValueProvider<K, C, C>
 
-function defineValueProvider<K extends Key, I extends Injectable, C extends I>(
-  provider: ValidatableValueProvider<K, I, C>,
-): ValueProvider<K, I, C>
+function defineValueProvider<
+  const K extends Key,
+  I extends Injectable,
+  C extends I,
+>(provider: ValidatableValueProvider<K, I, C>): ValueProvider<K, I, C>
 
-function defineValueProvider<K extends Key, I extends Injectable, C extends I>(
+function defineValueProvider<
+  const K extends Key,
+  I extends Injectable,
+  C extends I,
+>(
   provider: InferableValueProvider<K, C> | ValidatableValueProvider<K, I, C>,
 ): ValueProvider<K, I, C> {
   const { provide, ...rest } = provider

@@ -75,7 +75,7 @@ export interface ValidatableTransientFactoryProvider<
 }
 
 function defineFactoryProvider<
-  K extends Key,
+  const K extends Key,
   C extends Injectable,
   D extends DependencyDeclaration,
 >(
@@ -83,7 +83,7 @@ function defineFactoryProvider<
 ): FactoryProvider<K, C, C, D>
 
 function defineFactoryProvider<
-  K extends Key,
+  const K extends Key,
   I extends Injectable,
   C extends I,
   D extends DependencyDeclaration,
@@ -92,7 +92,7 @@ function defineFactoryProvider<
 ): FactoryProvider<K, I, C, D>
 
 function defineFactoryProvider<
-  K extends Key,
+  const K extends Key,
   C extends Injectable,
   D extends DependencyDeclaration,
 >(
@@ -100,7 +100,7 @@ function defineFactoryProvider<
 ): FactoryProvider<K, C, C, D>
 
 function defineFactoryProvider<
-  K extends Key,
+  const K extends Key,
   I extends Injectable,
   C extends I,
   D extends DependencyDeclaration,
@@ -109,7 +109,7 @@ function defineFactoryProvider<
 ): FactoryProvider<K, I, C, D>
 
 function defineFactoryProvider<
-  K extends Key,
+  const K extends Key,
   I extends Injectable,
   C extends I,
   D extends DependencyDeclaration,

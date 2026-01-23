@@ -41,12 +41,15 @@ export interface ValidatableClassProvider<
   scope?: Scope
 }
 
-function defineClassProvider<K extends Key, C extends InjectableConstructor>(
+function defineClassProvider<
+  const K extends Key,
+  C extends InjectableConstructor,
+>(
   provider: InferableClassProvider<K, C>,
 ): ClassProvider<K, ExtractInjectable<C>, C, ExtractDependencyDeclaration<C>>
 
 function defineClassProvider<
-  K extends Key,
+  const K extends Key,
   I extends Injectable,
   C extends InjectableConstructor<I>,
 >(
@@ -54,7 +57,7 @@ function defineClassProvider<
 ): ClassProvider<K, I, C, ExtractDependencyDeclaration<C>>
 
 function defineClassProvider<
-  K extends Key,
+  const K extends Key,
   I extends Injectable,
   C extends InjectableConstructor<I>,
   D extends DependencyDeclaration,
