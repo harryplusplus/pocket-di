@@ -1,4 +1,4 @@
-import type { ContainerImpl } from '../container-impl.ts'
+import type { ContainerImpl } from '../container/impl.ts'
 import type { Providers } from './provider.ts'
 
 export interface ContainerOptions<Ps extends Providers> {

@@ -1,6 +1,10 @@
+export type Include = 'local' | 'parent'
+
 export interface RegistryFindOptions {
-  exclude?: 'local' | 'parent'
+  include?: Include[]
 }
+
+const DEFAULT_INCLUDE: Include[] = ['local', 'parent']
 
 export class Registry<K, V> {
   private readonly map = new Map<K, V>()
@@ -16,16 +20,17 @@ export class Registry<K, V> {
   }
 
   find(key: K, options?: RegistryFindOptions): V | undefined {
-    const { exclude = undefined } = options ?? {}
+    const { include = DEFAULT_INCLUDE } = options ?? {}
+    const includeSet = new Set(include)
 
-    if (exclude !== 'local') {
+    if (includeSet.has('local')) {
       const value = this.map.get(key)
       if (value) {
         return value
       }
     }
 
-    if (exclude !== 'parent') {
+    if (includeSet.has('parent')) {
       return this.parent?.find(key)
     }
 

@@ -1,5 +1,5 @@
-import type { ContainerHandler } from '../container-handler.ts'
-import type { ContainerImpl } from '../container-impl.ts'
+import type { ContainerHandler } from '../container/handler.ts'
+import type { ContainerImpl } from '../container/impl.ts'
 import type { Injectable } from './injectable.ts'
 import type { ExtractTokens, Providers } from './provider.ts'
 import type { ExtractKey, ExtractType, Key, Tokens } from './token.ts'

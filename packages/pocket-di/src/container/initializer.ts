@@ -1,14 +1,14 @@
-import { CircularDependencyChecker } from './circular-dependency-checker.ts'
-import type { ContainerImpl } from './container-impl.ts'
-import { type FilledContainerImplOptions } from './types/container-options.ts'
-import type { DependencyDeclaration } from './types/dependency-declaration.ts'
+import { CircularDependencyChecker } from '../circular-dependency-checker.ts'
+import { type FilledContainerImplOptions } from '../types/container-options.ts'
+import type { DependencyDeclaration } from '../types/dependency-declaration.ts'
 import {
   isClassProvider,
   isFactoryProvider,
   type Provider,
-} from './types/provider.ts'
-import { inject } from './types/symbols.ts'
-import type { Key, Token } from './types/token.ts'
+} from '../types/provider.ts'
+import { inject } from '../types/symbols.ts'
+import type { Key, Token } from '../types/token.ts'
+import type { ContainerImpl } from './impl.ts'
 
 export class ContainerInitializer {
   private readonly impl: ContainerImpl
@@ -138,13 +138,13 @@ export class ContainerInitializer {
       return
     }
 
-    if (providerRegistry.find(key, { exclude: 'local' }) && !override) {
+    if (providerRegistry.find(key, { include: ['parent'] }) && !override) {
       throw new Error(
         `Cannot register key "${key}": already exists in parent container. Use override option to replace.`,
       )
     }
 
-    if (providerRegistry.find(key, { exclude: 'parent' })) {
+    if (providerRegistry.find(key, { include: ['local'] })) {
       throw new Error(
         `Cannot register key "${key}": duplicate registration in same container.`,
       )

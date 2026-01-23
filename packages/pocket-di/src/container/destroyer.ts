@@ -1,7 +1,7 @@
-import type { ContainerImpl } from './container-impl.ts'
-import { isPreDestroyable } from './types/lifecycle-events.ts'
-import { isClassProvider, isFactoryProvider } from './types/provider.ts'
-import { preDestroy } from './types/symbols.ts'
+import { isPreDestroyable } from '../types/lifecycle-events.ts'
+import { isClassProvider, isFactoryProvider } from '../types/provider.ts'
+import { preDestroy } from '../types/symbols.ts'
+import type { ContainerImpl } from './impl.ts'
 
 export class ContainerDestroyer {
   private readonly impl: ContainerImpl

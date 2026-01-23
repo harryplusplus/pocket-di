@@ -1,28 +1,28 @@
-import { AsyncLock } from './async-lock.ts'
-import { AsyncResolver } from './async-resolver.ts'
-import { ContainerDestroyer } from './container-destroyer.ts'
-import { ContainerHandler } from './container-handler.ts'
-import { ContainerInitializer } from './container-initializer.ts'
-import { createContainerProxy } from './container-proxy.ts'
-import { Registry } from './registry.ts'
-import { SyncResolver } from './sync-resolver.ts'
+import { AsyncLock } from '../async-lock.ts'
+import { Registry } from '../registry.ts'
 import type {
   Container,
   ContainerType,
   ExtractContainerType,
-} from './types/container.ts'
+} from '../types/container.ts'
 import type {
   ContainerContext,
   HasSingletonOptions,
-} from './types/container-context.ts'
+} from '../types/container-context.ts'
 import {
   type ChildContainerOptions,
   type ContainerImplOptions,
   fillContainerImplOptions,
-} from './types/container-options.ts'
-import type { Injectable } from './types/injectable.ts'
-import type { Provider, Providers } from './types/provider.ts'
-import type { Key } from './types/token.ts'
+} from '../types/container-options.ts'
+import type { Injectable } from '../types/injectable.ts'
+import type { Provider, Providers } from '../types/provider.ts'
+import type { Key } from '../types/token.ts'
+import { ContainerAsyncResolver } from './async-resolver.ts'
+import { ContainerDestroyer } from './destroyer.ts'
+import { ContainerHandler } from './handler.ts'
+import { ContainerInitializer } from './initializer.ts'
+import { createContainerProxy } from './proxy.ts'
+import { ContainerSyncResolver } from './sync-resolver.ts'
 
 export class ContainerImpl<T extends ContainerType = ContainerType> {
   private readonly lock = new AsyncLock()
@@ -52,8 +52,8 @@ export class ContainerImpl<T extends ContainerType = ContainerType> {
       singletonRegistry: new Registry<string, Injectable>(
         parent?.context.singletonRegistry,
       ),
-      asyncResolver: new AsyncResolver(this),
-      syncResolver: new SyncResolver(this),
+      asyncResolver: new ContainerAsyncResolver(this),
+      syncResolver: new ContainerSyncResolver(this),
     }
 
     new ContainerInitializer(this, filledOptions).init()

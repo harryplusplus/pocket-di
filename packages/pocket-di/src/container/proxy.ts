@@ -1,12 +1,12 @@
-import { ContainerImpl } from './container-impl.ts'
 import type {
   Container,
   ContainerPublicProperties,
   ContainerType,
   ExtractContainerType,
-} from './types/container.ts'
-import type { ContainerOptions } from './types/container-options.ts'
-import type { Providers } from './types/provider.ts'
+} from '../types/container.ts'
+import type { ContainerOptions } from '../types/container-options.ts'
+import type { Providers } from '../types/provider.ts'
+import { ContainerImpl } from './impl.ts'
 
 const PUBLIC_PROPERTIES = new Set<string>([
   '$createChild',
