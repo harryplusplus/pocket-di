@@ -1,27 +1,31 @@
-import { ContainerContext } from './container-context.ts'
-import type { Container, ContainerPublicMethods } from './types/container.ts'
+import { ContainerImpl } from './container-impl.ts'
+import type {
+  Container,
+  ContainerPublicProperties,
+  ContainerType,
+  ExtractContainerType,
+} from './types/container.ts'
 import type { ContainerOptions } from './types/container-options.ts'
-import type { ExtractTypeInfo, Providers } from './types/provider.ts'
-import type { TypeInfo } from './types/token.ts'
+import type { Providers } from './types/provider.ts'
 
-const PUBLIC_METHODS = new Set<string>([
+const PUBLIC_PROPERTIES = new Set<string>([
   '$createChild',
   '$destroy',
-] satisfies (keyof ContainerPublicMethods)[])
+] satisfies (keyof ContainerPublicProperties)[])
 
 const SKIPS = new Set(['then', 'catch', 'finally'])
 
-export function createContainerProxy<T extends TypeInfo>(
-  context: ContainerContext<T>,
+export function createContainerProxy<T extends ContainerType>(
+  impl: ContainerImpl<T>,
 ): Container<T> {
-  return new Proxy(context, {
+  return new Proxy(impl, {
     get: (target, key) => {
       if (typeof key !== 'string' || SKIPS.has(key)) {
         return undefined
       }
 
-      if (PUBLIC_METHODS.has(key)) {
-        return target[key as keyof ContainerPublicMethods]
+      if (PUBLIC_PROPERTIES.has(key)) {
+        return target[key as keyof ContainerPublicProperties]
       }
 
       return target.$getOrCreateHandler(key)
@@ -31,8 +35,8 @@ export function createContainerProxy<T extends TypeInfo>(
 
 export function createContainer<const Ps extends Providers>(
   options: ContainerOptions<Ps>,
-): Container<ExtractTypeInfo<Ps>> {
-  const context = new ContainerContext<ExtractTypeInfo<Ps>>(options)
+): Container<ExtractContainerType<Ps>> {
+  const impl = new ContainerImpl<ExtractContainerType<Ps>>(options)
 
-  return createContainerProxy(context)
+  return createContainerProxy(impl)
 }

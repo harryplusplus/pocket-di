@@ -1,15 +1,25 @@
-import type { ContainerContext } from '../container-context.ts'
-import type { Handler } from '../handler.ts'
-import type { TypeInfo } from './token.ts'
+import type { ContainerHandler } from '../container-handler.ts'
+import type { ContainerImpl } from '../container-impl.ts'
+import type { Injectable } from './injectable.ts'
+import type { ExtractTokens, Providers } from './provider.ts'
+import type { ExtractKey, ExtractType, Key, Tokens } from './token.ts'
 
-export type ContainerPublicMethods<T extends TypeInfo = TypeInfo> = Pick<
-  ContainerContext<T>,
-  '$createChild' | '$destroy'
->
+export type ContainerType = Record<Key, Injectable>
 
-export type ContainerHandlers<T extends TypeInfo> = {
-  [K in keyof T]: Handler<T[K]>
+export type ToContainerType<Ts extends Tokens> = {
+  [T in Ts[number] as ExtractKey<T>]: ExtractType<T>
 }
 
-export type Container<T extends TypeInfo = TypeInfo> =
-  ContainerPublicMethods<T> & ContainerHandlers<T>
+export type ExtractContainerType<Ps extends Providers> = ToContainerType<
+  ExtractTokens<Ps>
+>
+
+export type ContainerPublicProperties<T extends ContainerType = ContainerType> =
+  Pick<ContainerImpl<T>, '$createChild' | '$destroy'>
+
+export type ContainerHandlers<T extends ContainerType = ContainerType> = {
+  [K in keyof T]: ContainerHandler<T[K]>
+}
+
+export type Container<T extends ContainerType = ContainerType> =
+  ContainerPublicProperties<T> & ContainerHandlers<T>

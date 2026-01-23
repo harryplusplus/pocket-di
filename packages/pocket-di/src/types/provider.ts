@@ -1,6 +1,5 @@
 import type { ClassProvider } from './class-provider.ts'
 import type { FactoryProvider } from './factory-provider.ts'
-import type { ToTypeInfo } from './token.ts'
 import type { ValueProvider } from './value-provider.ts'
 
 export type Provider = ValueProvider | ClassProvider | FactoryProvider
@@ -26,7 +25,3 @@ export type Providers = readonly Provider[]
 export type ExtractTokens<Ps extends Providers> = {
   [K in keyof Ps]: ExtractToken<Ps[K]>
 }
-
-export type ExtractTypeInfo<Ps extends Providers> = ToTypeInfo<
-  ExtractTokens<Ps>
->

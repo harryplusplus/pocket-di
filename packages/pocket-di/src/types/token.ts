@@ -20,9 +20,3 @@ export type ExtractKey<T extends Token> = T['key']
 export type ExtractType<T extends Token> = T['_type']
 
 export type Tokens = readonly Token[]
-
-export type TypeInfo = Record<Key, Injectable>
-
-export type ToTypeInfo<Ts extends Tokens> = {
-  [T in Ts[number] as ExtractKey<T>]: ExtractType<T>
-}

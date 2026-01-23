@@ -1,5 +1,5 @@
 export class AsyncLock {
-  promise = Promise.resolve()
+  private promise = Promise.resolve()
 
   async acquire<T>(fn: () => Promise<T>): Promise<T> {
     const previous = this.promise

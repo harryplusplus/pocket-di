@@ -1,56 +1,49 @@
-import type { ContainerContext } from './container-context.ts'
+import type { ContainerImpl } from './container-impl.ts'
 import { isPreDestroyable } from './types/lifecycle-events.ts'
 import { isClassProvider, isFactoryProvider } from './types/provider.ts'
 import { preDestroy } from './types/symbols.ts'
 
-export class Destroyer {
-  context: ContainerContext
+export class ContainerDestroyer {
+  private readonly impl: ContainerImpl
 
-  constructor(context: ContainerContext) {
-    this.context = context
+  constructor(impl: ContainerImpl) {
+    this.impl = impl
   }
 
   async destroy(): Promise<void> {
-    const { context } = this
+    const { context } = this.impl
 
-    if (context.destroyCalled) {
-      return
-    }
+    await this.destroyChildren()
+    await this.destroySingletonRegistry()
 
-    await context.lock.acquire(async () => {
-      if (context.destroyCalled) {
-        return
-      }
+    context.handlerRegistry.clear()
+    context.providerRegistry.clear()
+    context.validKeySet.clear()
 
-      context.destroyCalled = true
-
-      await this.destroyChildren()
-      await this.destroySingletonRegistry()
-
-      context.handlerRegistry.clear()
-      context.providerRegistry.clear()
-      context.keySet.clear()
-    })
+    context.parent?.context.children.delete(this.impl)
+    context.parent = null
   }
 
   async destroyChildren(): Promise<void> {
-    const { children } = this.context
+    const { children } = this.impl.context
 
-    for (let i = children.length - 1; i >= 0; i--) {
+    const copiedChildren = [...children]
+    copiedChildren.reverse()
+    children.clear()
+
+    for (const child of copiedChildren) {
       try {
-        await children[i].$destroy()
+        await child.$destroy()
       } catch (_e) {
         // noop
       }
     }
-
-    children.length = 0
   }
 
   async destroySingletonRegistry(): Promise<void> {
-    const { singletonRegistry, providerRegistry } = this.context
+    const { singletonRegistry, providerRegistry } = this.impl.context
 
-    const copiedSingletons = [...singletonRegistry.map.entries()]
+    const copiedSingletons = [...singletonRegistry.entries()]
     copiedSingletons.reverse()
 
     for (const [key, singleton] of copiedSingletons) {

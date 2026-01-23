@@ -5,7 +5,7 @@ import type {
 import type { Injectable } from './types/injectable.ts'
 import type { Key } from './types/token.ts'
 
-export class Handler<I extends Injectable = Injectable> {
+export class ContainerHandler<I extends Injectable = Injectable> {
   context: ContainerContext
   key: Key
 
