@@ -125,18 +125,19 @@ export class ContainerImpl<T extends ContainerType = ContainerType> {
   ): ContainerHandler<I> | undefined {
     this.$ensureNotDestroyed()
 
-    const found = this.context.handlerRegistry.find(key)
+    const { handlerRegistry, validKeySet } = this.context
+    const found = handlerRegistry.find(key)
     if (found) {
       return found as ContainerHandler<I>
     }
 
-    if (!this.context.validKeySet.has(key)) {
+    if (!validKeySet.has(key)) {
       return undefined
     }
 
     const handler = new ContainerHandler<I>(this, key)
 
-    this.context.handlerRegistry.set(key, handler)
+    handlerRegistry.set(key, handler)
 
     return handler
   }
