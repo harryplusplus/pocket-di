@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { defineClassProvider } from '../types/class-provider.ts'
 import { defineFactoryProvider } from '../types/factory-provider.ts'
 import { inject, postConstruct } from '../types/symbols.ts'
+import { token } from '../types/token.ts'
 import { createContainer } from './proxy.ts'
 
 describe('sync-resolver - postConstruct async error', () => {
@@ -66,27 +67,57 @@ describe('sync-resolver - basic resolution', () => {
   })
 })
 
-describe('sync-resolver - factory with dependencies', () => {
-  it('should resolve factory dependencies', () => {
+describe('sync-resolver - dependencies', () => {
+  it('should resolve class with dependencies using inject symbol', () => {
     class ServiceA {
       value = 42
+      constructor(_deps: object) {}
     }
 
-    const serviceAProvider = defineClassProvider({
-      provide: 'serviceA',
-      useClass: ServiceA,
+    const serviceAToken = token<ServiceA>()('serviceA')
+
+    class ServiceB {
+      static [inject] = { serviceA: serviceAToken }
+      doubled: number
+
+      constructor({ serviceA }: { serviceA: ServiceA }) {
+        this.doubled = serviceA.value * 2
+      }
+    }
+
+    const container = createContainer({
+      providers: [
+        defineClassProvider({ provide: serviceAToken, useClass: ServiceA }),
+        defineClassProvider({ provide: 'serviceB', useClass: ServiceB }),
+      ],
     })
+
+    const instance = container.serviceB.resolveSync()
+
+    expect(instance.doubled).toBe(84)
+  })
+
+  it('should resolve factory with token-based dependencies', () => {
+    class ServiceA {
+      value = 42
+      constructor(_deps: object) {}
+    }
+
+    const serviceAToken = token<ServiceA>()('serviceA')
 
     const serviceBProvider = defineFactoryProvider({
       provide: 'serviceB',
       useFactory: ({ serviceA }: { serviceA: ServiceA }) => {
         return { doubled: serviceA.value * 2 }
       },
-      inject: { serviceA: { key: 'serviceA' } },
+      inject: { serviceA: serviceAToken },
     })
 
     const container = createContainer({
-      providers: [serviceAProvider, serviceBProvider],
+      providers: [
+        defineClassProvider({ provide: serviceAToken, useClass: ServiceA }),
+        serviceBProvider,
+      ],
     })
 
     const instance = container.serviceB.resolveSync()
