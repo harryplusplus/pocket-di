@@ -48,7 +48,32 @@ describe('initializer - missing dependency error', () => {
 })
 
 describe('initializer - invalid dependency name error', () => {
-  it('should throw error for __proto__ dependency name', () => {
+  it('should throw error for __proto__ dependency name in factory', () => {
+    const depToken = token<{ value: number }>()('dep')
+
+    const injectMetadata: Record<string, unknown> = {}
+    Object.defineProperty(injectMetadata, '__proto__', {
+      value: depToken,
+      enumerable: true,
+    })
+
+    expect(() =>
+      createContainer({
+        providers: [
+          defineClassProvider({ provide: depToken, useClass: class {} }),
+          defineFactoryProvider({
+            provide: 'service',
+            useFactory: () => ({ value: 42 }),
+            inject: injectMetadata,
+          }),
+        ],
+      }),
+    ).toThrow(
+      'Cannot register key "service": invalid dependency property name "__proto__".',
+    )
+  })
+
+  it('should throw error for __proto__ dependency name in class', () => {
     const depToken = token<{ value: number }>()('dep')
 
     class Service {
@@ -140,54 +165,5 @@ describe('initializer - invalid dependency name error', () => {
     ).toThrow(
       'Cannot register key "service" (class "Service"): invalid dependency property name "".',
     )
-  })
-})
-
-describe('initializer - duplicate registration in local container error', () => {
-  it('should throw error for duplicate in local when adding to registry', () => {
-    const serviceToken = token<{ value: number }>()('service')
-
-    // Create parent with a provider
-    const parent = createContainer({
-      providers: [
-        defineClassProvider({
-          provide: serviceToken,
-          useClass: class {
-            constructor(_deps: object) {}
-          },
-        }),
-      ],
-    })
-
-    // Create child that overrides parent's provider
-    // Then try to add the same provider again in the same child
-    // This simulates the edge case where validKeySet doesn't have it yet
-    // but local registry already does
-
-    // The public API prevents this, but we can test the defensive check
-    // by using the same provider reference multiple times
-    const childProvider = defineClassProvider({
-      provide: serviceToken,
-      useClass: class {
-        constructor(_deps: object) {}
-      },
-    })
-
-    // First child with override works fine
-    const child1 = parent.$createChild({
-      providers: [childProvider],
-      override: true,
-    })
-
-    expect(child1).toBeDefined()
-
-    // Trying to create another child with duplicate in same array
-    // triggers the validKeySet check (line 134) not line 144
-    // Line 144 is a defensive check for internal consistency
-    // that would only trigger if there's a bug in the code
-
-    // We can't easily trigger line 144 from public API
-    // as it requires bypassing validKeySet check
-    expect(true).toBe(true)
   })
 })
