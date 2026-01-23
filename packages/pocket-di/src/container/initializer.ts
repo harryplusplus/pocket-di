@@ -140,12 +140,6 @@ export class ContainerInitializer {
       )
     }
 
-    if (providerRegistry.find(key, { include: ['local'] })) {
-      throw new Error(
-        `Cannot register key "${key}": duplicate registration in same container.`,
-      )
-    }
-
     validKeySet.add(key)
   }
 }
