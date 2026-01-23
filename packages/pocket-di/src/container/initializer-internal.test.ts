@@ -8,54 +8,36 @@ import { token } from '../types/token.ts'
 import { ContainerImpl } from './impl.ts'
 
 describe('initializer - internal duplicate detection', () => {
-  it('should detect duplicate in local registry even if validKeySet is bypassed', () => {
+  it('should document defensive code for local registry check', () => {
     const serviceToken = token<{ value: number }>()('service')
 
-    const provider1 = defineClassProvider({
+    const provider = defineClassProvider({
       provide: serviceToken,
       useClass: class {
         constructor(_deps: object) {}
       },
     })
 
-    const provider2 = defineClassProvider({
-      provide: serviceToken,
-      useClass: class {
-        constructor(_deps: object) {}
-      },
-    })
+    // Line 144 in initializer.ts is a defensive check:
+    // if (providerRegistry.find(key, { include: ['local'] })) {
+    //   throw new Error(`Cannot register key "${key}": duplicate registration in same container.`);
+    // }
 
-    // This test simulates an internal bug scenario where:
-    // 1. A provider is added to local registry manually
-    // 2. validKeySet is not updated (simulating a bug)
-    // 3. Trying to add the same key again through normal flow
-    // Line 144 catches this defensive case
+    // This would only trigger if:
+    // 1. validKeySet.has(key) is false (line 134 passed)
+    // 2. Parent registry check passed or override=true (line 137 passed)
+    // 3. But local registry already has the key (internal bug)
 
-    const impl = new ContainerImpl({ providers: [] })
+    // In normal operation, line 134 catches duplicates first
+    // because validKeySet is updated before providerRegistry.set()
 
-    // Manually add to local registry (simulating internal bug)
-    impl.$context.providerRegistry.set('service', provider1)
+    const impl = new ContainerImpl({ providers: [provider] })
 
-    // Now try to add through normal initialization
-    // This should trigger line 144 because:
-    // - validKeySet doesn't have 'service' (we didn't add it)
-    // - parent registry doesn't have it
-    // - but local registry already has it
-
+    // Verify normal duplicate detection works (line 134)
     expect(() => {
-      new ContainerImpl({ providers: [provider2] })
-      // Note: This will trigger line 134, not 144
-      // because validKeySet is checked first
-    }).toThrow()
+      new ContainerImpl({ providers: [provider, provider] })
+    }).toThrow('Cannot register key "service": already exists.')
 
-    // The real test for line 144 would require:
-    // 1. Create parent with provider
-    // 2. Create child with override=true
-    // 3. Manually corrupt child's registry
-    // This is extremely artificial
-
-    // Line 144 is defensive code that protects against
-    // implementation bugs in the Registry or Initializer itself
     expect(impl).toBeDefined()
   })
 
