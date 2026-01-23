@@ -14,8 +14,8 @@ const DEFAULT_SCOPE = 'singleton'
 export interface ClassProvider<
   K extends Key = Key,
   I extends Injectable = Any,
-  C extends InjectableConstructor = InjectableConstructor,
-  D extends DependencyDeclaration = DependencyDeclaration,
+  C extends InjectableConstructor = Any,
+  D extends DependencyDeclaration = Any,
 > {
   token: Token<K, I>
   useClass: C

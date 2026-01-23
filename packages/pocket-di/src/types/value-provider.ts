@@ -5,7 +5,7 @@ import type { Any } from './utils.ts'
 export interface ValueProvider<
   K extends Key = Key,
   I extends Injectable = Any,
-  C extends I = I,
+  C extends I = Any,
 > {
   token: Token<K, I>
   useValue: C

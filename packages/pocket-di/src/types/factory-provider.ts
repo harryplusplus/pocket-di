@@ -14,8 +14,8 @@ const DEFAULT_INJECT: DependencyDeclaration = {}
 export interface FactoryProvider<
   K extends Key = Key,
   I extends Injectable = Any,
-  C extends I = I,
-  D extends DependencyDeclaration = DependencyDeclaration,
+  C extends I = Any,
+  D extends DependencyDeclaration = Any,
 > {
   token: Token<K, I>
   inject: D
