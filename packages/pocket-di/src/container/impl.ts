@@ -75,7 +75,11 @@ export class ContainerImpl<T extends ContainerType = ContainerType> {
   ): Container<T & ExtractContainerType<Ps>> {
     this.$ensureNotDestroyed()
 
-    const child = new ContainerImpl<T & ExtractContainerType<Ps>>(options)
+    const child = new ContainerImpl<T & ExtractContainerType<Ps>>({
+      ...options,
+
+      parent: this,
+    })
 
     this.$context.children.add(child)
 
