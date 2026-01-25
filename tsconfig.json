@@ -14,10 +14,5 @@
     "skipLibCheck": true,
     "strict": true
   },
-  "include": [
-    "packages/*/src/**/*.ts",
-    "eslint.config.ts",
-    "prettier.config.ts",
-    "packages/*/vitest.config.*.ts"
-  ]
+  "include": ["packages/*/src/**/*.ts", "**/*.config*.ts"]
 }
