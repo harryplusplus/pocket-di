@@ -1,6 +1,6 @@
 export type Include = 'local' | 'parent'
 
-export interface RegistryFindOptions {
+export interface FindOptions {
   include?: Include[]
 }
 
@@ -19,7 +19,7 @@ export class Registry<K, V> {
     this.parent = null
   }
 
-  find(key: K, options?: RegistryFindOptions): V | undefined {
+  find(key: K, options?: FindOptions): V | undefined {
     const { include = DEFAULT_INCLUDE } = options ?? {}
     const includeSet = new Set(include)
 
@@ -30,8 +30,11 @@ export class Registry<K, V> {
       }
     }
 
-    if (includeSet.has('parent')) {
-      return this.parent?.find(key)
+    if (this.parent && includeSet.has('parent')) {
+      const value = this.parent.find(key)
+      if (value) {
+        return value
+      }
     }
 
     return undefined
