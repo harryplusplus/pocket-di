@@ -1,4 +1,4 @@
-import type { ContainerImpl } from '../container/impl.ts'
+import { ContainerImpl } from '../container/impl.ts'
 import { Registry } from '../registry.ts'
 import type { Injectable } from './injectable.ts'
 import type { Provider } from './provider.ts'
@@ -58,5 +58,11 @@ export interface Container {
  */
 export interface CreateContainerOptions {
   providers: Provider[]
-  parent?: Container
+}
+
+/**
+ * Create a new DI container
+ */
+export function createContainer(options: CreateContainerOptions): Container {
+  return new ContainerImpl(options)
 }

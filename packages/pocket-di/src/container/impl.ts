@@ -1,3 +1,4 @@
+import { AsyncLock } from '../async-lock.ts'
 import { Registry } from '../registry.ts'
 import type {
   Container,
@@ -8,6 +9,7 @@ import type { Injectable } from '../types/injectable.ts'
 import type { Provider } from '../types/provider.ts'
 import type { InjectionToken } from '../types/token.ts'
 import { isPlainToken } from '../types/token.ts'
+import { ContainerDestroyer } from './destroyer.ts'
 
 /**
  * Internal options for creating a container
@@ -18,6 +20,7 @@ interface ContainerImplOptions {
 }
 
 export class ContainerImpl implements Container {
+  readonly lock = new AsyncLock()
   readonly context: ContainerContext
   private destroyed = false
 
@@ -43,6 +46,8 @@ export class ContainerImpl implements Container {
     }
 
     this.destroyed = true
+
+    await new ContainerDestroyer(this).destroy()
 
     // Destroy all children first
     for (const child of this.context.children) {
@@ -222,15 +227,4 @@ export class ContainerImpl implements Container {
 
     throw new Error(`Invalid provider for token: ${String(token)}`)
   }
-}
-
-/**
- * Create a new DI container
- */
-export function createContainer(options: CreateContainerOptions): Container {
-  const internalOptions: ContainerImplOptions = {
-    providers: options.providers,
-    parent: options.parent as any,
-  }
-  return new ContainerImpl(internalOptions)
 }
