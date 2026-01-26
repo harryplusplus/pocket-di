@@ -1,25 +1,62 @@
-import type { ContainerHandler } from '../container/handler.ts'
 import type { ContainerImpl } from '../container/impl.ts'
+import { Registry } from '../registry.ts'
 import type { Injectable } from './injectable.ts'
-import type { ExtractTokens, Providers } from './provider.ts'
-import type { ExtractKey, ExtractType, Key, Tokens } from './token.ts'
+import type { Provider } from './provider.ts'
+import type { InjectionToken } from './token.ts'
 
-export type ContainerType = Record<Key, Injectable>
-
-export type ToContainerType<Ts extends Tokens> = {
-  [T in Ts[number] as ExtractKey<T>]: ExtractType<T>
+/**
+ * Container context holding registries and parent/child relationships
+ */
+export interface ContainerContext {
+  readonly providerRegistry: Registry<InjectionToken, Provider>
+  readonly singletonRegistry: Registry<InjectionToken, Injectable>
+  readonly parent?: ContainerImpl
+  readonly children: Set<ContainerImpl>
 }
 
-export type ExtractContainerType<Ps extends Providers> = ToContainerType<
-  ExtractTokens<Ps>
->
+/**
+ * Main Container interface
+ */
+export interface Container {
+  /**
+   * Destroy the container and all singletons
+   */
+  destroy(): Promise<void>
 
-export type ContainerPublicProperties<T extends ContainerType = ContainerType> =
-  Pick<ContainerImpl<T>, '$createChild' | '$destroy'>
+  /**
+   * Create a child container with additional providers
+   * Child inherits parent's singletons
+   */
+  createChild(options: { providers: Provider[]; override?: boolean }): Container
 
-export type ContainerHandlers<T extends ContainerType = ContainerType> = {
-  [K in keyof T]: ContainerHandler<T[K]>
+  /**
+   * Resolve a dependency asynchronously
+   * Handles both sync and async factories
+   */
+  resolve<I extends Injectable>(token: InjectionToken<I>): Promise<I>
+
+  /**
+   * Resolve a dependency synchronously
+   * Throws if the provider requires async operations
+   */
+  resolveSync<I extends Injectable>(token: InjectionToken<I>): I
+
+  /**
+   * Check if a singleton instance exists for the token
+   */
+  hasSingleton(token: InjectionToken): boolean
+
+  /**
+   * Get an existing singleton instance
+   * Throws if not found
+   */
+  get<I extends Injectable>(token: InjectionToken<I>): I
 }
 
-export type Container<T extends ContainerType = ContainerType> =
-  ContainerPublicProperties<T> & ContainerHandlers<T>
+/**
+ * Options for creating a container (public API)
+ */
+export interface CreateContainerOptions {
+  providers: Provider[]
+  parent?: Container
+}
