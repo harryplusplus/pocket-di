@@ -5,21 +5,21 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
     }
   },
   "files": [
-    "dist/**/*.js",
-    "dist/**/*.d.ts",
-    "!dist/**/*.test.js",
-    "!dist/**/*.test.d.ts"
+    "dist/src/**/*.js",
+    "dist/src/**/*.d.ts"
   ],
   "scripts": {
     "build": "tsc",
+    "check-types": "tsc --noEmit",
     "clean": "rimraf dist",
-    "test:dist": "vitest --run -c vitest.config.dist.ts",
-    "test:src": "vitest --run -c vitest.config.src.ts"
+    "test:js": "run-s clean build test:js:cmd",
+    "test:js:cmd": "vitest --run -c vitest.config.js.ts",
+    "test:ts": "vitest --run -c vitest.config.ts.ts"
   },
   "publishConfig": {
     "access": "public"

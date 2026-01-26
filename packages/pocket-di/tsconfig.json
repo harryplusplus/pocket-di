@@ -1,12 +1,15 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    // Languages
+    "types": ["node"],
+
+    // Builds
     "outDir": "dist",
     "incremental": true,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true,
-    "types": ["node"]
+    "sourceMap": true
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"]
 }

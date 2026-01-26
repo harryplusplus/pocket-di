@@ -2,11 +2,16 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "check-types": "pnpm -r check-types",
+    "clean": "pnpm -r --reverse clean",
+    "format:all": "run-p format:md:all format:package-json",
+    "format:md:all": "run-s format:md:toc format:md:md",
+    "format:md:md": "markdownlint-cli2 --fix",
+    "format:md:toc": "doctoc README.md README.ko.md",
+    "format:package-json": "sort-package-json package.json packages/*/package.json",
     "lint": "eslint",
-    "format:md": "markdownlint-cli2 --fix",
-    "format:toc": "doctoc README.md README.ko.md",
-    "test:src": "pnpm --filter=pocket-di test:src",
-    "test:dist": "pnpm --filter=pocket-di clean && pnpm --filter=pocket-di build && pnpm --filter=pocket-di test:dist"
+    "test:js": "pnpm -r test:js",
+    "test:ts": "pnpm -r test:ts"
   },
   "devDependencies": {
     "@eslint/compat": "2.0.1",
@@ -21,6 +26,7 @@
     "eslint-plugin-simple-import-sort": "12.1.1",
     "jiti": "2.6.1",
     "markdownlint-cli2": "0.20.0",
+    "npm-run-all": "4.1.5",
     "prettier": "3.8.1",
     "rimraf": "6.1.2",
     "sort-package-json": "3.6.1",
