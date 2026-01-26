@@ -7,9 +7,8 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [pocket-di](#pocket-di)
-  - [빌드리스 타입스크립트란 무엇인가요?](#빌드리스-타입스크립트란-무엇인가요)
-  - [왜 다른 DI 라이브러리를 사용하지 않고, 신규 DI 라이브러리를 만들었나요?](#왜-다른-di-라이브러리를-사용하지-않고-신규-di-라이브러리를-만들었나요)
+- [빌드리스 타입스크립트란 무엇인가요?](#%EB%B9%8C%EB%93%9C%EB%A6%AC%EC%8A%A4-%ED%83%80%EC%9E%85%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8%EB%9E%80-%EB%AC%B4%EC%97%87%EC%9D%B8%EA%B0%80%EC%9A%94)
+- [왜 다른 DI 라이브러리를 사용하지 않고, 신규 DI 라이브러리를 만들었나요?](#%EC%99%9C-%EB%8B%A4%EB%A5%B8-di-%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%98%EC%A7%80-%EC%95%8A%EA%B3%A0-%EC%8B%A0%EA%B7%9C-di-%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC%EB%A5%BC-%EB%A7%8C%EB%93%A4%EC%97%88%EB%82%98%EC%9A%94)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

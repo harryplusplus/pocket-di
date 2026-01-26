@@ -7,8 +7,7 @@ A simple DI library for Buildless TypeScript.
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [pocket-di](#pocket-di)
-  - [TODO](#todo)
+- [TODO](#todo)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
