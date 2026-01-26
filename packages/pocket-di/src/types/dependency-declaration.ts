@@ -1,12 +1,12 @@
 import type { Injectable } from './injectable.ts'
 import type { InjectableConstructor } from './injectable-constructor.ts'
 import type { inject } from './symbols.ts'
-import type { Token } from './token.ts'
+import type { HasTypeToken } from './token.ts'
 
-export type DependencyDeclaration = Record<string, Token>
+export type DependencyDeclaration = Record<string, HasTypeToken>
 
 export type ExtractDependencies<D extends DependencyDeclaration> = {
-  [K in keyof D]: D[K] extends Token<infer _, infer I> ? I : never
+  [K in keyof D]: D[K] extends HasTypeToken<infer I> ? I : never
 }
 
 export type AnyDependencies = Record<string, Injectable>
