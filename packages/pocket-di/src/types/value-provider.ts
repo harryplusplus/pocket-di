@@ -1,53 +1,36 @@
 import type { Injectable } from './injectable.ts'
-import { type Key, type Token, token } from './token.ts'
-import type { Any } from './utils.ts'
+import { type HasTypeToken, type InjectionToken } from './token.ts'
 
 export interface ValueProvider<
-  K extends Key = Key,
-  I extends Injectable = Any,
-  C extends I = Any,
+  I extends Injectable = Injectable,
+  C extends I = I,
 > {
-  token: Token<K, I>
+  provide: InjectionToken<I>
   useValue: C
 }
 
-export interface InferableValueProvider<K extends Key, C extends Injectable> {
-  provide: K
+export interface InferableValueProvider<C extends Injectable> {
+  provide: string | symbol
   useValue: C
 }
 
-export interface ValidatableValueProvider<
-  K extends Key,
-  I extends Injectable,
-  C extends I,
-> {
-  provide: Token<K, I>
+export interface ValidatableValueProvider<I extends Injectable, C extends I> {
+  provide: HasTypeToken<I>
   useValue: C
 }
 
-function defineValueProvider<const K extends Key, C extends Injectable>(
-  provider: InferableValueProvider<K, C>,
-): ValueProvider<K, C, C>
+function defineValueProvider<C extends Injectable>(
+  provider: InferableValueProvider<C>,
+): ValueProvider<C, C>
 
-function defineValueProvider<
-  const K extends Key,
-  I extends Injectable,
-  C extends I,
->(provider: ValidatableValueProvider<K, I, C>): ValueProvider<K, I, C>
+function defineValueProvider<I extends Injectable, C extends I>(
+  provider: ValidatableValueProvider<I, C>,
+): ValueProvider<I, C>
 
-function defineValueProvider<
-  const K extends Key,
-  I extends Injectable,
-  C extends I,
->(
-  provider: InferableValueProvider<K, C> | ValidatableValueProvider<K, I, C>,
-): ValueProvider<K, I, C> {
-  const { provide, ...rest } = provider
-
-  return {
-    token: typeof provide === 'string' ? token<I>()(provide) : provide,
-    ...rest,
-  }
+function defineValueProvider<I extends Injectable, C extends I>(
+  provider: InferableValueProvider<C> | ValidatableValueProvider<I, C>,
+): ValueProvider<I, C> {
+  return provider
 }
 
 export { defineValueProvider }
