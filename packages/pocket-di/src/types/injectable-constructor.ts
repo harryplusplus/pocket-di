@@ -10,8 +10,5 @@ export interface InjectableConstructor<
   [inject]?: D
 }
 
-export type ExtractInjectable<T extends InjectableConstructor> =
-  T extends InjectableConstructor<infer I> ? I : never
-
 export type ExtractDependencyDeclaration<T extends InjectableConstructor> =
   T extends InjectableConstructor<infer _, infer D> ? D : never

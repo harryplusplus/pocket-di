@@ -1,5 +1,9 @@
 import type { Injectable } from './injectable.ts'
-import { type HasTypeToken, type InjectionToken } from './token.ts'
+import {
+  type HasTypeToken,
+  type InjectionToken,
+  type PlainToken,
+} from './token.ts'
 
 export interface ValueProvider<
   I extends Injectable = Injectable,
@@ -10,7 +14,7 @@ export interface ValueProvider<
 }
 
 export interface InferableValueProvider<C extends Injectable> {
-  provide: string | symbol
+  provide: PlainToken
   useValue: C
 }
 
