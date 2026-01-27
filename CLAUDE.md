@@ -113,24 +113,32 @@ Check files in `src/` directory. Read JSDoc @file documentation in each source f
 
 ### Workflow
 
-When implementing a feature:
+1. **Single file testing** (Quick feedback loop)
+   ```bash
+   # Test a single file (TypeScript)
+   pnpm test:item src/<file>.ts
 
-1. **Write test first** (Red)
-   - Create test file: `tests/<feature>.test.ts`
-   - Describe expected behavior with test cases
+   # Lint a single file
+   pnpm lint:item src/<file>.ts
+   ```
 
-2. **Implement minimal code** (Green)
-   - Write just enough to pass tests
-   - Don't over-engineer
+2. **When implementing a feature:**
+   - **Write test first** (Red)
+     - Create test file: `tests/<feature>.test.ts`
+     - Describe expected behavior with test cases
 
-3. **Refactor** (Refactor)
-   - Improve code quality
-   - Ensure tests still pass
+   - **Implement minimal code** (Green)
+     - Write just enough to pass tests
+     - Don't over-engineer
 
-4. **Verify** (static → dynamic)
-   - Check type errors: `pnpm check-types`
-   - Run lint: `pnpm lint`
-   - Run tests: `pnpm test:ts` or `pnpm test:js`
+   - **Refactor** (Refactor)
+     - Improve code quality
+     - Ensure tests still pass
+
+   - **Verify** (static → dynamic)
+     - Check type errors: `pnpm check-types`
+     - Run lint: `pnpm lint`
+     - Run tests: `pnpm test:ts` or `pnpm test:js`
 
 ### Test File Structure
 
