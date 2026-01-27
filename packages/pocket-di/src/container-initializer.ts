@@ -40,6 +40,7 @@ export class ContainerInitializer {
       parent: this.options.parent,
       children: new Set(),
       providerMap: new Map(),
+      singletonMap: new Map(),
     }
   }
 

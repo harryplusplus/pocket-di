@@ -1,66 +1,123 @@
-import type { ClassProvider } from '../types/class-provider.ts'
-import type { DependencyDeclaration } from '../types/dependency-declaration.ts'
-import type { FactoryProvider } from '../types/factory-provider.ts'
-import type { Injectable } from '../types/injectable.ts'
-import { isClassProvider, isValueProvider } from '../types/provider.ts'
-import { inject } from '../types/symbols.ts'
-import type { Key } from '../types/token.ts'
-import type { ContainerImpl } from './impl.ts'
+/**
+ * @file Common resolution logic shared between async/sync resolvers
+ */
 
-export type ProviderHasDependencies = ClassProvider | FactoryProvider
+import { inject } from './symbols.ts'
+import type { ContainerContext } from './container-context.ts'
+import type { ContainerImpl } from './container-impl.ts'
+import type { Injectable } from './injectable.ts'
+import type { NormalizedProvider } from './normalized-provider.ts'
+import type { InjectionToken } from './token.ts'
 
-export function providerToDeclaration(
-  provider: ProviderHasDependencies,
-): DependencyDeclaration {
-  return isClassProvider(provider)
-    ? (provider.useClass[inject] ?? {})
-    : provider.inject
+export type ProviderHasDependencies = NormalizedProvider & {
+  type: 'class' | 'factory'
 }
 
 export type ResolveInstanceOrProviderOutput =
   | { kind: 'instance'; instance: Injectable }
   | { kind: 'provider'; provider: ProviderHasDependencies }
 
+/**
+ * CommonResolver handles shared logic between async/sync resolvers
+ */
 export class CommonResolver {
-  private readonly impl: ContainerImpl
+  private readonly context: ContainerContext
 
-  constructor(impl: ContainerImpl) {
-    this.impl = impl
+  constructor(container: ContainerImpl) {
+    this.context = container.context
   }
 
-  resolveInstanceOrProvider(key: Key): ResolveInstanceOrProviderOutput {
-    const { singletonRegistry, providerRegistry } = this.impl.$context
-
-    const singleton = singletonRegistry.find(key)
-    if (singleton) {
+  /**
+   * Get instance or provider for token
+   * 1. Check singletonMap for cached instance
+   * 2. Find provider from providerMap
+   * 3. Return instance for value provider
+   * 4. Return provider for class/factory provider
+   */
+  resolveInstanceOrProvider(
+    token: InjectionToken,
+  ): ResolveInstanceOrProviderOutput {
+    // Return cached singleton if available
+    const singleton = this.context.singletonMap.get(token)
+    if (singleton !== undefined) {
       return { kind: 'instance', instance: singleton }
     }
 
-    const provider = providerRegistry.find(key)
+    // Find provider
+    const provider = this.findProvider(token)
     if (!provider) {
       throw new Error(
-        `Internal error: provider for token "${key}" not found during resolve.`,
+        `Cannot resolve token "${String(token)}": provider not found.`,
       )
     }
 
-    if (isValueProvider(provider)) {
-      return { kind: 'instance', instance: provider.useValue }
+    // Return instance for value provider
+    if (provider.type === 'value') {
+      const value = provider.value
+      if (value === undefined) {
+        throw new Error(
+          `Cannot resolve token "${String(token)}": value provider has undefined value.`,
+        )
+      }
+      return { kind: 'instance', instance: value }
     }
 
-    return { kind: 'provider', provider }
+    // Return provider for class/factory provider
+    return { kind: 'provider', provider: provider as ProviderHasDependencies }
   }
 
+  /**
+   * Store singleton-scoped instance in singletonMap
+   */
   updateSingletonRegistry(input: {
-    provider: ProviderHasDependencies
+    provider: NormalizedProvider
     instance: Injectable
   }): void {
-    const { singletonRegistry } = this.impl.$context
     const { provider, instance } = input
 
-    const { scope = 'singleton' } = provider
-
-    if (scope === 'singleton') {
-      singletonRegistry.set(provider.token.key, instance)
+    if (provider.scope === 'singleton') {
+      this.context.singletonMap.set(provider.token, instance)
     }
   }
+
+  /**
+   * Find provider in current or parent containers
+   */
+  private findProvider(
+    token: InjectionToken,
+  ): NormalizedProvider | undefined {
+    // Search in current container
+    const provider = this.context.providerMap.get(token)
+    if (provider) {
+      return provider
+    }
+
+    // Search in parent container
+    const parent = this.context.parent
+    if (parent) {
+      return parent.context.providerMap.get(token) ?? undefined
+    }
+
+    return undefined
+  }
+}
+
+/**
+ * Extract dependency declaration from provider
+ */
+export function getProviderDependencies(
+  provider: ProviderHasDependencies,
+): Record<string, InjectionToken> {
+  if (provider.type === 'class' && provider.classConstructor) {
+    const ctor = provider.classConstructor
+    // Use inject static symbol if available, otherwise empty object
+    const injectMetadata = (ctor as any)[inject]
+    if (injectMetadata && typeof injectMetadata === 'object') {
+      return injectMetadata
+    }
+    return {}
+  }
+
+  // factory type
+  return provider.inject ?? {}
 }

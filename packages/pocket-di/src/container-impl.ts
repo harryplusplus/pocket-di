@@ -1,10 +1,17 @@
+/**
+ * @file Internal container implementation
+ */
+
 import { AsyncLock } from './async-lock.ts'
+import { AsyncResolver } from './async-resolver.ts'
 import type { Container, CreateChildOptions } from './container.ts'
 import type { ContainerContext } from './container-context.ts'
 import { ContainerInitializer } from './container-initializer.ts'
+import { Destroyer } from './destroyer.ts'
 import type { Injectable } from './injectable.ts'
 import type { Provider } from './provider.ts'
 import type { InjectionToken } from './token.ts'
+import { SyncResolver } from './sync-resolver.ts'
 
 /**
  * Internal options for creating a container
@@ -14,18 +21,62 @@ interface ContainerImplOptions {
   parent?: ContainerImpl
 }
 
-// TODO: ContainerImpl의 모든 메서드는 다른 클래스에게 행동을 위임합니다.
-// 이 때, context를 공유합니다.
-// 따라서, 각 메서드는 파괴 검사, lock 검사를 제외하고 1~3 줄만 있어야 합니다.
-// 각 클래스에게 위임하는 이유는 구현 및 테스트 용이성을 위해서입니다.
+/**
+ * ContainerImpl implements the Container interface
+ * All methods delegate behavior to specialized classes
+ */
 export class ContainerImpl implements Container {
   readonly lock = new AsyncLock()
   private destroyed = false
   readonly context!: ContainerContext
 
+  // Lazy initialization of resolvers and destroyer
+  private _asyncResolver?: AsyncResolver
+  private _syncResolver?: SyncResolver
+  private _destroyer?: Destroyer
+
   constructor(options: ContainerImplOptions) {
     const initializer = new ContainerInitializer(this, options)
     this.context = initializer.initialize()
+  }
+
+  /**
+   * Get async resolver instance (lazy initialization)
+   */
+  private get asyncResolver(): AsyncResolver {
+    if (!this._asyncResolver) {
+      this._asyncResolver = new AsyncResolver(this)
+    }
+    return this._asyncResolver
+  }
+
+  /**
+   * Get sync resolver instance (lazy initialization)
+   */
+  private get syncResolver(): SyncResolver {
+    if (!this._syncResolver) {
+      this._syncResolver = new SyncResolver(this)
+    }
+    return this._syncResolver
+  }
+
+  /**
+   * Get destroyer instance (lazy initialization)
+   */
+  private get destroyer(): Destroyer {
+    if (!this._destroyer) {
+      this._destroyer = new Destroyer(this)
+    }
+    return this._destroyer
+  }
+
+  /**
+   * Check if container is destroyed
+   */
+  private checkDestroyed(): void {
+    if (this.destroyed) {
+      throw new Error('Container has been destroyed')
+    }
   }
 
   async destroy(): Promise<void> {
@@ -40,9 +91,7 @@ export class ContainerImpl implements Container {
         return
       }
 
-      // TODO: 자식을 역순으로 파괴합니다.
-      // TODO: 본인 singleton을 역순으로 파괴합니다. 파괴하기 전에 preDestroy를 호출합니다.
-      // TODO: context를 초기화합니다.
+      await this.destroyer.destroy()
     })
   }
 
@@ -51,20 +100,28 @@ export class ContainerImpl implements Container {
   }
 
   async resolve<I extends Injectable>(token: InjectionToken<I>): Promise<I> {
-    // TODO: container 파괴유무 검사 메서드 호출
-    // TODO: 구현
+    this.checkDestroyed()
+    return this.asyncResolver.resolve(token)
   }
 
   resolveSync<I extends Injectable>(token: InjectionToken<I>): I {
-    // TODO: container 파괴유무 검사 메서드 호출
-    // TODO: 구현
+    this.checkDestroyed()
+    return this.syncResolver.resolve(token)
   }
 
   hasSingleton(token: InjectionToken): boolean {
-    // TODO: 구현
+    this.checkDestroyed()
+    return this.context.singletonMap.has(token)
   }
 
   get<I extends Injectable>(token: InjectionToken<I>): I {
-    // TODO: 구현
+    this.checkDestroyed()
+    const instance = this.context.singletonMap.get(token)
+    if (instance === undefined) {
+      throw new Error(
+        `Cannot get singleton for token "${String(token)}": instance not found.`,
+      )
+    }
+    return instance as I
   }
 }
