@@ -125,14 +125,18 @@ describe('<Feature>', () => {
 
 ## Implementation Status
 
-### ✅ Completed
+### ✅ Completed (2025-01-27)
 
-**Pre-handover Cleanup (2025-01-27):**
-- ✅ `pnpm format:all` executed
-  - package.json files sorted
-  - README.md TOC updated
-  - README.ko.md TOC updated
-  - Markdown linted and fixed
+**Container Architecture:**
+
+All core components implemented and working. 47 tests passing, 64% coverage.
+
+**ContainerContext** (src/container-context.ts)
+
+- `parent?: ContainerImpl` - Parent container reference
+- `children: Set<ContainerImpl>` - Child containers
+- `providerMap: Map<InjectionToken, NormalizedProvider>` - Provider registry
+- `singletonMap: Map<InjectionToken, Injectable>` - Singleton instance registry
 
 **ContainerInitializer** (src/container-initializer.ts)
 
@@ -141,6 +145,7 @@ describe('<Feature>', () => {
 - Token uniqueness validation (same container, parent containers)
 - Dependency validation (unregistered deps, invalid names, circular dependencies)
 - Parent chain dependency lookup
+- Initializes singletonMap in context
 
 **CircularDependencyChecker** (src/circular-dependency-checker.ts)
 
@@ -154,53 +159,101 @@ describe('<Feature>', () => {
 - normalizeToken() for all injection tokens
 - Extract inject metadata from constructors using hasOwnProperty
 
-**ContainerContext** (src/container-context.ts)
+**CommonResolver** (src/common-resolver.ts)
 
-- Added providerMap: Map<InjectionToken, NormalizedProvider>
+- resolveInstanceOrProvider() - Check singletonMap, then providerMap
+- updateSingletonRegistry() - Store singleton if scope is singleton
+- getProviderDependencies() - Extract inject metadata from providers
+- Parent container lookup for providers
 
-**ContainerImpl Constructor** (src/container-impl.ts)
+**SyncResolver** (src/sync-resolver.ts)
 
-- Uses ContainerInitializer for context initialization
+- resolve() - Sync resolve with dependency injection
+- resolveDependencies() - Resolve deps synchronously
+- resolveInstance() - Create instance, call postConstruct (throw if async)
+- Recursive dependency resolution
 
-**Tests** (30 tests passing)
+**AsyncResolver** (src/async-resolver.ts)
+
+- resolve() - Async resolve with dependency injection
+- resolveDependencies() - Resolve deps asynchronously
+- resolveInstance() - Create instance, await postConstruct
+- Recursive dependency resolution
+
+**Destroyer** (src/destroyer.ts)
+
+- destroy() - Destroy children, singletons, clear maps
+- destroyChildren() - Destroy children in reverse order
+- destroySingletons() - Destroy singletons in reverse order
+- Call provider preDestroy hook or instance preDestroy method if available
+
+**ContainerImpl** (src/container-impl.ts)
+
+- `resolve<I>(token)` - Async resolve via AsyncResolver
+- `resolveSync<I>(token)` - Sync resolve via SyncResolver
+- `hasSingleton(token)` - Check singletonMap.has(token)
+- `get<I>(token)` - Get singleton from singletonMap (throw if not found)
+- `destroy()` - Destroy via Destroyer
+- `checkDestroyed()` - Throw error if container is destroyed
+- Lazy initialization of resolvers and destroyer
+
+**Tests** (47 tests passing)
 
 - normalized-provider.test.ts (13 tests)
 - container-initializer.test.ts (17 tests)
+- common-resolver.test.ts (9 tests)
+- sync-resolver.test.ts (8 tests)
 
 ### 🚧 Next Steps
 
-**ContainerImpl Methods to Implement:**
+**Remaining Test Coverage:**
 
-1. `resolve<I>(token)` - Async resolve with dependency injection
-2. `resolveSync<I>(token)` - Sync resolve with dependency injection
-3. `hasSingleton(token)` - Check if singleton instance exists
-4. `get<I>(token)` - Get existing singleton without resolving
-5. `destroy()` - Destroy container and resources
+To reach 100% coverage, write tests for:
 
-**Required Components:**
+1. **AsyncResolver** (async-resolver.test.ts)
+   - Async resolution with dependencies
+   - Async postConstruct handling
+   - Async factory handling
+   - Error cases (missing deps, etc.)
 
-- **AsyncResolver** - Async dependency resolution
-- **SyncResolver** - Sync dependency resolution
-- **CommonResolver** - Shared resolution logic
-- **Destroyer** - Container and resource cleanup
+2. **Destroyer** (destroyer.test.ts)
+   - Child container destruction
+   - Singleton destruction with preDestroy
+   - Provider preDestroy hooks
+   - Instance preDestroy methods
+   - Reverse order destruction
 
-**Implementation Order:**
+3. **ContainerImpl** (container-impl.test.ts)
+   - hasSingleton() method
+   - get() method
+   - destroy() method
+   - checkDestroyed() behavior
+   - Error on destroyed container access
 
-1. CommonResolver (shared logic)
-2. SyncResolver (sync resolution + postConstruct)
-3. AsyncResolver (async resolution + postConstruct)
-4. Destroyer (preDestroy + cleanup)
-5. Wire up ContainerImpl methods
+**Key Considerations for Tests:**
 
-**Key Considerations:**
+- Use `deps: any` and `deps.dep` pattern (dependencies object)
+- No constructor parameter properties (erasableSyntaxOnly)
+- Class constructors receive full dependencies object
+- Example:
 
-- Use `context.providerMap` as source of truth (no separate cache)
-- Singleton instances stored in Map<InjectionToken, Injectable>
-- Respect scope (singleton/transient)
-- Call postConstruct after instance creation
-- Call preDestroy before instance destruction
-- Handle parent container lookup
-- Check container destroyed state
+  ```typescript
+  class Service {
+    static [inject] = { dep: Dependency as any }
+    dep: any
+    constructor(deps: any) {
+      this.dep = deps.dep  // Extract from dependencies object
+    }
+  }
+  ```
+
+**Current Coverage by File:**
+
+- common-resolver.ts: 80% (some edge cases)
+- sync-resolver.ts: 79% (some error paths)
+- async-resolver.ts: 0% (needs tests)
+- destroyer.ts: 0% (needs tests)
+- container-impl.ts: 59% (hasSingleton, get, destroy tested)
 
 ## Immutable (Constitution)
 
