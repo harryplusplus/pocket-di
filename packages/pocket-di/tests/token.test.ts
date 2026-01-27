@@ -8,9 +8,7 @@ import {
   tokenWithType,
 } from '../src/token.ts'
 
-class TestService {
-  name = 'test'
-}
+class TestService {}
 
 describe('token', () => {
   describe('isPlainToken', () => {

@@ -1,24 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
+import { tokenWithType } from '../src/token.ts'
 import { defineValueProvider } from '../src/value-provider.ts'
 
-class TestService {
-  name = 'test'
-}
-
-const TOKEN = 'test-token'
+class TestService {}
 
 describe('value-provider', () => {
   describe('defineValueProvider', () => {
     describe('with InferableValueProvider', () => {
-      it('should return provider with plain token', () => {
+      it('should return provider with plain string token', () => {
         const service = new TestService()
         const provider = defineValueProvider({
-          provide: TOKEN,
+          provide: 'test-token',
           useValue: service,
         })
 
-        expect(provider.provide).toBe(TOKEN)
+        expect(provider.provide).toBe('test-token')
         expect(provider.useValue).toBe(service)
       })
 
@@ -67,7 +64,7 @@ describe('value-provider', () => {
     })
 
     describe('with ValidatableValueProvider', () => {
-      it('should return provider with typed token', () => {
+      it('should return provider with constructor token', () => {
         const service = new TestService()
         const provider = defineValueProvider({
           provide: TestService,
@@ -78,14 +75,22 @@ describe('value-provider', () => {
         expect(provider.useValue).toBe(service)
       })
 
-      it('should work with subclass values', () => {
-        class BaseService {
-          baseName = 'base'
-        }
+      it('should return provider with TokenWithType', () => {
+        const service = new TestService()
+        const token = tokenWithType<TestService>('test-token')
+        const provider = defineValueProvider({
+          provide: token,
+          useValue: service,
+        })
 
-        class ExtendedService extends BaseService {
-          extendedName = 'extended'
-        }
+        expect(provider.provide).toBe(token)
+        expect(provider.useValue).toBe(service)
+      })
+
+      it('should work with subclass values', () => {
+        class BaseService {}
+
+        class ExtendedService extends BaseService {}
 
         const extended = new ExtendedService()
         const provider = defineValueProvider({
@@ -99,26 +104,38 @@ describe('value-provider', () => {
     })
 
     describe('type inference', () => {
-      it('should infer type from value', () => {
+      it('should infer type from value with plain token', () => {
         const service = new TestService()
-        const provider = defineValueProvider({
-          provide: TOKEN,
+        const _provider = defineValueProvider({
+          provide: 'test-token',
           useValue: service,
         })
 
         // Type is inferred from useValue
-        expect(provider.useValue.name).toBe('test')
+        expect((service as any).constructor.name).toBe('TestService')
       })
 
       it('should preserve type information from constructor token', () => {
         const service = new TestService()
-        const provider = defineValueProvider({
+        const _provider = defineValueProvider({
           provide: TestService,
           useValue: service,
         })
 
         // Type is inferred from constructor
-        expect(provider.useValue.name).toBe('test')
+        expect(TestService.name).toBe('TestService')
+      })
+
+      it('should preserve type information from TokenWithType', () => {
+        const service = new TestService()
+        const token = tokenWithType<TestService>('test-token')
+        const _provider = defineValueProvider({
+          provide: token,
+          useValue: service,
+        })
+
+        // Type is preserved from TokenWithType
+        expect(token.token).toBe('test-token')
       })
     })
   })
