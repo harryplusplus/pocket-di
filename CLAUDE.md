@@ -266,14 +266,14 @@ NEVER modify without asking:
 
 ## Commit Workflow
 
-CRITICAL: Run from repository ROOT directory before every commit
+CRITICAL: Run `pnpm precommit` from repository ROOT before every commit
 
 ```bash
 # Always from /Users/harry/repo/pocket-di
 cd /Users/harry/repo/pocket-di
 
-# 1. Format everything (MUST PASS before commit)
-pnpm format:all
+# 1. Run precommit (MUST PASS before commit)
+pnpm precommit
 
 # 2. Check status
 git status
@@ -286,18 +286,20 @@ git commit -m "..."
 git push
 ```
 
-Why root directory?
+What `pnpm precommit` runs (in order):
 
-- `format:all` is only available in root package.json
-- It runs: TOC update + markdown lint + package.json sort
-- Must pass all checks before commit is allowed
-- Precommit hooks verify formatting
+1. `format:all` - TOC update + markdown lint + package.json sort
+2. `check-types` - Type check all packages
+3. `lint` - Fix ESLint issues
+4. `test:ts` - Run TypeScript tests
+5. `test:js` - Run JavaScript tests
 
-If format:all fails:
+If precommit fails:
 
-- Fix markdown errors in CLAUDE.md, README.md
-- DO NOT bypass with `--no-verify`
-- Commit should only succeed after clean format:all run
+- Fix the reported errors
+- Re-run `pnpm precommit`
+- DO NOT bypass with `git commit --no-verify`
+- Commit should only succeed after clean precommit run
 
 ## Session Resumption
 
@@ -309,11 +311,8 @@ For new sessions or resuming after crash, follow this checklist:
 # From repository root
 cd /Users/harry/repo/pocket-di
 
-# Verify formatting is clean
-pnpm format:all
-
-# Run tests to verify current state
-pnpm test:ts
+# Run full precommit check
+pnpm precommit
 
 # Check what's been done
 git log --oneline -10
@@ -409,10 +408,8 @@ class Service {
 ### 6. Verification Before Commit
 
 ```bash
-# From root
-pnpm format:all  # MUST PASS
-pnpm test:ts     # All tests pass
-pnpm lint        # No errors
+# From root - single command that checks everything
+pnpm precommit
 
 # Only then commit
 git add -A && git commit -m "..."
