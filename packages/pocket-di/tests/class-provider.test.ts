@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { defineClassProvider } from '../src/class-provider.ts'
-import { tokenWithType } from '../src/token.ts'
+import { defineToken } from '../src/token.ts'
 
 class TestService {}
 
@@ -96,7 +96,7 @@ describe('class-provider', () => {
       })
 
       it('should support TokenWithType as provide token', () => {
-        const token = tokenWithType<TestService>('test-token')
+        const token = defineToken<TestService>('test-token')
         const provider = defineClassProvider({
           provide: token,
           useClass: TestService,

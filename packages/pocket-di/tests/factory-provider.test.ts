@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { defineFactoryProvider } from '../src/factory-provider.ts'
-import { tokenWithType } from '../src/token.ts'
+import { defineToken } from '../src/token.ts'
 
 class TestService {}
 
@@ -76,7 +76,7 @@ describe('factory-provider', () => {
 
       it('should use provided inject', () => {
         const factory = (_deps: { dep: DepService }) => new TestService()
-        const inject = { dep: tokenWithType<DepService>('dep-token') }
+        const inject = { dep: defineToken<DepService>('dep-token') }
 
         const provider = defineFactoryProvider({
           provide: 'test-token',
@@ -113,7 +113,7 @@ describe('factory-provider', () => {
 
       it('should work with dependencies', () => {
         const factory = (_deps: { dep: DepService }) => new TestService()
-        const inject = { dep: tokenWithType<DepService>('dep-token') }
+        const inject = { dep: defineToken<DepService>('dep-token') }
 
         const provider = defineFactoryProvider({
           provide: 'test-token',
@@ -141,7 +141,7 @@ describe('factory-provider', () => {
 
       it('should work with TokenWithType as provide token', () => {
         const factory = () => new TestService()
-        const token = tokenWithType<TestService>('test-token')
+        const token = defineToken<TestService>('test-token')
         const provider = defineFactoryProvider({
           provide: token,
           useFactory: factory,
@@ -168,7 +168,7 @@ describe('factory-provider', () => {
 
       it('should support all options', () => {
         const factory = (_deps: { dep: DepService }) => new TestService()
-        const inject = { dep: tokenWithType<DepService>('dep-token') }
+        const inject = { dep: defineToken<DepService>('dep-token') }
         const preDestroy = (_instance: TestService) => {
           // noop for testing
         }
@@ -202,7 +202,7 @@ describe('factory-provider', () => {
 
       it('should work with TokenWithType as provide token', () => {
         const factory = () => new TestService()
-        const token = tokenWithType<TestService>('test-token')
+        const token = defineToken<TestService>('test-token')
         const provider = defineFactoryProvider({
           provide: token,
           useFactory: factory,
@@ -215,7 +215,7 @@ describe('factory-provider', () => {
 
       it('should work with dependencies', () => {
         const factory = (_deps: { dep: DepService }) => new TestService()
-        const inject = { dep: tokenWithType<DepService>('dep-token') }
+        const inject = { dep: defineToken<DepService>('dep-token') }
 
         const provider = defineFactoryProvider({
           provide: TestService,

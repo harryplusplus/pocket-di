@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { tokenWithType } from '../src/token.ts'
+import { defineToken } from '../src/token.ts'
 import { defineValueProvider } from '../src/value-provider.ts'
 
 class TestService {}
@@ -77,7 +77,7 @@ describe('value-provider', () => {
 
       it('should return provider with TokenWithType', () => {
         const service = new TestService()
-        const token = tokenWithType<TestService>('test-token')
+        const token = defineToken<TestService>('test-token')
         const provider = defineValueProvider({
           provide: token,
           useValue: service,
@@ -128,7 +128,7 @@ describe('value-provider', () => {
 
       it('should preserve type information from TokenWithType', () => {
         const service = new TestService()
-        const token = tokenWithType<TestService>('test-token')
+        const token = defineToken<TestService>('test-token')
         const _provider = defineValueProvider({
           provide: token,
           useValue: service,

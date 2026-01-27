@@ -26,14 +26,11 @@ describe('normalized-provider', () => {
       expect(normalizeToken(token)).toBe(token)
     })
 
-    it('should extract plain token from TokenWithType', () => {
+    it('should extract plain token from TypedToken', () => {
       const plainToken = 'my-token'
       const typeSymbol = type
-      const tokenWithType = {
-        token: plainToken,
-        [typeSymbol]: undefined as any,
-      }
-      expect(normalizeToken(tokenWithType as any)).toBe(plainToken)
+      const typedToken = { token: plainToken, [typeSymbol]: undefined as any }
+      expect(normalizeToken(typedToken as any)).toBe(plainToken)
     })
 
     it('should return constructor token as-is', () => {

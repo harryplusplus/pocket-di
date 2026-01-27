@@ -16,27 +16,25 @@ export type InjectionToken<I extends Injectable = Injectable> =
 export type PlainToken = string | symbol
 
 export type HasTypeToken<I extends Injectable = Injectable> =
-  | TokenWithType<I>
+  | TypedToken<I>
   | InjectableConstructor<I>
 
 export function isPlainToken(token: InjectionToken): token is PlainToken {
   return typeof token === 'string' || typeof token === 'symbol'
 }
 
-export interface TokenWithType<I extends Injectable = Injectable> {
+export interface TypedToken<I extends Injectable = Injectable> {
   token: string | symbol
   [type]: I
 }
 
-export function tokenWithType<I extends Injectable>(
+export function defineToken<I extends Injectable>(
   token: PlainToken,
-): TokenWithType<I> {
+): TypedToken<I> {
   return { token, [type]: undefined as unknown as I }
 }
 
-export function isTokenWithTypeToken(
-  token: InjectionToken,
-): token is TokenWithType {
+export function isTypedToken(token: InjectionToken): token is TypedToken {
   return typeof token === 'object' && type in token
 }
 

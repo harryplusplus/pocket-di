@@ -17,9 +17,9 @@ export type {
   HasTypeToken,
   InjectionToken,
   PlainToken,
-  TokenWithType,
+  TypedToken,
 } from './token.ts'
-export { tokenWithType } from './token.ts'
+export { defineToken, isTypedToken } from './token.ts'
 export type { Any, Constructor, MaybePromise } from './utils.ts'
 export type { ValueProvider } from './value-provider.ts'
 export { defineValueProvider } from './value-provider.ts'

@@ -14,11 +14,7 @@ import {
   type Provider,
 } from './provider.ts'
 import { inject } from './symbols.ts'
-import {
-  type InjectionToken,
-  isPlainToken,
-  isTokenWithTypeToken,
-} from './token.ts'
+import { type InjectionToken, isPlainToken, isTypedToken } from './token.ts'
 import type { MaybePromise } from './utils.ts'
 import type { ValueProvider } from './value-provider.ts'
 
@@ -119,7 +115,7 @@ export function normalizeToken(token: InjectionToken): InjectionToken {
     return token
   }
 
-  if (isTokenWithTypeToken(token)) {
+  if (isTypedToken(token)) {
     return token.token
   }
 
