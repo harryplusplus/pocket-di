@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { defineClassProvider } from '../src/class-provider.ts'
 import { ContainerImpl } from '../src/container-impl.ts'
+import type { InferCP } from '../src/dependency-declaration.ts'
 import { inject } from '../src/symbols.ts'
 import { defineValueProvider } from '../src/value-provider.ts'
 
@@ -41,10 +42,11 @@ describe('ContainerCommonResolver', () => {
     it('should extract dependencies from class with inject metadata', () => {
       class Dependency {}
       class TestService {
-        static [inject] = { dep: Dependency as any }
-        dep: any
-        constructor(deps: any) {
-          this.dep = deps.dep
+        static [inject] = { dep: Dependency }
+        c: InferCP<typeof TestService>
+
+        constructor(c: InferCP<typeof TestService>) {
+          this.c = c
         }
       }
 
@@ -101,7 +103,7 @@ describe('ContainerCommonResolver', () => {
             provide: TestService,
             useClass: TestService,
             scope,
-          } as any),
+          }),
         ],
       })
 

@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { defineClassProvider } from '../src/class-provider.ts'
 import { ContainerInitializer } from '../src/container-initializer.ts'
+import {
+  defineDeclaration,
+  type DependencyDeclaration,
+} from '../src/dependency-declaration.ts'
 import { defineFactoryProvider } from '../src/factory-provider.ts'
 import {
   isClassProvider,
@@ -12,7 +16,8 @@ import { inject } from '../src/symbols.ts'
 import { defineValueProvider } from '../src/value-provider.ts'
 
 class ServiceA {
-  static [inject] = { serviceB: 'ServiceB' as any }
+  // TODO: fix
+  static [inject] = defineDeclaration({ serviceB: 'ServiceB' })
 }
 
 class ServiceB {
@@ -20,11 +25,13 @@ class ServiceB {
 }
 
 class CircularA {
-  static [inject] = { circularB: 'CircularB' as any }
+  // TODO: fix
+  static [inject] = defineDeclaration({ circularB: 'CircularB' })
 }
 
 class CircularB {
-  static [inject] = { circularA: 'CircularA' as any }
+  // TODO: fix
+  static [inject] = defineDeclaration({ circularA: 'CircularA' })
 }
 
 describe('container-initializer', () => {

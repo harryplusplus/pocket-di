@@ -9,6 +9,12 @@ import type { HasTypeToken } from './token.ts'
 
 export type DependencyDeclaration = Record<string, HasTypeToken>
 
+export function defineDeclaration(
+  declaration: DependencyDeclaration,
+): DependencyDeclaration {
+  return declaration
+}
+
 export type ExtractDependencies<D extends DependencyDeclaration> = {
   [K in keyof D]: D[K] extends HasTypeToken<infer I> ? I : never
 }

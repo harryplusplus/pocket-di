@@ -117,9 +117,9 @@ describe('class-provider', () => {
         })
 
         expect(provider.provide).toBe(BaseService)
-        expect((BaseService as any).name).toBe('BaseService')
+        expect(BaseService.name).toBe('BaseService')
         expect(provider.useClass).toBe(ExtendedService)
-        expect((ExtendedService as any).name).toBe('ExtendedService')
+        expect(ExtendedService.name).toBe('ExtendedService')
       })
     })
 
