@@ -47,4 +47,48 @@ describe('circular-dependency-checker', () => {
       checker.push('B')
     }).toThrow('Circular dependency detected: A -> B -> C -> D -> B')
   })
+
+  describe('pop', () => {
+    it('should remove token from chain', () => {
+      const checker = new CircularDependencyChecker()
+
+      checker.push('a')
+      checker.push('b')
+      checker.push('c')
+
+      expect(checker.chain.size).toBe(3)
+
+      checker.pop('b')
+
+      expect(checker.chain.size).toBe(2)
+      expect(checker.chain.has('a')).toBe(true)
+      expect(checker.chain.has('b')).toBe(false)
+      expect(checker.chain.has('c')).toBe(true)
+    })
+
+    it('should allow re-adding token after pop', () => {
+      const checker = new CircularDependencyChecker()
+
+      checker.push('a')
+      checker.push('b')
+      checker.pop('b')
+
+      expect(() => {
+        checker.push('b')
+      }).not.toThrow()
+    })
+
+    it('should detect circular dependency after pop', () => {
+      const checker = new CircularDependencyChecker()
+
+      checker.push('a')
+      checker.push('b')
+      checker.pop('b')
+      checker.push('c')
+
+      expect(() => {
+        checker.push('a')
+      }).toThrow('Circular dependency detected: a -> c -> a')
+    })
+  })
 })
