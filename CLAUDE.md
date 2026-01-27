@@ -79,10 +79,6 @@ pnpm test:item tests/<file>.test.ts
 
 # 4. Lint single file
 pnpm lint:item src/<file>.ts
-
-# 5. When done: precommit, commit, push
-pnpm precommit
-git add -A && git commit -m "..." && git push
 ```
 
 ## Project Structure
