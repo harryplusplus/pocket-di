@@ -8,20 +8,40 @@
   - [Software Development](#software-development)
   - [Testing](#testing)
 - [Quick Start](#quick-start)
+  - [For New Session](#for-new-session)
+  - [Working on a Single File](#working-on-a-single-file)
 - [Project Structure](#project-structure)
   - [pocket-di/](#pocket-di)
   - [examples/](#examples)
 - [Type Design Patterns](#type-design-patterns)
+  - [Provider Variants](#provider-variants)
+    - [Inferable Variant (타입 추론)](#inferable-variant-%ED%83%80%EC%9E%85-%EC%B6%94%EB%A1%A0)
+    - [Validatable Variant (타입 검증)](#validatable-variant-%ED%83%80%EC%9E%85-%EA%B2%80%EC%A6%9D)
+  - [Token Types](#token-types)
+  - [DependencyDeclaration Rules](#dependencydeclaration-rules)
 - [Naming Conventions](#naming-conventions)
+  - [Functions](#functions)
+  - [Type Suffixes](#type-suffixes)
+  - [Naming Philosophy](#naming-philosophy)
 - [Commands](#commands)
+  - [Single File Commands](#single-file-commands)
+  - [Format](#format)
+  - [Test](#test)
 - [Session Resumption](#session-resumption)
+  - [1. Check git history](#1-check-git-history)
+  - [2. Review source files](#2-review-source-files)
 - [Implementation Workflow](#implementation-workflow)
 - [Testing Workflow](#testing-workflow)
+  - [Workflow](#workflow)
+  - [Test File Structure](#test-file-structure)
 - [Commit Workflow](#commit-workflow)
 - [Implementation Status](#implementation-status)
+  - [Completed with Full Coverage](#completed-with-full-coverage)
+  - [TODO (Need Implementation)](#todo-need-implementation)
+  - [Architecture Overview](#architecture-overview)
 - [Immutable (Constitution)](#immutable-constitution)
 
-<!-- END doctoc generated TOC -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Principles
 
@@ -48,13 +68,6 @@
 - **Descriptive Names**: Test names should describe what they test
 
 ## Quick Start
-
-### For New Session
-
-```bash
-cd /Users/harry/repo/pocket-di
-pnpm install
-```
 
 ### Working on a Single File
 
@@ -103,11 +116,13 @@ Real-world usage examples
 All providers have two variants for type safety:
 
 #### Inferable Variant (타입 추론)
+
 - `provide`: **PlainToken** (string | symbol)
 - 타입은 `useClass`/`useFactory`/`useValue`로부터 추론
 - 사용 예: `defineClassProvider({ provide: 'token', useClass: Service })`
 
 #### Validatable Variant (타입 검증)
+
 - `provide`: **HasTypeToken** (TypedToken or Constructor)
 - 타입이 명시적으로 지정됨
 - 사용 예: `defineClassProvider({ provide: Service, useClass: Service })`
@@ -137,15 +152,18 @@ inject: { dep: 'string-token' }  // 컴파일 에러!
 ## Naming Conventions
 
 ### Functions
+
 - **define***: 생성 함수 (defineToken, defineClassProvider, defineValueProvider, defineFactoryProvider)
 - **is***: 타입 가드 함수 (isTypedToken, isValueProvider, isClassProvider, etc.)
 
 ### Type Suffixes
+
 - **Token**: 타입 정보를 가진 객체 (TypedToken, PlainToken, InjectionToken)
 - **Provider**: 의존성 제공자 (ValueProvider, ClassProvider, FactoryProvider)
 - **Resolver**: 의존성 해석 (SyncResolver, AsyncResolver, CommonResolver)
 
 ### Naming Philosophy
+
 - 타입 이름에는 "Token" 접미사를 붙여서 이해하기 쉽게 합니다
   - `TypedToken` (not `TokenWithType`) - 토큰 타입임을 명확히 알 수 있음
   - `InjectionToken` - 의존성 주입용 토큰임을 명확히 알 수 있음
@@ -222,6 +240,7 @@ Example:
 ### Workflow
 
 1. **Single file testing** (Quick feedback loop)
+
    ```bash
    # Test a single file (TypeScript)
    pnpm test:item src/<file>.ts
@@ -314,20 +333,23 @@ If precommit fails:
 
 ## Implementation Status
 
-### Completed (100% Coverage)
+### Completed with Full Coverage
 
 **Core utilities:**
+
 - ✅ async-lock
 - ✅ circular-dependency-checker
 - ✅ token, symbols
 
 **Providers:**
+
 - ✅ value-provider
 - ✅ class-provider
 - ✅ factory-provider
 - ✅ provider (type guards)
 
 **Container components:**
+
 - ✅ container-initializer
 - ✅ container-destroyer
 - ✅ container-sync-resolver
@@ -343,6 +365,7 @@ If precommit fails:
 ### Architecture Overview
 
 **Container Core:**
+
 - **Registry**: Stores all provider registrations
 - **SyncResolver**: Synchronous dependency resolution
 - **AsyncResolver**: Asynchronous dependency resolution (with AsyncLock)
@@ -350,6 +373,7 @@ If precommit fails:
 - **Destroyer**: Cleans up container lifecycle
 
 **Resolution Flow:**
+
 1. Provider registration via `ValueProvider`, `ClassProvider`, `FactoryProvider`, or Constructor
 2. Normalization to unified `NormalizedProvider` format
 3. Dependency injection using `inject` static property
@@ -357,6 +381,7 @@ If precommit fails:
 5. Instance creation with lifecycle hooks
 
 **Lifecycle:**
+
 1. **Construction**: Constructor injection + postConstruct hook
 2. **Usage**: Resolved instances cached by scope
 3. **Destruction**: preDestroy hook when container is destroyed
