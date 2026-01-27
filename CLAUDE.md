@@ -7,23 +7,21 @@
 - [Principles](#principles)
   - [Software Development](#software-development)
   - [Testing](#testing)
+- [Quick Start](#quick-start)
 - [Project Structure](#project-structure)
   - [pocket-di/](#pocket-di)
   - [examples/](#examples)
+- [Type Design Patterns](#type-design-patterns)
+- [Naming Conventions](#naming-conventions)
 - [Commands](#commands)
-  - [Format](#format)
-  - [Test](#test)
 - [Session Resumption](#session-resumption)
-  - [1. Check git history](#1-check-git-history)
-  - [2. Review source files](#2-review-source-files)
-- [Testing Workflow](#testing-workflow)
-  - [Workflow](#workflow)
-  - [Test File Structure](#test-file-structure)
 - [Implementation Workflow](#implementation-workflow)
+- [Testing Workflow](#testing-workflow)
 - [Commit Workflow](#commit-workflow)
+- [Implementation Status](#implementation-status)
 - [Immutable (Constitution)](#immutable-constitution)
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!-- END doctoc generated TOC -->
 
 ## Principles
 
@@ -49,6 +47,32 @@
 - **Integration Tests**: Test component interactions
 - **Descriptive Names**: Test names should describe what they test
 
+## Quick Start
+
+### For New Session
+
+```bash
+cd /Users/harry/repo/pocket-di
+pnpm install
+```
+
+### Working on a Single File
+
+```bash
+# 1. Write source file (src/)
+#    - Add JSDoc @file comment
+# 2. Write test file (tests/)
+# 3. Test single file
+pnpm test:item tests/<file>.test.ts
+
+# 4. Lint single file
+pnpm lint:item src/<file>.ts
+
+# 5. When done: format, commit, push
+pnpm format:all
+git add -A && git commit -m "..." && git push
+```
+
 ## Project Structure
 
 ```text
@@ -72,6 +96,60 @@ Real-world usage examples
 - Keep imports realistic: `from 'pocket-di'` not `from '../dist'`
 - examples verifies public API from `pocket-di/src/index.ts`
 
+## Type Design Patterns
+
+### Provider Variants
+
+All providers have two variants for type safety:
+
+#### Inferable Variant (타입 추론)
+- `provide`: **PlainToken** (string | symbol)
+- 타입은 `useClass`/`useFactory`/`useValue`로부터 추론
+- 사용 예: `defineClassProvider({ provide: 'token', useClass: Service })`
+
+#### Validatable Variant (타입 검증)
+- `provide`: **HasTypeToken** (TypedToken or Constructor)
+- 타입이 명시적으로 지정됨
+- 사용 예: `defineClassProvider({ provide: Service, useClass: Service })`
+- 사용 예: `defineClassProvider({ provide: defineToken<Service>('token'), useClass: Service })`
+
+### Token Types
+
+- **PlainToken**: `string` | `symbol` - 타입 정보 없는 토큰
+- **TypedToken**: `{ token: string | symbol, [type]: T }` - 타입 정보가 있는 토큰
+- **Constructor**: 클래스 생성자 - 생성자 자체가 타입 정보를 가짐
+
+### DependencyDeclaration Rules
+
+`inject`는 반드시 **HasTypeToken**만 사용해야 합니다:
+
+```typescript
+// ✅ 올바른 사용
+inject: { dep: defineToken<DepService>('dep') }
+inject: { dep: DepService }
+
+// ❌ 잘못된 사용
+inject: { dep: 'string-token' }  // 컴파일 에러!
+```
+
+**이유**: `DependencyDeclaration = Record<string, HasTypeToken>`이므로 문자열/심볼은 사용할 수 없습니다.
+
+## Naming Conventions
+
+### Functions
+- **define***: 생성 함수 (defineToken, defineClassProvider, defineValueProvider, defineFactoryProvider)
+- **is***: 타입 가드 함수 (isTypedToken, isValueProvider, isClassProvider, etc.)
+
+### Type Suffixes
+- **Token**: 타입 정보를 가진 객체 (TypedToken, PlainToken, InjectionToken)
+- **Provider**: 의존성 제공자 (ValueProvider, ClassProvider, FactoryProvider)
+- **Resolver**: 의존성 해석 (SyncResolver, AsyncResolver, CommonResolver)
+
+### Naming Philosophy
+- 타입 이름에는 "Token" 접미사를 붙여서 이해하기 쉽게 합니다
+  - `TypedToken` (not `TokenWithType`) - 토큰 타입임을 명확히 알 수 있음
+  - `InjectionToken` - 의존성 주입용 토큰임을 명확히 알 수 있음
+
 ## Commands
 
 **Configuration:**
@@ -82,11 +160,21 @@ Real-world usage examples
 
 See `package.json` > `scripts` for all available commands.
 
+### Single File Commands
+
+```bash
+# Test a single file
+pnpm test:item tests/<file>.test.ts
+
+# Lint a single file
+pnpm lint:item src/<file>.ts
+```
+
 ### Format
 
 - **All**: `pnpm format:all` (run format:md:all + format:package-json in parallel)
   - **MD all**: `pnpm format:md:all` (TOC → MD, serial order)
-    - **TOC**: `pnpm format:md:toc` (update README table of contents)
+    - **TOC**: `pnpm format:md:tOC` (update README table of contents)
     - **MD**: `pnpm format:md:md` (fix markdown linting)
   - **Package.json**: `pnpm format:package-json` (sort package.json keys)
 
@@ -109,12 +197,31 @@ git log --oneline -10
 
 Check files in `src/` directory. Read JSDoc @file documentation in each source file for details.
 
+## Implementation Workflow
+
+**TypeScript Configuration:**
+
+- `erasableSyntaxOnly: true` - No constructor parameter properties
+- Use field declarations + constructor assignment instead
+
+**Documentation:**
+
+Write JSDoc `@file` documentation for each source file.
+
+Example:
+
+```typescript
+// src/<implementation>.ts
+/**
+ * @file Description of what this file does.
+ */
+```
+
 ## Testing Workflow
 
 ### Workflow
 
 1. **Single file testing** (Quick feedback loop)
-
    ```bash
    # Test a single file (TypeScript)
    pnpm test:item src/<file>.ts
@@ -146,12 +253,9 @@ Check files in `src/` directory. Read JSDoc @file documentation in each source f
 ```typescript
 // tests/<feature>.test.ts
 import { describe, it, expect } from 'vitest'
-import { inject } from '../src/symbols.ts'
 
-// Use static [inject] for dependency declarations
-class TestService {
-  static [inject] = { dep: 'dependency-token' as any }
-}
+// Use empty classes for testing
+class TestService {}
 
 describe('<Feature>', () => {
   describe('<Scenario>', () => {
@@ -172,30 +276,8 @@ describe('<Feature>', () => {
 **Key Patterns:**
 
 - Nest `describe()` blocks for better organization (feature → scenario → test)
-
-## Implementation Workflow
-
-**TypeScript Configuration:**
-
-- `erasableSyntaxOnly: true` - No constructor parameter properties
-- Use field declarations + constructor assignment instead
-
-**Import Order:**
-
-- Auto-fixed on lint
-
-**Documentation:**
-
-Write JSDoc `@file` documentation for each source file.
-
-Example:
-
-```typescript
-// src/<implementation>.ts
-/**
- * @file Description of what this file does.
- */
-```
+- Use empty classes (no properties) for test fixtures
+- Imports are auto-sorted by eslint
 
 ## Commit Workflow
 
@@ -229,6 +311,55 @@ If precommit fails:
 - Fix the reported errors
 - Re-run `pnpm precommit`
 - Commit should only succeed after clean precommit run
+
+## Implementation Status
+
+### Completed (100% Coverage)
+
+**Core utilities:**
+- ✅ async-lock
+- ✅ circular-dependency-checker
+- ✅ token, symbols
+
+**Providers:**
+- ✅ value-provider
+- ✅ class-provider
+- ✅ factory-provider
+- ✅ provider (type guards)
+
+**Container components:**
+- ✅ container-initializer
+- ✅ container-destroyer
+- ✅ container-sync-resolver
+- ✅ container-common-resolver
+
+### TODO (Need Implementation)
+
+- ⏳ Container async methods (resolveAsync, destroyAsync, createChildAsync)
+- ⏳ Container async-resolver
+- ⏳ Lifecycle events (postConstruct, preDestroy)
+- ⏳ Error handling & edge cases
+
+### Architecture Overview
+
+**Container Core:**
+- **Registry**: Stores all provider registrations
+- **SyncResolver**: Synchronous dependency resolution
+- **AsyncResolver**: Asynchronous dependency resolution (with AsyncLock)
+- **Initializer**: Creates instances from providers
+- **Destroyer**: Cleans up container lifecycle
+
+**Resolution Flow:**
+1. Provider registration via `ValueProvider`, `ClassProvider`, `FactoryProvider`, or Constructor
+2. Normalization to unified `NormalizedProvider` format
+3. Dependency injection using `inject` static property
+4. Circular dependency detection
+5. Instance creation with lifecycle hooks
+
+**Lifecycle:**
+1. **Construction**: Constructor injection + postConstruct hook
+2. **Usage**: Resolved instances cached by scope
+3. **Destruction**: preDestroy hook when container is destroyed
 
 ## Immutable (Constitution)
 
