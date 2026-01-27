@@ -213,10 +213,17 @@ NEVER modify without asking:
 
 ## Session Resumption
 
-To resume a previous session after a crash or restart:
+When handing over to next session or resuming after crash:
 
-1. **Check plan file**: Look at `/Users/harry/.claude/plans/calm-dancing-kahan.md` for the current implementation plan
-2. **Use `/context` command**: Check current context usage and memory files
-3. **Reference recent work**: The plan file contains detailed implementation steps that can be continued
+1. **Run format:all**: `pnpm format:all`
+   - Sort package.json files
+   - Update README TOCs
+   - Fix markdown linting
+
+2. **Check plan file**: Look at `/Users/harry/.claude/plans/calm-dancing-kahan.md` for the current implementation plan
+
+3. **Use `/context` command**: Check current context usage and memory files
+
+4. **Reference recent work**: The plan file contains detailed implementation steps that can be continued
 
 The plan file is automatically managed by Claude and persists across sessions.
