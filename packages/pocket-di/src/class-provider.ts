@@ -1,3 +1,11 @@
+/**
+ * @file ClassProvider는 injectable class를 제공하는 Provider입니다.
+ * injectable class는 inject symbol을 사용해 dependency declaration을 정의할 수 있습니다.
+ * 그리고 postConstruct symbol을 사용해 생성자 호출 직후 호출될 lifecycle event를 정의할 수 있습니다.
+ * 만약 resolveSync()로 resolve되는 경우, postConstruct 메서드에서 Promise를 반환하면 예외를 발생시킵니다.
+ * 그리고 preDestroy symbol을 사용해 destroy 전 실행할 lifecycle event를 정의할 수 있습니다.
+ */
+
 import type { Injectable } from './injectable.ts'
 import type { InjectableConstructor } from './injectable-constructor.ts'
 import type { Scope } from './scope.ts'

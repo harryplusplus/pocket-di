@@ -1,3 +1,7 @@
+/**
+ * @file Provider는 container에 등록할 수 있는 provider들의 union type입니다.
+ */
+
 import type { ClassProvider } from './class-provider.ts'
 import type { FactoryProvider } from './factory-provider.ts'
 import type { InjectableConstructor } from './injectable-constructor.ts'

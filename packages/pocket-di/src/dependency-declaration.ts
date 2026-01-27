@@ -1,3 +1,7 @@
+/**
+ * @file dependency declaration을 정의하는 type과 그 utility type들이 있습니다.
+ */
+
 import type { Injectable } from './injectable.ts'
 import type { InjectableConstructor } from './injectable-constructor.ts'
 import type { inject } from './symbols.ts'
