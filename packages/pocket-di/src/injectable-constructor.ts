@@ -1,8 +1,8 @@
 /**
- * @file InjectableConstructor는 injectable을 제공하는 constructor을 정의하는 type입니다.
- * inject symbol을 사용해 dependency declaration을 정의할 수 있습니다.
- * postConstruct symbol을 사용해 생성자를 직후 호출할 lifecycle event를 정의할 수 있습니다.
- * preDestroy symbol을 사용해 destroy 전 실행할 lifecycle event를 정의할 수 있습니다.
+ * @file InjectableConstructor defines a constructor that provides an injectable
+ * Use inject symbol to define dependency declaration
+ * Use postConstruct symbol to define lifecycle event called after instantiation
+ * Use preDestroy symbol to define lifecycle event called before destruction
  */
 
 import type { DependencyDeclaration } from './dependency-declaration.ts'

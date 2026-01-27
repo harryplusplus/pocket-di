@@ -1,5 +1,5 @@
 /**
- * @file pocket-di에서 사용할 symbol들을 정의합니다.
+ * @file Symbols used in pocket-di
  */
 
 //#region Internals

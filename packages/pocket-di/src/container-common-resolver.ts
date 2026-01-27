@@ -18,9 +18,9 @@ export type ResolveInstanceOrProviderOutput =
   | { kind: 'provider'; provider: ProviderHasDependencies }
 
 /**
- * CommonResolver handles shared logic between async/sync resolvers
+ * ContainerCommonResolver handles shared logic between async/sync resolvers
  */
-export class CommonResolver {
+export class ContainerCommonResolver {
   private readonly context: ContainerContext
 
   constructor(container: ContainerImpl) {

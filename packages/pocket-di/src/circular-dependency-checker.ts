@@ -1,5 +1,5 @@
 /**
- * @file 순환 의존성을 검사하는 클래스입니다.
+ * @file Class for checking circular dependencies
  */
 
 import type { InjectionToken } from './token.ts'

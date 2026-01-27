@@ -1,5 +1,5 @@
 /**
- * @file container에서 소유하고 사용하는 상태을 정의하는 interface입니다.
+ * @file State owned and used by container
  */
 
 import type { ContainerImpl } from './container-impl.ts'
@@ -8,7 +8,7 @@ import type { NormalizedProvider } from './normalized-provider.ts'
 import type { InjectionToken } from './token.ts'
 
 /**
- * container에서 소유하고 사용하는 상태 interface입니다.
+ * State owned and used by container
  */
 export interface ContainerContext {
   readonly parent?: ContainerImpl

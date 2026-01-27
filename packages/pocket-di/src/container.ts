@@ -1,5 +1,5 @@
 /**
- * @file 컨테이너 공개 API입니다.
+ * @file Public container API
  */
 
 import { ContainerImpl } from './container-impl.ts'
@@ -9,13 +9,13 @@ import type { InjectionToken } from './token.ts'
 
 export interface CreateChildOptions {
   /**
-   * 자식 컨테이너에서 사용될 provider들을 등록합니다.
+   * Registers providers to be used in child container
    */
   providers: Provider[]
 
   /**
-   * 부모 컨테이너의 provider를 override할 지 여부를 정의합니다.
-   * false일 경우, parent에 등록되어 있는 같은 토큰값의 provider가 있을 경우 예외를 발생시킵니다.
+   * Defines whether to override parent's provider
+   * If false and same token exists in parent, throws error
    * @default false
    * @todo
    */
@@ -24,45 +24,45 @@ export interface CreateChildOptions {
 
 export interface Container {
   /**
-   * 이 컨테이너와 그 모든 자식들을 파괴합니다.
+   * Destroy this container and all its children
    */
   destroy(): Promise<void>
 
   /**
-   * 자식 컨테이너를 생성합니다.
+   * Create a child container
    */
   createChild(options: CreateChildOptions): Container
 
   /**
-   * injectable instance를 resolve하고 반환합니다.
-   * singleton provider의 token value일 경우, 이미 있는 singleton을 재사용합니다.
-   * 만약 transient provider의 token value일 경우, 매번 새로운 instance를 반환합니다.
-   * dependencies도 재귀적으로 resolve됩니다.
+   * Resolve and return injectable instance
+   * Reuses existing singleton if provider is singleton
+   * Creates new instance on every resolve if provider is transient
+   * Dependencies are also resolved recursively
    */
   resolve<I extends Injectable>(token: InjectionToken<I>): Promise<I>
 
   /**
-   * injectable instance를 resolve하고 반환합니다.
-   * 만약 class instance가 postCreate을 구현하는 경우, postCreate을 실행합니다. 이 때, Promise를 반환하면 예외를 발생시킵니다.
-   * 만약 factory provider의 useFactory가 Promise를 반환하는 경우, 예외를 발생시킵니다.
-   * dependencies도 재귀적으로 resolve되기 때문에 모든 dependencies도 이미 resolve되어 있거나 Promise를 반환하면 안됩니다.
+   * Resolve and return injectable instance synchronously
+   * If class instance has postConstruct, calls it (throws if returns Promise)
+   * If factory provider's useFactory returns Promise, throws error
+   * All dependencies must also be synchronously resolved (not return Promise)
    */
   resolveSync<I extends Injectable>(token: InjectionToken<I>): I
 
   /**
-   * singleton instance가 있는지 조회합니다.
+   * Check if singleton instance exists
    */
   hasSingleton(token: InjectionToken): boolean
 
   /**
-   * singleton instance를 반환합니다. 없을 경우 예외를 발생시킵니다.
+   * Return singleton instance, throw if not found
    */
   get<I extends Injectable>(token: InjectionToken<I>): I
 }
 
 export interface CreateContainerOptions {
   /**
-   * 컨테이너에서 사용할 provider들을 등록합니다.
+   * Registers providers to be used in container
    */
   providers: Provider[]
 }

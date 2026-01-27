@@ -4,7 +4,7 @@ import { defineClassProvider } from '../src/class-provider.ts'
 import { ContainerImpl } from '../src/container-impl.ts'
 import { inject, postConstruct } from '../src/symbols.ts'
 
-describe('SyncResolver', () => {
+describe('ContainerSyncResolver', () => {
   describe('resolve with postConstruct', () => {
     it('should call postConstruct after instance creation', () => {
       let called = false

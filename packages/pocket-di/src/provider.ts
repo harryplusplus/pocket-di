@@ -1,5 +1,5 @@
 /**
- * @file Provider는 container에 등록할 수 있는 provider들의 union type입니다.
+ * @file Union type of all providers that can be registered in container
  */
 
 import type { ClassProvider } from './class-provider.ts'

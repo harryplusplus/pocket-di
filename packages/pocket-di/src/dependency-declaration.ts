@@ -1,5 +1,5 @@
 /**
- * @file dependency declaration을 정의하는 type과 그 utility type들이 있습니다.
+ * @file Types and utility types for dependency declaration
  */
 
 import type { Injectable } from './injectable.ts'

@@ -3,14 +3,14 @@
  */
 
 import { AsyncLock } from './async-lock.ts'
-import { AsyncResolver } from './async-resolver.ts'
 import type { Container, CreateChildOptions } from './container.ts'
+import { ContainerAsyncResolver } from './container-async-resolver.ts'
 import type { ContainerContext } from './container-context.ts'
+import { ContainerDestroyer } from './container-destroyer.ts'
 import { ContainerInitializer } from './container-initializer.ts'
-import { Destroyer } from './destroyer.ts'
+import { ContainerSyncResolver } from './container-sync-resolver.ts'
 import type { Injectable } from './injectable.ts'
 import type { Provider } from './provider.ts'
-import { SyncResolver } from './sync-resolver.ts'
 import type { InjectionToken } from './token.ts'
 
 /**
@@ -31,9 +31,9 @@ export class ContainerImpl implements Container {
   readonly context!: ContainerContext
 
   // Lazy initialization of resolvers and destroyer
-  private _asyncResolver?: AsyncResolver
-  private _syncResolver?: SyncResolver
-  private _destroyer?: Destroyer
+  private _asyncResolver?: ContainerAsyncResolver
+  private _syncResolver?: ContainerSyncResolver
+  private _containerDestroyer?: ContainerDestroyer
 
   constructor(options: ContainerImplOptions) {
     const initializer = new ContainerInitializer(this, options)
@@ -43,9 +43,9 @@ export class ContainerImpl implements Container {
   /**
    * Get async resolver instance (lazy initialization)
    */
-  private get asyncResolver(): AsyncResolver {
+  private get asyncResolver(): ContainerAsyncResolver {
     if (!this._asyncResolver) {
-      this._asyncResolver = new AsyncResolver(this)
+      this._asyncResolver = new ContainerAsyncResolver(this)
     }
     return this._asyncResolver
   }
@@ -53,21 +53,21 @@ export class ContainerImpl implements Container {
   /**
    * Get sync resolver instance (lazy initialization)
    */
-  private get syncResolver(): SyncResolver {
+  private get syncResolver(): ContainerSyncResolver {
     if (!this._syncResolver) {
-      this._syncResolver = new SyncResolver(this)
+      this._syncResolver = new ContainerSyncResolver(this)
     }
     return this._syncResolver
   }
 
   /**
-   * Get destroyer instance (lazy initialization)
+   * Get ContainerDestroyer instance (lazy initialization)
    */
-  private get destroyer(): Destroyer {
-    if (!this._destroyer) {
-      this._destroyer = new Destroyer(this)
+  private get containerDestroyer(): ContainerDestroyer {
+    if (!this._containerDestroyer) {
+      this._containerDestroyer = new ContainerDestroyer(this)
     }
-    return this._destroyer
+    return this._containerDestroyer
   }
 
   /**
@@ -91,7 +91,7 @@ export class ContainerImpl implements Container {
         return
       }
 
-      await this.destroyer.destroy()
+      await this.containerDestroyer.destroy()
     })
   }
 

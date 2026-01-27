@@ -1,5 +1,5 @@
 /**
- * @file Provider를 통일된 형태로 변환하기 위한 interface와 utility 함수입니다.
+ * @file Interface and utility functions to normalize providers into a unified format
  */
 
 import type { ClassProvider } from './class-provider.ts'
@@ -108,7 +108,7 @@ function extractClassMetadata(constructor: InjectableConstructor): {
   const hasInject = Object.prototype.hasOwnProperty.call(constructor, inject)
   const declaration = hasInject ? (constructor as any)[inject] : {}
 
-  // preDestroy는 나중에 lifecycle-events 모듈에서 추출
+  // preDestroy will be extracted later in lifecycle-events module
   const preDestroy = undefined
 
   return { inject: declaration, preDestroy }

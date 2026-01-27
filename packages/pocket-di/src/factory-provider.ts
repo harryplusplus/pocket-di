@@ -1,10 +1,10 @@
 /**
- * @file FactoryProvider는 factory function를 제공하는 Provider입니다.
- * scope를 정의할 수 있습니다.
- * inject property를 통해 dependency declaration을 정의할 수 있습니다.
- * useFactory는 injectable instance를 생성하는 factory function입니다. Promise를 반환할 수 있습니다.
- * 만약 resolveSync()로 resolve되는 경우, useFactory는 Promise를 반환하면 예외를 발생시킵니다.
- * preDestroy는 destroy 전 실행할 lifecycle event를 정의할 수 있습니다.
+ * @file FactoryProvider provides a factory function
+ * You can define scope
+ * You can define dependency declaration through inject property
+ * useFactory is a factory function that creates injectable instance, can return Promise
+ * If resolved via resolveSync(), useFactory must not return Promise or throws error
+ * preDestroy defines lifecycle event to execute before destroy
  */
 
 import type {

@@ -1,31 +1,31 @@
 /**
- * @file Synchronous instance resolution logic
+ * @file Asynchronous instance resolution logic
  */
 
 import {
-  CommonResolver,
+  ContainerCommonResolver,
   getProviderDependencies,
   type ProviderHasDependencies,
-} from './common-resolver.ts'
+} from './container-common-resolver.ts'
 import type { ContainerImpl } from './container-impl.ts'
 import type { Injectable } from './injectable.ts'
 import { postConstruct } from './symbols.ts'
 import type { InjectionToken } from './token.ts'
 
 /**
- * SyncResolver handles synchronous instance resolution
+ * ContainerAsyncResolver handles asynchronous instance resolution
  */
-export class SyncResolver {
-  private readonly common: CommonResolver
+export class ContainerAsyncResolver {
+  private readonly common: ContainerCommonResolver
 
   constructor(container: ContainerImpl) {
-    this.common = new CommonResolver(container)
+    this.common = new ContainerCommonResolver(container)
   }
 
   /**
-   * Resolve instance for token synchronously
+   * Resolve instance for token asynchronously
    */
-  resolve<I extends Injectable>(token: InjectionToken<I>): I {
+  async resolve<I extends Injectable>(token: InjectionToken<I>): Promise<I> {
     const output = this.common.resolveInstanceOrProvider(token)
 
     // Return cached instance if available
@@ -35,8 +35,8 @@ export class SyncResolver {
 
     // Create instance from provider
     const { provider } = output
-    const dependencies = this.resolveDependencies(provider)
-    const instance = this.resolveInstance(provider, dependencies)
+    const dependencies = await this.resolveDependencies(provider)
+    const instance = await this.resolveInstance(provider, dependencies)
 
     // Store in singleton registry if scope is singleton
     this.common.updateSingletonRegistry({ provider, instance })
@@ -45,16 +45,16 @@ export class SyncResolver {
   }
 
   /**
-   * Resolve provider dependencies synchronously
+   * Resolve provider dependencies asynchronously
    */
-  private resolveDependencies(
+  private async resolveDependencies(
     provider: ProviderHasDependencies,
-  ): Record<string, Injectable> {
+  ): Promise<Record<string, Injectable>> {
     const deps = getProviderDependencies(provider)
     const resolved: Record<string, Injectable> = {}
 
     for (const [name, depToken] of Object.entries(deps)) {
-      resolved[name] = this.resolve(depToken)
+      resolved[name] = await this.resolve(depToken)
     }
 
     return resolved
@@ -63,10 +63,10 @@ export class SyncResolver {
   /**
    * Create instance from provider and call postConstruct
    */
-  private resolveInstance(
+  private async resolveInstance(
     provider: ProviderHasDependencies,
     dependencies: Record<string, Injectable>,
-  ): Injectable {
+  ): Promise<Injectable> {
     let instance: Injectable
 
     if (provider.type === 'class') {
@@ -86,38 +86,21 @@ export class SyncResolver {
           `Cannot resolve "${String(provider.token)}": factory is missing.`,
         )
       }
-      const result = factory(dependencies)
-
-      // Throw error if factory returns Promise
-      if (result instanceof Promise) {
-        throw new Error(
-          `Cannot resolve "${String(provider.token)}" synchronously: factory returns Promise.`,
-        )
-      }
-
-      instance = result
+      instance = await factory(dependencies)
     }
 
     // Call postConstruct
-    this.callPostConstruct(instance)
+    await this.callPostConstruct(instance)
 
     return instance
   }
 
   /**
    * Call postConstruct on instance
-   * Throws error if postConstruct returns Promise
    */
-  private callPostConstruct(instance: Injectable): void {
+  private async callPostConstruct(instance: Injectable): Promise<void> {
     if (this.isPostConstructable(instance)) {
-      const result = instance[postConstruct]()
-
-      // Throw error if postConstruct returns Promise
-      if (result instanceof Promise) {
-        throw new Error(
-          `Cannot call postConstruct on ${instance.constructor.name}: method returns Promise.`,
-        )
-      }
+      await instance[postConstruct]()
     }
   }
 

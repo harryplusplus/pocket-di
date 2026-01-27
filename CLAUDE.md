@@ -159,28 +159,28 @@ All core components implemented and working. 47 tests passing, 64% coverage.
 - normalizeToken() for all injection tokens
 - Extract inject metadata from constructors using hasOwnProperty
 
-**CommonResolver** (src/common-resolver.ts)
+**ContainerCommonResolver** (src/container-common-resolver.ts)
 
 - resolveInstanceOrProvider() - Check singletonMap, then providerMap
 - updateSingletonRegistry() - Store singleton if scope is singleton
 - getProviderDependencies() - Extract inject metadata from providers
 - Parent container lookup for providers
 
-**SyncResolver** (src/sync-resolver.ts)
+**ContainerSyncResolver** (src/container-sync-resolver.ts)
 
 - resolve() - Sync resolve with dependency injection
 - resolveDependencies() - Resolve deps synchronously
 - resolveInstance() - Create instance, call postConstruct (throw if async)
 - Recursive dependency resolution
 
-**AsyncResolver** (src/async-resolver.ts)
+**ContainerAsyncResolver** (src/container-async-resolver.ts)
 
 - resolve() - Async resolve with dependency injection
 - resolveDependencies() - Resolve deps asynchronously
 - resolveInstance() - Create instance, await postConstruct
 - Recursive dependency resolution
 
-**Destroyer** (src/destroyer.ts)
+**ContainerDestroyer** (src/container-destroyer.ts)
 
 - destroy() - Destroy children, singletons, clear maps
 - destroyChildren() - Destroy children in reverse order
@@ -189,11 +189,11 @@ All core components implemented and working. 47 tests passing, 64% coverage.
 
 **ContainerImpl** (src/container-impl.ts)
 
-- `resolve<I>(token)` - Async resolve via AsyncResolver
-- `resolveSync<I>(token)` - Sync resolve via SyncResolver
+- `resolve<I>(token)` - Async resolve via ContainerAsyncResolver
+- `resolveSync<I>(token)` - Sync resolve via ContainerSyncResolver
 - `hasSingleton(token)` - Check singletonMap.has(token)
 - `get<I>(token)` - Get singleton from singletonMap (throw if not found)
-- `destroy()` - Destroy via Destroyer
+- `destroy()` - Destroy via ContainerDestroyer
 - `checkDestroyed()` - Throw error if container is destroyed
 - Lazy initialization of resolvers and destroyer
 
@@ -201,8 +201,8 @@ All core components implemented and working. 47 tests passing, 64% coverage.
 
 - normalized-provider.test.ts (13 tests)
 - container-initializer.test.ts (17 tests)
-- common-resolver.test.ts (9 tests)
-- sync-resolver.test.ts (8 tests)
+- container-common-resolver.test.ts (6 tests)
+- container-sync-resolver.test.ts (7 tests)
 
 ### 🚧 Next Steps
 
@@ -210,13 +210,13 @@ All core components implemented and working. 47 tests passing, 64% coverage.
 
 To reach 100% coverage, write tests for:
 
-1. **AsyncResolver** (async-resolver.test.ts)
+1. **ContainerAsyncResolver** (container-async-resolver.test.ts)
    - Async resolution with dependencies
    - Async postConstruct handling
    - Async factory handling
    - Error cases (missing deps, etc.)
 
-2. **Destroyer** (destroyer.test.ts)
+2. **ContainerDestroyer** (container-destroyer.test.ts)
    - Child container destruction
    - Singleton destruction with preDestroy
    - Provider preDestroy hooks
@@ -249,10 +249,10 @@ To reach 100% coverage, write tests for:
 
 **Current Coverage by File:**
 
-- common-resolver.ts: 80% (some edge cases)
-- sync-resolver.ts: 79% (some error paths)
-- async-resolver.ts: 0% (needs tests)
-- destroyer.ts: 0% (needs tests)
+- container-common-resolver.ts: 80% (some edge cases)
+- container-sync-resolver.ts: 79% (some error paths)
+- container-async-resolver.ts: 0% (needs tests)
+- container-destroyer.ts: 0% (needs tests)
 - container-impl.ts: 59% (hasSingleton, get, destroy tested)
 
 ## Immutable (Constitution)
@@ -337,9 +337,9 @@ ContainerImpl
   │   ├── parent?: ContainerImpl
   │   └── children: Set<ContainerImpl>
   │
-  ├── AsyncResolver → CommonResolver (lazy init)
-  ├── SyncResolver → CommonResolver (lazy init)
-  └── Destroyer (lazy init)
+  ├── ContainerAsyncResolver → ContainerCommonResolver (lazy init)
+  ├── ContainerSyncResolver → ContainerCommonResolver (lazy init)
+  └── ContainerDestroyer (lazy init)
 ```
 
 **Dependency Injection Pattern:**
@@ -359,12 +359,12 @@ class Service {
 
 **Next Test Files to Write:**
 
-1. `tests/async-resolver.test.ts` (0% coverage)
-   - Copy pattern from `sync-resolver.test.ts`
+1. `tests/container-async-resolver.test.ts` (0% coverage)
+   - Copy pattern from `container-sync-resolver.test.ts`
    - Change to async/await
    - Test async postConstruct
 
-2. `tests/destroyer.test.ts` (0% coverage)
+2. `tests/container-destroyer.test.ts` (0% coverage)
    - Test child container destruction
    - Test preDestroy hooks
    - Test reverse order destruction

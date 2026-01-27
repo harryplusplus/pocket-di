@@ -1,5 +1,5 @@
 /**
- * @file injectable class에 전달된 symbol들을 구현하기 위한 interface 및 확인하기 위한 function들이 있습니다.
+ * @file Interfaces and functions to implement and check lifecycle symbols on injectable classes
  */
 
 import type { Injectable } from './injectable.ts'

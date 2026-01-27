@@ -1,5 +1,5 @@
 /**
- * @file Container 초기화, provider 등록 및 검증을 담당하는 클래스입니다.
+ * @file Handles container initialization, provider registration, and validation
  */
 
 import { CircularDependencyChecker } from './circular-dependency-checker.ts'

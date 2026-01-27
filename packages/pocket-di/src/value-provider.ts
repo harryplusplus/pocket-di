@@ -1,5 +1,5 @@
 /**
- * @file ValueProvider는 값을 제공하는 Provider입니다.
+ * @file Provider that provides a value
  */
 
 import type { Injectable } from './injectable.ts'

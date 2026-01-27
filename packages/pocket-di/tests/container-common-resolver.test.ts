@@ -5,7 +5,7 @@ import { ContainerImpl } from '../src/container-impl.ts'
 import { inject } from '../src/symbols.ts'
 import { defineValueProvider } from '../src/value-provider.ts'
 
-describe('CommonResolver', () => {
+describe('ContainerCommonResolver', () => {
   describe('resolveInstanceOrProvider', () => {
     it('should return cached singleton from singletonMap', () => {
       class TestService {}

@@ -9,9 +9,9 @@ import type { NormalizedProvider } from './normalized-provider.ts'
 import { preDestroy } from './symbols.ts'
 
 /**
- * Destroyer handles container destruction and resource cleanup
+ * ContainerDestroyer handles container destruction and resource cleanup
  */
-export class Destroyer {
+export class ContainerDestroyer {
   private readonly container: ContainerImpl
   private readonly context: ContainerContext
 

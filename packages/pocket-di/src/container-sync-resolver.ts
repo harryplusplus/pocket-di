@@ -1,31 +1,31 @@
 /**
- * @file Asynchronous instance resolution logic
+ * @file Synchronous instance resolution logic
  */
 
 import {
-  CommonResolver,
+  ContainerCommonResolver,
   getProviderDependencies,
   type ProviderHasDependencies,
-} from './common-resolver.ts'
+} from './container-common-resolver.ts'
 import type { ContainerImpl } from './container-impl.ts'
 import type { Injectable } from './injectable.ts'
 import { postConstruct } from './symbols.ts'
 import type { InjectionToken } from './token.ts'
 
 /**
- * AsyncResolver handles asynchronous instance resolution
+ * ContainerSyncResolver handles synchronous instance resolution
  */
-export class AsyncResolver {
-  private readonly common: CommonResolver
+export class ContainerSyncResolver {
+  private readonly common: ContainerCommonResolver
 
   constructor(container: ContainerImpl) {
-    this.common = new CommonResolver(container)
+    this.common = new ContainerCommonResolver(container)
   }
 
   /**
-   * Resolve instance for token asynchronously
+   * Resolve instance for token synchronously
    */
-  async resolve<I extends Injectable>(token: InjectionToken<I>): Promise<I> {
+  resolve<I extends Injectable>(token: InjectionToken<I>): I {
     const output = this.common.resolveInstanceOrProvider(token)
 
     // Return cached instance if available
@@ -35,8 +35,8 @@ export class AsyncResolver {
 
     // Create instance from provider
     const { provider } = output
-    const dependencies = await this.resolveDependencies(provider)
-    const instance = await this.resolveInstance(provider, dependencies)
+    const dependencies = this.resolveDependencies(provider)
+    const instance = this.resolveInstance(provider, dependencies)
 
     // Store in singleton registry if scope is singleton
     this.common.updateSingletonRegistry({ provider, instance })
@@ -45,16 +45,16 @@ export class AsyncResolver {
   }
 
   /**
-   * Resolve provider dependencies asynchronously
+   * Resolve provider dependencies synchronously
    */
-  private async resolveDependencies(
+  private resolveDependencies(
     provider: ProviderHasDependencies,
-  ): Promise<Record<string, Injectable>> {
+  ): Record<string, Injectable> {
     const deps = getProviderDependencies(provider)
     const resolved: Record<string, Injectable> = {}
 
     for (const [name, depToken] of Object.entries(deps)) {
-      resolved[name] = await this.resolve(depToken)
+      resolved[name] = this.resolve(depToken)
     }
 
     return resolved
@@ -63,10 +63,10 @@ export class AsyncResolver {
   /**
    * Create instance from provider and call postConstruct
    */
-  private async resolveInstance(
+  private resolveInstance(
     provider: ProviderHasDependencies,
     dependencies: Record<string, Injectable>,
-  ): Promise<Injectable> {
+  ): Injectable {
     let instance: Injectable
 
     if (provider.type === 'class') {
@@ -86,21 +86,38 @@ export class AsyncResolver {
           `Cannot resolve "${String(provider.token)}": factory is missing.`,
         )
       }
-      instance = await factory(dependencies)
+      const result = factory(dependencies)
+
+      // Throw error if factory returns Promise
+      if (result instanceof Promise) {
+        throw new Error(
+          `Cannot resolve "${String(provider.token)}" synchronously: factory returns Promise.`,
+        )
+      }
+
+      instance = result
     }
 
     // Call postConstruct
-    await this.callPostConstruct(instance)
+    this.callPostConstruct(instance)
 
     return instance
   }
 
   /**
    * Call postConstruct on instance
+   * Throws error if postConstruct returns Promise
    */
-  private async callPostConstruct(instance: Injectable): Promise<void> {
+  private callPostConstruct(instance: Injectable): void {
     if (this.isPostConstructable(instance)) {
-      await instance[postConstruct]()
+      const result = instance[postConstruct]()
+
+      // Throw error if postConstruct returns Promise
+      if (result instanceof Promise) {
+        throw new Error(
+          `Cannot call postConstruct on ${instance.constructor.name}: method returns Promise.`,
+        )
+      }
     }
   }
 
