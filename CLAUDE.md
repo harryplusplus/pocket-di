@@ -1,4 +1,61 @@
-# Project Setup
+# Project Handover Documentation
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Principles](#principles)
+  - [Software Development](#software-development)
+  - [Testing](#testing)
+- [Project Setup](#project-setup)
+- [Commands](#commands)
+  - [Setup](#setup)
+  - [Quality](#quality)
+  - [Format](#format)
+  - [Test](#test)
+- [Structure](#structure)
+- [Testing Workflow](#testing-workflow)
+- [Test File Structure](#test-file-structure)
+- [Implementation Status](#implementation-status)
+  - [✅ Completed (2025-01-27)](#-completed-2025-01-27)
+  - [🚧 Next Steps](#-next-steps)
+- [Immutable (Constitution)](#immutable-constitution)
+- [Commit Workflow](#commit-workflow)
+- [Session Resumption](#session-resumption)
+  - [1. Quick Start (5 minutes)](#1-quick-start-5-minutes)
+  - [2. Understand Current State](#2-understand-current-state)
+  - [3. Continue Implementation](#3-continue-implementation)
+  - [4. File Organization](#4-file-organization)
+  - [5. Common Pitfalls](#5-common-pitfalls)
+  - [6. Verification Before Commit](#6-verification-before-commit)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Principles
+
+### Software Development
+
+- **KISS**: Prefer simple, readable code over clever solutions
+- **YAGNI**: Build only what's needed now, not what might be needed later
+- **DRY**: Every piece of knowledge should have a single representation (don't over-abstract)
+- **SRP**: A class should have one reason to change (one job)
+- **OCP**: Open for extension, closed for modification
+- **LSP**: Subtypes must be substitutable for their base types
+- **ISP**: Prefer many small interfaces over one large interface
+- **DIP**: Depend on abstractions, not concretions
+- **Source of Truth**: Data should have ONE authoritative source
+- **Derive, Don't Store**: Compute values from source of truth, don't cache unless absolutely necessary
+
+### Testing
+
+- **TDD**: Write tests BEFORE implementation (Red → Green → Refactor)
+- **Test Isolation**: Each test should be independent (no shared state)
+- **Test Coverage**: Cover happy path + edge cases + error cases
+- **Unit Tests**: Test individual classes/functions in isolation
+- **Integration Tests**: Test component interactions
+- **Descriptive Names**: Test names should describe what they test
+
+## Project Setup
 
 - **PM**: pnpm only
 - **External deps**: Exact versions only (no `^` or `~`)
@@ -45,28 +102,6 @@ packages/
 
 - Keep imports realistic: `from 'pocket-di'` not `from '../dist'`
 - examples verifies public API from `pocket-di/src/index.ts`
-
-## Software Development Principles
-
-- **KISS**: Prefer simple, readable code over clever solutions
-- **YAGNI**: Build only what's needed now, not what might be needed later
-- **DRY**: Every piece of knowledge should have a single representation (don't over-abstract)
-- **SRP**: A class should have one reason to change (one job)
-- **OCP**: Open for extension, closed for modification
-- **LSP**: Subtypes must be substitutable for their base types
-- **ISP**: Prefer many small interfaces over one large interface
-- **DIP**: Depend on abstractions, not concretions
-- **Source of Truth**: Data should have ONE authoritative source (e.g., `providerMap.keys()`, not separate `validTokens`)
-- **Derive, Don't Store**: Compute values from source of truth, don't cache unless absolutely necessary
-
-## Testing Principles
-
-- **TDD**: Write tests BEFORE implementation (Red → Green → Refactor)
-- **Test Isolation**: Each test should be independent (no shared state)
-- **Test Coverage**: Cover happy path + edge cases + error cases
-- **Unit Tests**: Test individual classes/functions in isolation
-- **Integration Tests**: Test component interactions
-- **Descriptive Names**: Test names should describe what they test
 
 ## Testing Workflow
 

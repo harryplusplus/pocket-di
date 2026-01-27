@@ -7,7 +7,7 @@
     "format:all": "run-p format:md:all format:package-json",
     "format:md:all": "run-s format:md:toc format:md:md",
     "format:md:md": "markdownlint-cli2 --fix",
-    "format:md:toc": "doctoc README.md README.ko.md",
+    "format:md:toc": "doctoc README.md README.ko.md CLAUDE.md",
     "format:package-json": "sort-package-json package.json packages/*/package.json",
     "lint": "eslint --fix",
     "precommit": "run-s format:all check-types lint test:ts test:js",
