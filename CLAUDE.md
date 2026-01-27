@@ -84,10 +84,10 @@ When implementing a feature:
    - Improve code quality
    - Ensure tests still pass
 
-4. **Verify**
-   - Run `pnpm test:ts` or `pnpm test:js`
+4. **Verify** (static → dynamic)
    - Check type errors: `pnpm check-types`
    - Run lint: `pnpm lint`
+   - Run tests: `pnpm test:ts` or `pnpm test:js`
 
 ## Test File Structure
 
