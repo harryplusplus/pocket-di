@@ -91,7 +91,7 @@ describe('async-lock', () => {
       const lock = new AsyncLock()
 
       await expect(
-        lock.acquire(async () => {
+        lock.acquire(() => {
           throw new Error('Test error')
         }),
       ).rejects.toThrow('Test error')
@@ -102,13 +102,14 @@ describe('async-lock', () => {
       const results: string[] = []
 
       await expect(
-        lock.acquire(async () => {
+        lock.acquire(() => {
           results.push('before-error')
           throw new Error('Test error')
         }),
       ).rejects.toThrow('Test error')
 
       await lock.acquire(async () => {
+        await Promise.resolve()
         results.push('after-error')
       })
 
@@ -121,10 +122,12 @@ describe('async-lock', () => {
       const lock = new AsyncLock()
 
       const result1 = await lock.acquire(async () => {
+        await Promise.resolve()
         return 'first'
       })
 
       const result2 = await lock.acquire(async () => {
+        await Promise.resolve()
         return 'second'
       })
 

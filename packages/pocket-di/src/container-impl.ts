@@ -11,7 +11,7 @@ import { ContainerInitializer } from './container-initializer.ts'
 import { ContainerSyncResolver } from './container-sync-resolver.ts'
 import type { Injectable } from './injectable.ts'
 import type { Provider } from './provider.ts'
-import type { InjectionToken } from './token.ts'
+import { type InjectionToken, tokenToString, toKeyToken } from './token.ts'
 
 /**
  * Internal options for creating a container
@@ -111,15 +111,15 @@ export class ContainerImpl implements Container {
 
   hasSingleton(token: InjectionToken): boolean {
     this.checkDestroyed()
-    return this.context.singletonMap.has(token)
+    return this.context.singletonMap.has(toKeyToken(token))
   }
 
   get<I extends Injectable>(token: InjectionToken<I>): I {
     this.checkDestroyed()
-    const instance = this.context.singletonMap.get(token)
+    const instance = this.context.singletonMap.get(toKeyToken(token))
     if (instance === undefined) {
       throw new Error(
-        `Cannot get singleton for token "${String(token)}": instance not found.`,
+        `Cannot get singleton for token "${tokenToString(token)}": instance not found.`,
       )
     }
     return instance as I

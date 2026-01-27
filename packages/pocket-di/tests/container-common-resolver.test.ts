@@ -18,8 +18,7 @@ describe('ContainerCommonResolver', () => {
       // Resolve once to cache
       const instance1 = container.resolveSync(TestService)
 
-      // Get the common resolver output
-      const { context } = container as any
+      const { context } = container
       const singleton = context.singletonMap.get(TestService)
       expect(singleton).toBe(instance1)
     })
@@ -90,9 +89,7 @@ describe('ContainerCommonResolver', () => {
       const instance2 = container.resolveSync(TestService)
 
       expect(instance1).toBe(instance2)
-      expect((container as any).context.singletonMap.has(TestService)).toBe(
-        true,
-      )
+      expect(container.context.singletonMap.has(TestService)).toBe(true)
     })
 
     it('should not store transient instances in singletonMap', () => {

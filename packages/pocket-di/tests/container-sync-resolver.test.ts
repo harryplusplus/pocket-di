@@ -146,24 +146,7 @@ describe('ContainerSyncResolver', () => {
       ).toThrow('is not registered')
     })
 
-    it('should throw error if class constructor is missing', () => {
-      class TestService {}
-      const container = new ContainerImpl({
-        providers: [
-          defineClassProvider({ provide: TestService, useClass: TestService }),
-        ],
-      })
-
-      // Manually corrupt the provider
-      const provider = (container as any).context.providerMap.get(TestService)
-      provider.classConstructor = null
-
-      expect(() => container.resolveSync(TestService)).toThrow(
-        'class constructor is missing',
-      )
-    })
-
-    it('should throw error when accessing destroyed container', () => {
+    it('should throw error when accessing destroyed container', async () => {
       class TestService {}
       const container = new ContainerImpl({
         providers: [
@@ -172,11 +155,10 @@ describe('ContainerSyncResolver', () => {
       })
 
       // Destroy the container
-      container.destroy().then(() => {
-        expect(() => container.resolveSync(TestService)).toThrow(
-          'has been destroyed',
-        )
-      })
+      await container.destroy()
+      expect(() => container.resolveSync(TestService)).toThrow(
+        'has been destroyed',
+      )
     })
   })
 })

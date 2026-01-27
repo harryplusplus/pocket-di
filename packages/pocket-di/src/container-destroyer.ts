@@ -5,7 +5,10 @@
 import type { ContainerContext } from './container-context.ts'
 import type { ContainerImpl } from './container-impl.ts'
 import type { Injectable } from './injectable.ts'
-import type { NormalizedProvider } from './normalized-provider.ts'
+import { isPreDestroyable } from './lifecycle-events.ts'
+import { isFactoryProvider } from './provider.ts'
+import type { ConcreteProvider } from './provider-utils.ts'
+import { findProvider } from './provider-utils.ts'
 import { preDestroy } from './symbols.ts'
 
 /**
@@ -66,8 +69,8 @@ export class ContainerDestroyer {
     const entries = [...this.context.singletonMap.entries()]
     entries.reverse()
 
-    for (const [token, instance] of entries) {
-      const provider = this.findProvider(token)
+    for (const [key, instance] of entries) {
+      const provider = findProvider(key, this.context)
       if (provider) {
         await this.callPreDestroy(provider, instance)
       }
@@ -79,11 +82,11 @@ export class ContainerDestroyer {
    * or if instance has preDestroy method
    */
   private async callPreDestroy(
-    provider: NormalizedProvider,
+    provider: ConcreteProvider,
     instance: Injectable,
   ): Promise<void> {
-    // Try provider's preDestroy hook
-    if (provider.preDestroy) {
+    // Try provider's preDestroy hook (only FactoryProvider has preDestroy)
+    if (isFactoryProvider(provider) && provider.preDestroy) {
       try {
         await provider.preDestroy(instance)
       } catch {
@@ -93,7 +96,7 @@ export class ContainerDestroyer {
     }
 
     // Try instance's preDestroy method
-    if (this.isPreDestroyable(instance)) {
+    if (isPreDestroyable(instance)) {
       try {
         await instance[preDestroy]()
       } catch {
@@ -101,38 +104,4 @@ export class ContainerDestroyer {
       }
     }
   }
-
-  /**
-   * Check if instance has preDestroy method
-   */
-  private isPreDestroyable(
-    instance: Injectable,
-  ): instance is Injectable & { [preDestroy]: () => void | Promise<void> } {
-    return (
-      typeof instance === 'object' &&
-      instance !== null &&
-      preDestroy in instance &&
-      typeof (instance as any)[preDestroy] === 'function'
-    )
-  }
-
-  /**
-   * Find provider for token in current or parent containers
-   */
-  private findProvider(token: InjectionToken): NormalizedProvider | undefined {
-    const provider = this.context.providerMap.get(token)
-    if (provider) {
-      return provider
-    }
-
-    const parent = this.context.parent
-    if (parent) {
-      return parent.context.providerMap.get(token) ?? undefined
-    }
-
-    return undefined
-  }
 }
-
-// Import InjectionToken at the bottom to avoid circular dependency
-import type { InjectionToken } from './token.ts'

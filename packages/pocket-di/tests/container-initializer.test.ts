@@ -3,6 +3,11 @@ import { describe, expect, it } from 'vitest'
 import { defineClassProvider } from '../src/class-provider.ts'
 import { ContainerInitializer } from '../src/container-initializer.ts'
 import { defineFactoryProvider } from '../src/factory-provider.ts'
+import {
+  isClassProvider,
+  isFactoryProvider,
+  isValueProvider,
+} from '../src/provider.ts'
 import { inject } from '../src/symbols.ts'
 import { defineValueProvider } from '../src/value-provider.ts'
 
@@ -61,6 +66,7 @@ describe('container-initializer', () => {
 
       initializer.initialize()
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       expect(parent.context.children.has(container)).toBe(true)
     })
   })
@@ -79,8 +85,8 @@ describe('container-initializer', () => {
       const context = initializer.initialize()
 
       expect(context.providerMap.has('my-service')).toBe(true)
-      const normalized = context.providerMap.get('my-service')
-      expect(normalized?.type).toBe('value')
+      const normalized = context.providerMap.get('my-service')!
+      expect(isValueProvider(normalized)).toBe(true)
     })
 
     it('should register class provider', () => {
@@ -100,9 +106,11 @@ describe('container-initializer', () => {
       const context = initializer.initialize()
 
       expect(context.providerMap.has('my-service')).toBe(true)
-      const normalized = context.providerMap.get('my-service')
-      expect(normalized?.type).toBe('class')
-      expect(normalized?.classConstructor).toBe(ServiceA)
+      const normalized = context.providerMap.get('my-service')!
+      expect(isClassProvider(normalized)).toBe(true)
+      if (isClassProvider(normalized)) {
+        expect(normalized.useClass).toBe(ServiceA)
+      }
     })
 
     it('should register factory provider', () => {
@@ -119,9 +127,11 @@ describe('container-initializer', () => {
       const context = initializer.initialize()
 
       expect(context.providerMap.has('my-service')).toBe(true)
-      const normalized = context.providerMap.get('my-service')
-      expect(normalized?.type).toBe('factory')
-      expect(normalized?.factory).toBe(factory)
+      const normalized = context.providerMap.get('my-service')!
+      expect(isFactoryProvider(normalized)).toBe(true)
+      if (isFactoryProvider(normalized)) {
+        expect(normalized.useFactory).toBe(factory)
+      }
     })
 
     it('should register constructor provider', () => {
@@ -132,8 +142,8 @@ describe('container-initializer', () => {
       const context = initializer.initialize()
 
       expect(context.providerMap.has(ServiceB)).toBe(true)
-      const normalized = context.providerMap.get(ServiceB)
-      expect(normalized?.type).toBe('class')
+      const normalized = context.providerMap.get(ServiceB)!
+      expect(isClassProvider(normalized)).toBe(true)
     })
   })
 

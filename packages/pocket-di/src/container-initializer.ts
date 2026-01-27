@@ -5,13 +5,16 @@
 import { CircularDependencyChecker } from './circular-dependency-checker.ts'
 import type { ContainerContext } from './container-context.ts'
 import type { ContainerImpl } from './container-impl.ts'
-import {
-  type NormalizedProvider,
-  normalizeProvider,
-  normalizeToken,
-} from './normalized-provider.ts'
 import type { Provider } from './provider.ts'
-import type { HasTypeToken, InjectionToken } from './token.ts'
+import { isValueProvider } from './provider.ts'
+import type { ProviderWithDependencies } from './provider-utils.ts'
+import {
+  findProvider,
+  getProviderDependencies,
+  normalizeProvider,
+} from './provider-utils.ts'
+import type { HasTypeToken, InjectionToken, KeyToken } from './token.ts'
+import { tokenToString, toKeyToken } from './token.ts'
 
 export interface ContainerInitializerOptions {
   providers: Provider[]
@@ -54,25 +57,30 @@ export class ContainerInitializer {
   private registerProviders(context: ContainerContext): void {
     for (const provider of this.options.providers) {
       const normalized = normalizeProvider(provider)
-      this.validateTokenUniqueness(normalized.token, context)
-      context.providerMap.set(normalized.token, normalized)
+      const key = toKeyToken(normalized.provide)
+      this.validateTokenUniqueness(key, normalized.provide, context)
+      context.providerMap.set(key, normalized)
     }
   }
 
   private validateTokenUniqueness(
+    key: KeyToken,
     token: InjectionToken,
     context: ContainerContext,
   ): void {
-    if (context.providerMap.has(token)) {
+    // Check parent first
+    const parentProvider =
+      context.parent && findProvider(key, context.parent?.context)
+    if (parentProvider) {
       throw new Error(
-        `Cannot register token "${String(token)}": already registered in this container.`,
+        `Cannot register token "${tokenToString(token)}": already exists in parent container.`,
       )
     }
 
-    const parentProvider = this.findProviderInParents(token, context)
-    if (parentProvider) {
+    // Then check current container
+    if (context.providerMap.has(key)) {
       throw new Error(
-        `Cannot register token "${String(token)}": already exists in parent container.`,
+        `Cannot register token "${tokenToString(token)}": already registered in this container.`,
       )
     }
   }
@@ -80,29 +88,36 @@ export class ContainerInitializer {
   private validateDependencies(context: ContainerContext): void {
     const checker = new CircularDependencyChecker()
 
-    for (const [token, provider] of context.providerMap) {
-      checker.push(token)
-      this.validateProviderDependencies(provider, checker, context)
-      checker.pop(token)
+    for (const [key, provider] of context.providerMap) {
+      checker.push(key)
+      // Only validate providers that can have dependencies
+      if (!isValueProvider(provider)) {
+        this.validateProviderDependencies(
+          provider as ProviderWithDependencies,
+          checker,
+          context,
+        )
+      }
+      checker.pop(key)
     }
   }
 
   private validateProviderDependencies(
-    provider: NormalizedProvider,
+    provider: ProviderWithDependencies,
     checker: CircularDependencyChecker,
     context: ContainerContext,
   ): void {
-    const deps = provider.inject ?? {}
+    const deps = getProviderDependencies(provider)
 
     for (const [depName, depToken] of Object.entries(deps)) {
-      this.validateDependencyName(depName, provider.token)
-      this.validateDependencyToken(depToken, provider.token, checker, context)
+      this.validateDependencyName(depName, provider)
+      this.validateDependencyToken(depToken, provider, checker, context)
     }
   }
 
   private validateDependencyName(
     name: string,
-    providerToken: InjectionToken,
+    provider: ProviderWithDependencies,
   ): void {
     if (
       !name ||
@@ -111,55 +126,35 @@ export class ContainerInitializer {
       name === 'prototype'
     ) {
       throw new Error(
-        `Cannot register provider "${String(providerToken)}": invalid dependency name "${name}".`,
+        `Cannot register provider "${tokenToString(provider.provide)}": invalid dependency name "${name}".`,
       )
     }
   }
 
   private validateDependencyToken(
     depToken: HasTypeToken,
-    providerToken: InjectionToken,
+    provider: ProviderWithDependencies,
     checker: CircularDependencyChecker,
     context: ContainerContext,
   ): void {
-    const normalizedDepToken = normalizeToken(depToken)
+    const depKey = toKeyToken(depToken)
 
-    const depProvider = this.findProvider(normalizedDepToken, context)
+    const depProvider = findProvider(depKey, context)
     if (!depProvider) {
       throw new Error(
-        `Cannot register provider "${String(providerToken)}": dependency "${String(normalizedDepToken)}" is not registered.`,
+        `Cannot register provider "${tokenToString(provider.provide)}": dependency "${tokenToString(depToken)}" is not registered.`,
       )
     }
 
-    checker.push(normalizedDepToken)
-    this.validateProviderDependencies(depProvider, checker, context)
-    checker.pop(normalizedDepToken)
-  }
-
-  private findProvider(
-    token: InjectionToken,
-    context: ContainerContext,
-  ): NormalizedProvider | undefined {
-    if (context.providerMap.has(token)) {
-      return context.providerMap.get(token)!
+    // Only validate providers that can have dependencies
+    if (!isValueProvider(depProvider)) {
+      checker.push(depKey)
+      this.validateProviderDependencies(
+        depProvider as ProviderWithDependencies,
+        checker,
+        context,
+      )
+      checker.pop(depKey)
     }
-
-    return this.findProviderInParents(token, context)
-  }
-
-  private findProviderInParents(
-    token: InjectionToken,
-    context: ContainerContext,
-  ): NormalizedProvider | undefined {
-    const parent = context.parent
-    if (!parent) {
-      return undefined
-    }
-
-    if (parent.context.providerMap.has(token)) {
-      return parent.context.providerMap.get(token)!
-    }
-
-    return this.findProviderInParents(token, parent.context)
   }
 }

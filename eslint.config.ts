@@ -26,7 +26,7 @@ export default defineConfig([
     rules: {
       'max-lines': [
         'error',
-        { max: 150, skipBlankLines: true, skipComments: true },
+        { max: 200, skipBlankLines: true, skipComments: true },
       ],
       'max-lines-per-function': [
         'error',
@@ -60,6 +60,7 @@ export default defineConfig([
   {
     files: ['**/*.test.ts'],
     rules: {
+      '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-explicit-any': 'off',

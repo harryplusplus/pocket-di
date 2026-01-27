@@ -5,12 +5,15 @@
 import {
   ContainerCommonResolver,
   getProviderDependencies,
-  type ProviderHasDependencies,
+  type ProviderWithDependencies,
 } from './container-common-resolver.ts'
 import type { ContainerImpl } from './container-impl.ts'
 import type { Injectable } from './injectable.ts'
+import { isPostConstructable } from './lifecycle-events.ts'
+import { isClassProvider } from './provider.ts'
 import { postConstruct } from './symbols.ts'
 import type { InjectionToken } from './token.ts'
+import { tokenToString } from './token.ts'
 
 /**
  * ContainerSyncResolver handles synchronous instance resolution
@@ -48,7 +51,7 @@ export class ContainerSyncResolver {
    * Resolve provider dependencies synchronously
    */
   private resolveDependencies(
-    provider: ProviderHasDependencies,
+    provider: ProviderWithDependencies,
   ): Record<string, Injectable> {
     const deps = getProviderDependencies(provider)
     const resolved: Record<string, Injectable> = {}
@@ -64,34 +67,23 @@ export class ContainerSyncResolver {
    * Create instance from provider and call postConstruct
    */
   private resolveInstance(
-    provider: ProviderHasDependencies,
+    provider: ProviderWithDependencies,
     dependencies: Record<string, Injectable>,
   ): Injectable {
     let instance: Injectable
 
-    if (provider.type === 'class') {
+    if (isClassProvider(provider)) {
       // Create via class constructor
-      const ctor = provider.classConstructor
-      if (!ctor) {
-        throw new Error(
-          `Cannot resolve "${String(provider.token)}": class constructor is missing.`,
-        )
-      }
+      const ctor = provider.useClass
       instance = new ctor(dependencies)
     } else {
       // Create via factory
-      const factory = provider.factory
-      if (!factory) {
-        throw new Error(
-          `Cannot resolve "${String(provider.token)}": factory is missing.`,
-        )
-      }
-      const result = factory(dependencies)
+      const result = provider.useFactory(dependencies)
 
       // Throw error if factory returns Promise
       if (result instanceof Promise) {
         throw new Error(
-          `Cannot resolve "${String(provider.token)}" synchronously: factory returns Promise.`,
+          `Cannot resolve "${tokenToString(provider.provide)}" synchronously: factory returns Promise.`,
         )
       }
 
@@ -109,7 +101,7 @@ export class ContainerSyncResolver {
    * Throws error if postConstruct returns Promise
    */
   private callPostConstruct(instance: Injectable): void {
-    if (this.isPostConstructable(instance)) {
+    if (isPostConstructable(instance)) {
       const result = instance[postConstruct]()
 
       // Throw error if postConstruct returns Promise
@@ -119,19 +111,5 @@ export class ContainerSyncResolver {
         )
       }
     }
-  }
-
-  /**
-   * Check if instance has postConstruct method
-   */
-  private isPostConstructable(
-    instance: Injectable,
-  ): instance is Injectable & { [postConstruct]: () => void | Promise<void> } {
-    return (
-      typeof instance === 'object' &&
-      instance !== null &&
-      postConstruct in instance &&
-      typeof (instance as any)[postConstruct] === 'function'
-    )
   }
 }

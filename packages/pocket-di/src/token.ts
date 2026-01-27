@@ -19,6 +19,14 @@ export type HasTypeToken<I extends Injectable = Injectable> =
   | TypedToken<I>
   | InjectableConstructor<I>
 
+/**
+ * KeyToken is a type that can be used as a key in Map.
+ * - PlainToken: string | symbol
+ * - InjectableConstructor: class constructor
+ * TypedToken is NOT included because it's an object and cannot be used as Map key.
+ */
+export type KeyToken = PlainToken | InjectableConstructor
+
 export function isPlainToken(token: InjectionToken): token is PlainToken {
   return typeof token === 'string' || typeof token === 'symbol'
 }
@@ -42,4 +50,57 @@ export function isConstructorToken(
   token: InjectionToken,
 ): token is InjectableConstructor {
   return typeof token === 'function'
+}
+
+/**
+ * Convert InjectionToken to KeyToken for use as Map key.
+ * - TypedToken: extracts the inner token (string | symbol)
+ * - PlainToken: returns as-is
+ * - InjectableConstructor: returns as-is
+ */
+export function toKeyToken(token: InjectionToken): KeyToken {
+  if (isTypedToken(token)) {
+    return token.token
+  }
+  return token
+}
+
+/**
+ * Converts an InjectionToken to its string representation.
+ *
+ * - For `string`: returns the string as-is
+ * - For `symbol`: returns `Symbol(description)` or `Symbol()`
+ * - For `TypedToken`: returns string representation of the inner token
+ * - For `InjectableConstructor`: returns the class name (function.name)
+ *
+ * @param token - The token to convert
+ * @returns String representation of the token
+ *
+ * @example
+ * ```ts
+ * tokenToString('my-token') // 'my-token'
+ * tokenToString(Symbol('foo')) // 'Symbol(foo)'
+ * tokenToString(defineToken<number>('num')) // 'num'
+ * tokenToString(class Service {}) // 'Service'
+ * ```
+ */
+export function tokenToString(token: InjectionToken): string {
+  // InjectableConstructor: use class name
+  if (isConstructorToken(token)) {
+    return token.name || '(anonymous class)'
+  }
+
+  // TypedToken: extract the inner token
+  if (isTypedToken(token)) {
+    const innerToken = token.token
+    return tokenToString(innerToken)
+  }
+
+  // symbol
+  if (typeof token === 'symbol') {
+    return token.description ? `Symbol(${token.description})` : 'Symbol()'
+  }
+
+  // string (default)
+  return token
 }

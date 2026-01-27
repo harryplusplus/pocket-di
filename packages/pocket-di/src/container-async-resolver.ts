@@ -5,10 +5,12 @@
 import {
   ContainerCommonResolver,
   getProviderDependencies,
-  type ProviderHasDependencies,
+  type ProviderWithDependencies,
 } from './container-common-resolver.ts'
 import type { ContainerImpl } from './container-impl.ts'
 import type { Injectable } from './injectable.ts'
+import { isPostConstructable } from './lifecycle-events.ts'
+import { isClassProvider } from './provider.ts'
 import { postConstruct } from './symbols.ts'
 import type { InjectionToken } from './token.ts'
 
@@ -48,7 +50,7 @@ export class ContainerAsyncResolver {
    * Resolve provider dependencies asynchronously
    */
   private async resolveDependencies(
-    provider: ProviderHasDependencies,
+    provider: ProviderWithDependencies,
   ): Promise<Record<string, Injectable>> {
     const deps = getProviderDependencies(provider)
     const resolved: Record<string, Injectable> = {}
@@ -64,29 +66,17 @@ export class ContainerAsyncResolver {
    * Create instance from provider and call postConstruct
    */
   private async resolveInstance(
-    provider: ProviderHasDependencies,
+    provider: ProviderWithDependencies,
     dependencies: Record<string, Injectable>,
   ): Promise<Injectable> {
     let instance: Injectable
 
-    if (provider.type === 'class') {
+    if (isClassProvider(provider)) {
       // Create via class constructor
-      const ctor = provider.classConstructor
-      if (!ctor) {
-        throw new Error(
-          `Cannot resolve "${String(provider.token)}": class constructor is missing.`,
-        )
-      }
-      instance = new ctor(dependencies)
+      instance = new provider.useClass(dependencies)
     } else {
       // Create via factory
-      const factory = provider.factory
-      if (!factory) {
-        throw new Error(
-          `Cannot resolve "${String(provider.token)}": factory is missing.`,
-        )
-      }
-      instance = await factory(dependencies)
+      instance = await provider.useFactory(dependencies)
     }
 
     // Call postConstruct
@@ -99,22 +89,8 @@ export class ContainerAsyncResolver {
    * Call postConstruct on instance
    */
   private async callPostConstruct(instance: Injectable): Promise<void> {
-    if (this.isPostConstructable(instance)) {
+    if (isPostConstructable(instance)) {
       await instance[postConstruct]()
     }
-  }
-
-  /**
-   * Check if instance has postConstruct method
-   */
-  private isPostConstructable(
-    instance: Injectable,
-  ): instance is Injectable & { [postConstruct]: () => void | Promise<void> } {
-    return (
-      typeof instance === 'object' &&
-      instance !== null &&
-      postConstruct in instance &&
-      typeof (instance as any)[postConstruct] === 'function'
-    )
   }
 }

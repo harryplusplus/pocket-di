@@ -5,17 +5,18 @@
 import type { ContainerContext } from './container-context.ts'
 import type { ContainerImpl } from './container-impl.ts'
 import type { Injectable } from './injectable.ts'
-import type { NormalizedProvider } from './normalized-provider.ts'
-import { inject } from './symbols.ts'
+import { isValueProvider } from './provider.ts'
+import type {
+  ConcreteProvider,
+  ProviderWithDependencies,
+} from './provider-utils.ts'
+import { findProvider, getProviderDependencies } from './provider-utils.ts'
 import type { InjectionToken } from './token.ts'
-
-export type ProviderHasDependencies = NormalizedProvider & {
-  type: 'class' | 'factory'
-}
+import { tokenToString, toKeyToken } from './token.ts'
 
 export type ResolveInstanceOrProviderOutput =
   | { kind: 'instance'; instance: Injectable }
-  | { kind: 'provider'; provider: ProviderHasDependencies }
+  | { kind: 'provider'; provider: ProviderWithDependencies }
 
 /**
  * ContainerCommonResolver handles shared logic between async/sync resolvers
@@ -37,26 +38,28 @@ export class ContainerCommonResolver {
   resolveInstanceOrProvider(
     token: InjectionToken,
   ): ResolveInstanceOrProviderOutput {
+    const key = toKeyToken(token)
+
     // Return cached singleton if available
-    const singleton = this.context.singletonMap.get(token)
+    const singleton = this.context.singletonMap.get(key)
     if (singleton !== undefined) {
       return { kind: 'instance', instance: singleton }
     }
 
     // Find provider
-    const provider = this.findProvider(token)
+    const provider = findProvider(key, this.context)
     if (!provider) {
       throw new Error(
-        `Cannot resolve token "${String(token)}": provider not found.`,
+        `Cannot resolve token "${tokenToString(token)}": provider not found.`,
       )
     }
 
     // Return instance for value provider
-    if (provider.type === 'value') {
-      const value = provider.value
+    if (isValueProvider(provider)) {
+      const value = provider.useValue
       if (value === undefined) {
         throw new Error(
-          `Cannot resolve token "${String(token)}": value provider has undefined value.`,
+          `Cannot resolve token "${tokenToString(token)}": value provider has undefined value.`,
         )
       }
       return { kind: 'instance', instance: value }
@@ -70,52 +73,24 @@ export class ContainerCommonResolver {
    * Store singleton-scoped instance in singletonMap
    */
   updateSingletonRegistry(input: {
-    provider: NormalizedProvider
+    provider: ConcreteProvider
     instance: Injectable
   }): void {
     const { provider, instance } = input
 
+    // ValueProvider doesn't have scope, always cache as value
+    if (isValueProvider(provider)) {
+      const key = toKeyToken(provider.provide)
+      this.context.singletonMap.set(key, instance)
+      return
+    }
+
+    // ClassProvider and FactoryProvider have scope
     if (provider.scope === 'singleton') {
-      this.context.singletonMap.set(provider.token, instance)
+      const key = toKeyToken(provider.provide)
+      this.context.singletonMap.set(key, instance)
     }
-  }
-
-  /**
-   * Find provider in current or parent containers
-   */
-  private findProvider(token: InjectionToken): NormalizedProvider | undefined {
-    // Search in current container
-    const provider = this.context.providerMap.get(token)
-    if (provider) {
-      return provider
-    }
-
-    // Search in parent container
-    const parent = this.context.parent
-    if (parent) {
-      return parent.context.providerMap.get(token) ?? undefined
-    }
-
-    return undefined
   }
 }
 
-/**
- * Extract dependency declaration from provider
- */
-export function getProviderDependencies(
-  provider: ProviderHasDependencies,
-): Record<string, InjectionToken> {
-  if (provider.type === 'class' && provider.classConstructor) {
-    const ctor = provider.classConstructor
-    // Use inject static symbol if available, otherwise empty object
-    const injectMetadata = (ctor as any)[inject]
-    if (injectMetadata && typeof injectMetadata === 'object') {
-      return injectMetadata
-    }
-    return {}
-  }
-
-  // factory type
-  return provider.inject ?? {}
-}
+export { getProviderDependencies, type ProviderWithDependencies }

@@ -128,6 +128,7 @@ All providers have two variants for type safety:
 - **PlainToken**: `string` | `symbol` - Token without type information
 - **TypedToken**: `{ token: string | symbol, [type]: T }` - Token with type information
 - **Constructor**: Class constructor - constructor itself has type information
+- **KeyToken**: `PlainToken | Constructor` - Map-compatible token (objects cannot be Map keys)
 
 ### DependencyDeclaration Rules
 
@@ -337,6 +338,7 @@ If precommit fails:
 - ✅ async-lock
 - ✅ circular-dependency-checker
 - ✅ token, symbols
+- ✅ provider-utils (normalizeProvider, getProviderDependencies, findProvider)
 
 **Providers:**
 
@@ -350,32 +352,44 @@ If precommit fails:
 - ✅ container-initializer
 - ✅ container-destroyer
 - ✅ container-sync-resolver
+- ✅ container-async-resolver
 - ✅ container-common-resolver
+
+**Lifecycle:**
+
+- ✅ lifecycle-events (isPostConstructable, isPreDestroyable)
 
 ### TODO (Need Implementation)
 
 - ⏳ Container async methods (resolveAsync, destroyAsync, createChildAsync)
-- ⏳ Container async-resolver
-- ⏳ Lifecycle events (postConstruct, preDestroy)
 - ⏳ Error handling & edge cases
+- ⏳ Integration tests for full container lifecycle
 
 ### Architecture Overview
 
 **Container Core:**
 
-- **Registry**: Stores all provider registrations
+- **Registry**: Stores all provider registrations (Map<KeyToken, ConcreteProvider>)
+- **CommonResolver**: Shared resolution logic (singleton cache, provider lookup)
 - **SyncResolver**: Synchronous dependency resolution
 - **AsyncResolver**: Asynchronous dependency resolution (with AsyncLock)
-- **Initializer**: Creates instances from providers
-- **Destroyer**: Cleans up container lifecycle
+- **Initializer**: Provider registration and validation
+- **Destroyer**: Cleanup and lifecycle hooks
+
+**Provider Utilities:**
+
+- **normalizeProvider**: Converts Constructor → ClassProvider
+- **getProviderDependencies**: Extracts dependencies from provider
+- **findProvider**: Recursive lookup in container hierarchy
 
 **Resolution Flow:**
 
 1. Provider registration via `ValueProvider`, `ClassProvider`, `FactoryProvider`, or Constructor
-2. Normalization to unified `NormalizedProvider` format
-3. Dependency injection using `inject` static property
-4. Circular dependency detection
-5. Instance creation with lifecycle hooks
+2. Normalization to `ConcreteProvider` format
+3. Dependency validation with circular dependency detection
+4. Dependency injection using `inject` static property
+5. Instance creation with lifecycle hooks (postConstruct)
+6. Singleton caching by scope
 
 **Lifecycle:**
 
