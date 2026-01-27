@@ -8,7 +8,6 @@
   - [Software Development](#software-development)
   - [Testing](#testing)
 - [Quick Start](#quick-start)
-  - [For New Session](#for-new-session)
   - [Working on a Single File](#working-on-a-single-file)
 - [Project Structure](#project-structure)
   - [pocket-di/](#pocket-di)
@@ -81,8 +80,8 @@ pnpm test:item tests/<file>.test.ts
 # 4. Lint single file
 pnpm lint:item src/<file>.ts
 
-# 5. When done: format, commit, push
-pnpm format:all
+# 5. When done: precommit, commit, push
+pnpm precommit
 git add -A && git commit -m "..." && git push
 ```
 
