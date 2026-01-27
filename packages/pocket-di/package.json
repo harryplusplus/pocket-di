@@ -19,7 +19,8 @@
     "clean": "rimraf dist",
     "test:js": "run-s clean build test:js:cmd",
     "test:js:cmd": "vitest --run -c vitest.config.js.ts",
-    "test:ts": "vitest --run -c vitest.config.ts.ts"
+    "test:ts": "vitest --run -c vitest.config.ts.ts",
+    "lint": "eslint ."
   },
   "publishConfig": {
     "access": "public"

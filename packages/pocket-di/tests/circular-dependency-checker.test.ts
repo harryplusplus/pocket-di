@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { CircularDependencyChecker } from './circular-dependency-checker.ts'
+import { CircularDependencyChecker } from '../src/circular-dependency-checker.ts'
 
 describe('circular-dependency-checker', () => {
   it('should not throw for non-circular dependencies', () => {

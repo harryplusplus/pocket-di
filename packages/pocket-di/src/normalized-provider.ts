@@ -97,7 +97,9 @@ function extractClassMetadata(constructor: InjectableConstructor): {
   inject: DependencyDeclaration
   preDestroy: ((instance: Injectable) => MaybePromise<void>) | undefined
 } {
-  const declaration = constructor[inject] ?? {}
+  // Use Object.prototype.hasOwnProperty to check for symbol property
+  const hasInject = Object.prototype.hasOwnProperty.call(constructor, inject)
+  const declaration = hasInject ? (constructor as any)[inject] : {}
 
   // preDestroy는 나중에 lifecycle-events 모듈에서 추출
   const preDestroy = undefined
