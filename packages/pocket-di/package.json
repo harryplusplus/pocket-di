@@ -17,10 +17,10 @@
     "build": "tsc",
     "check-types": "tsc --noEmit",
     "clean": "rimraf dist",
+    "lint": "eslint . --fix",
     "test:js": "run-s clean build test:js:cmd",
     "test:js:cmd": "vitest --run -c vitest.config.js.ts",
-    "test:ts": "vitest --run -c vitest.config.ts.ts",
-    "lint": "eslint ."
+    "test:ts": "vitest --run -c vitest.config.ts.ts"
   },
   "publishConfig": {
     "access": "public"

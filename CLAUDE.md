@@ -118,6 +118,7 @@ describe('<Feature>', () => {
 ```
 
 **Key Patterns:**
+
 - Use `static [inject]` for dependency declarations (not instance properties)
 - Use `as any` for token values when type compatibility is an issue
 - Nest `describe()` blocks for better organization (feature → scenario → test)
@@ -126,7 +127,15 @@ describe('<Feature>', () => {
 
 ### ✅ Completed
 
+**Pre-handover Cleanup (2025-01-27):**
+- ✅ `pnpm format:all` executed
+  - package.json files sorted
+  - README.md TOC updated
+  - README.ko.md TOC updated
+  - Markdown linted and fixed
+
 **ContainerInitializer** (src/container-initializer.ts)
+
 - Container initialization with parent-child relationship
 - Provider registration and validation
 - Token uniqueness validation (same container, parent containers)
@@ -134,28 +143,34 @@ describe('<Feature>', () => {
 - Parent chain dependency lookup
 
 **CircularDependencyChecker** (src/circular-dependency-checker.ts)
+
 - Push/pop methods for tracking dependency chains
 - Circular dependency detection with clear error messages
 
 **NormalizedProvider** (src/normalized-provider.ts)
+
 - Unified provider interface (token, type, scope, value/constructor/factory)
 - normalizeProvider() for all provider types
 - normalizeToken() for all injection tokens
 - Extract inject metadata from constructors using hasOwnProperty
 
 **ContainerContext** (src/container-context.ts)
+
 - Added providerMap: Map<InjectionToken, NormalizedProvider>
 
 **ContainerImpl Constructor** (src/container-impl.ts)
+
 - Uses ContainerInitializer for context initialization
 
 **Tests** (30 tests passing)
+
 - normalized-provider.test.ts (13 tests)
 - container-initializer.test.ts (17 tests)
 
 ### 🚧 Next Steps
 
 **ContainerImpl Methods to Implement:**
+
 1. `resolve<I>(token)` - Async resolve with dependency injection
 2. `resolveSync<I>(token)` - Sync resolve with dependency injection
 3. `hasSingleton(token)` - Check if singleton instance exists
@@ -163,12 +178,14 @@ describe('<Feature>', () => {
 5. `destroy()` - Destroy container and resources
 
 **Required Components:**
+
 - **AsyncResolver** - Async dependency resolution
 - **SyncResolver** - Sync dependency resolution
 - **CommonResolver** - Shared resolution logic
 - **Destroyer** - Container and resource cleanup
 
 **Implementation Order:**
+
 1. CommonResolver (shared logic)
 2. SyncResolver (sync resolution + postConstruct)
 3. AsyncResolver (async resolution + postConstruct)
@@ -176,6 +193,7 @@ describe('<Feature>', () => {
 5. Wire up ContainerImpl methods
 
 **Key Considerations:**
+
 - Use `context.providerMap` as source of truth (no separate cache)
 - Singleton instances stored in Map<InjectionToken, Injectable>
 - Respect scope (singleton/transient)
