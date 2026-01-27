@@ -14,8 +14,8 @@
   - [examples/](#examples)
 - [Type Design Patterns](#type-design-patterns)
   - [Provider Variants](#provider-variants)
-    - [Inferable Variant (타입 추론)](#inferable-variant-%ED%83%80%EC%9E%85-%EC%B6%94%EB%A1%A0)
-    - [Validatable Variant (타입 검증)](#validatable-variant-%ED%83%80%EC%9E%85-%EA%B2%80%EC%A6%9D)
+    - [Inferable Variant](#inferable-variant)
+    - [Validatable Variant](#validatable-variant)
   - [Token Types](#token-types)
   - [DependencyDeclaration Rules](#dependencydeclaration-rules)
 - [Naming Conventions](#naming-conventions)
@@ -114,58 +114,58 @@ Real-world usage examples
 
 All providers have two variants for type safety:
 
-#### Inferable Variant (타입 추론)
+#### Inferable Variant
 
 - `provide`: **PlainToken** (string | symbol)
-- 타입은 `useClass`/`useFactory`/`useValue`로부터 추론
-- 사용 예: `defineClassProvider({ provide: 'token', useClass: Service })`
+- Type is inferred from `useClass`/`useFactory`/`useValue`
+- Example: `defineClassProvider({ provide: 'token', useClass: Service })`
 
-#### Validatable Variant (타입 검증)
+#### Validatable Variant
 
 - `provide`: **HasTypeToken** (TypedToken or Constructor)
-- 타입이 명시적으로 지정됨
-- 사용 예: `defineClassProvider({ provide: Service, useClass: Service })`
-- 사용 예: `defineClassProvider({ provide: defineToken<Service>('token'), useClass: Service })`
+- Type is explicitly specified
+- Example: `defineClassProvider({ provide: Service, useClass: Service })`
+- Example: `defineClassProvider({ provide: defineToken<Service>('token'), useClass: Service })`
 
 ### Token Types
 
-- **PlainToken**: `string` | `symbol` - 타입 정보 없는 토큰
-- **TypedToken**: `{ token: string | symbol, [type]: T }` - 타입 정보가 있는 토큰
-- **Constructor**: 클래스 생성자 - 생성자 자체가 타입 정보를 가짐
+- **PlainToken**: `string` | `symbol` - Token without type information
+- **TypedToken**: `{ token: string | symbol, [type]: T }` - Token with type information
+- **Constructor**: Class constructor - constructor itself has type information
 
 ### DependencyDeclaration Rules
 
-`inject`는 반드시 **HasTypeToken**만 사용해야 합니다:
+`inject` must only use **HasTypeToken**:
 
 ```typescript
-// ✅ 올바른 사용
+// ✅ Correct usage
 inject: { dep: defineToken<DepService>('dep') }
 inject: { dep: DepService }
 
-// ❌ 잘못된 사용
-inject: { dep: 'string-token' }  // 컴파일 에러!
+// ❌ Incorrect usage
+inject: { dep: 'string-token' }  // Compilation error!
 ```
 
-**이유**: `DependencyDeclaration = Record<string, HasTypeToken>`이므로 문자열/심볼은 사용할 수 없습니다.
+**Reason**: `DependencyDeclaration = Record<string, HasTypeToken>`, so strings/symbols cannot be used.
 
 ## Naming Conventions
 
 ### Functions
 
-- **define***: 생성 함수 (defineToken, defineClassProvider, defineValueProvider, defineFactoryProvider)
-- **is***: 타입 가드 함수 (isTypedToken, isValueProvider, isClassProvider, etc.)
+- **define***: Creation functions (defineToken, defineClassProvider, defineValueProvider, defineFactoryProvider)
+- **is***: Type guard functions (isTypedToken, isValueProvider, isClassProvider, etc.)
 
 ### Type Suffixes
 
-- **Token**: 타입 정보를 가진 객체 (TypedToken, PlainToken, InjectionToken)
-- **Provider**: 의존성 제공자 (ValueProvider, ClassProvider, FactoryProvider)
-- **Resolver**: 의존성 해석 (SyncResolver, AsyncResolver, CommonResolver)
+- **Token**: Objects with type information (TypedToken, PlainToken, InjectionToken)
+- **Provider**: Dependency providers (ValueProvider, ClassProvider, FactoryProvider)
+- **Resolver**: Dependency resolution (SyncResolver, AsyncResolver, CommonResolver)
 
 ### Naming Philosophy
 
-- 타입 이름에는 "Token" 접미사를 붙여서 이해하기 쉽게 합니다
-  - `TypedToken` (not `TokenWithType`) - 토큰 타입임을 명확히 알 수 있음
-  - `InjectionToken` - 의존성 주입용 토큰임을 명확히 알 수 있음
+- Add "Token" suffix to type names for better understanding
+  - `TypedToken` (not `TokenWithType`) - Clearly identifiable as token type
+  - `InjectionToken` - Clearly identifiable as injection token
 
 ## Commands
 
