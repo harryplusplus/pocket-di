@@ -8,6 +8,7 @@
   - [Software Development](#software-development)
   - [Testing](#testing)
 - [Quick Start](#quick-start)
+  - [For New Developers](#for-new-developers)
   - [Working on a Single File](#working-on-a-single-file)
 - [Project Structure](#project-structure)
   - [pocket-di/](#pocket-di)
@@ -18,6 +19,18 @@
     - [Validatable Variant](#validatable-variant)
   - [Token Types](#token-types)
   - [DependencyDeclaration Rules](#dependencydeclaration-rules)
+  - [Token Type Decision Tree](#token-type-decision-tree)
+- [Common Pitfalls](#common-pitfalls)
+  - [1. Using `String(token)` in Error Messages](#1-using-stringtoken-in-error-messages)
+  - [2. Using TypedToken as Map Key](#2-using-typedtoken-as-map-key)
+  - [3. Forgetting to Normalize Provider](#3-forgetting-to-normalize-provider)
+  - [4. Duplicating Provider Logic](#4-duplicating-provider-logic)
+  - [5. Not Checking for `undefined` After Map.get()](#5-not-checking-for-undefined-after-mapget)
+- [Code Smell Detection](#code-smell-detection)
+  - [Pattern 1: Duplicated Provider Logic](#pattern-1-duplicated-provider-logic)
+  - [Pattern 2: Manual Token String Conversion](#pattern-2-manual-token-string-conversion)
+  - [Pattern 3: Recursive Parent Search Logic](#pattern-3-recursive-parent-search-logic)
+  - [Pattern 4: Type Guard Duplication](#pattern-4-type-guard-duplication)
 - [Naming Conventions](#naming-conventions)
   - [Functions](#functions)
   - [Type Suffixes](#type-suffixes)
@@ -29,10 +42,15 @@
 - [Session Resumption](#session-resumption)
   - [1. Check git history](#1-check-git-history)
   - [2. Review source files](#2-review-source-files)
+  - [3. Understand the Task](#3-understand-the-task)
 - [Implementation Workflow](#implementation-workflow)
 - [Testing Workflow](#testing-workflow)
   - [Workflow](#workflow)
   - [Test File Structure](#test-file-structure)
+  - [Testing Best Practices](#testing-best-practices)
+    - [When to Use `as any` in Tests](#when-to-use-as-any-in-tests)
+    - [Type Assertions in Tests](#type-assertions-in-tests)
+    - [Test Naming Convention](#test-naming-convention)
 - [Commit Workflow](#commit-workflow)
 - [Implementation Status](#implementation-status)
   - [Completed with Full Coverage](#completed-with-full-coverage)
@@ -67,6 +85,17 @@
 - **Descriptive Names**: Test names should describe what they test
 
 ## Quick Start
+
+### For New Developers
+
+**Start here:** Read the [Architecture Overview](#architecture-overview) first to understand the big picture.
+
+**Recommended reading order:**
+
+1. [Type Design Patterns](#type-design-patterns) - Understand provider and token types
+2. [Common Pitfalls](#common-pitfalls) - Avoid mistakes others made
+3. [Code Smell Detection](#code-smell-detection) - Know when to refactor
+4. [Project Structure](#project-structure) - Navigate the codebase
 
 ### Working on a Single File
 
@@ -145,6 +174,166 @@ inject: { dep: 'string-token' }  // Compilation error!
 
 **Reason**: `DependencyDeclaration = Record<string, HasTypeToken>`, so strings/symbols cannot be used.
 
+### Token Type Decision Tree
+
+```text
+Need to use as Map key?
+├─ Yes → Use KeyToken (PlainToken | Constructor)
+│         NEVER use TypedToken as Map key (object identity issue)
+└─ No → Use InjectionToken (PlainToken | TypedToken | Constructor)
+         Use TypedToken when you need type safety with string/symbol
+```
+
+**Why KeyToken exists:**
+
+JavaScript `Map` uses `SameValueZero` algorithm for key equality. Objects with same content but different identity are different keys:
+
+```typescript
+// ❌ WRONG: TypedToken objects have unique identity
+const token1 = defineToken<Service>('service')
+const token2 = defineToken<Service>('service')
+const map = new Map()
+map.set(token1, value)  // token1 is used as object
+map.get(token2)         // undefined! Different object
+
+// ✅ CORRECT: Use KeyToken (primitive or constructor)
+const key = toKeyToken(token)  // extracts 'service' string
+map.set(key, value)
+map.get(toKeyToken(token))     // works!
+```
+
+## Common Pitfalls
+
+### 1. Using `String(token)` in Error Messages
+
+❌ **Wrong:**
+
+```typescript
+throw new Error(`Cannot resolve "${String(token)}"`)
+```
+
+✅ **Correct:**
+
+```typescript
+import { tokenToString } from './token.ts'
+throw new Error(`Cannot resolve "${tokenToString(token)}"`)
+```
+
+**Why:** `String(token)` doesn't handle TypedToken objects correctly. `tokenToString` properly extracts the primitive token and formats symbols.
+
+### 2. Using TypedToken as Map Key
+
+❌ **Wrong:**
+
+```typescript
+const typedToken = defineToken<Service>('service')
+providerMap.set(typedToken, provider)  // object identity!
+```
+
+✅ **Correct:**
+
+```typescript
+import { toKeyToken } from './token.ts'
+const key = toKeyToken(typedToken)
+providerMap.set(key, provider)
+```
+
+### 3. Forgetting to Normalize Provider
+
+When accepting `Provider` type (which includes Constructor), always normalize:
+
+```typescript
+import { normalizeProvider, type ConcreteProvider } from './provider-utils.ts'
+
+function register(provider: Provider): void {
+  const normalized: ConcreteProvider = normalizeProvider(provider)
+  // Now use normalized.provide, etc.
+}
+```
+
+### 4. Duplicating Provider Logic
+
+Don't implement these yourself - use from `provider-utils.ts`:
+
+- `normalizeProvider()` - Convert Constructor to ClassProvider
+- `getProviderDependencies()` - Extract dependencies from provider
+- `findProvider()` - Search in container hierarchy
+
+### 5. Not Checking for `undefined` After Map.get()
+
+After `Map.get()`, always check for undefined:
+
+```typescript
+const provider = map.get(key)
+if (!provider) {
+  throw new Error(`Provider not found: ${tokenToString(key)}`)
+}
+// Safe to use provider now
+```
+
+## Code Smell Detection
+
+If you see these patterns, it's time to refactor:
+
+### Pattern 1: Duplicated Provider Logic
+
+**Smell:** Same provider handling code in multiple files
+
+```typescript
+// ❌ BAD: Duplicated in 3+ files
+if (isFactoryProvider(provider)) {
+  return provider.inject ?? {}
+} else {
+  return provider.useClass[inject] ?? {}
+}
+```
+
+**Solution:** Move to `provider-utils.ts` as `getProviderDependencies()`
+
+### Pattern 2: Manual Token String Conversion
+
+**Smell:** `String(token)` or manual token property access
+
+```typescript
+// ❌ BAD
+const str = token.token.toString()
+const str = String(token)
+```
+
+**Solution:** Use `tokenToString(token)` from `token.ts`
+
+### Pattern 3: Recursive Parent Search Logic
+
+**Smell:** Parent lookup code scattered across resolvers
+
+```typescript
+// ❌ BAD: Repeated in multiple files
+let current = this.context
+while (current) {
+  const provider = current.providerMap.get(key)
+  if (provider) return provider
+  current = current.parent?.context
+}
+```
+
+**Solution:** Use `findProvider(key, context)` from `provider-utils.ts`
+
+### Pattern 4: Type Guard Duplication
+
+**Smell:** Same type guard implemented multiple times
+
+```typescript
+// ❌ BAD: Checking for postConstruct manually
+if (
+  typeof instance === 'object' &&
+  instance !== null &&
+  postConstruct in instance &&
+  typeof instance[postConstruct] === 'function'
+) { ... }
+```
+
+**Solution:** Use `isPostConstructable(instance)` from `lifecycle-events.ts`
+
 ## Naming Conventions
 
 ### Functions
@@ -207,9 +396,50 @@ For new or returning sessions, follow this checklist:
 git log --oneline -10
 ```
 
+Look for:
+
+- Recent refactors that might affect your work
+- Files that were recently modified
+- Commit messages describing what changed
+
 ### 2. Review source files
 
-Check files in `src/` directory. Read JSDoc @file documentation in each source file for details.
+**Start here:** The [Architecture Overview](#architecture-overview) shows the big picture.
+
+**File-by-file approach:**
+
+1. **Read JSDoc @file comments first** - Each file has a `@file` comment explaining its purpose
+2. **Check exports** - Look at what the file exports to understand its API
+3. **Check imports** - See what it depends on
+
+**Key files to understand:**
+
+| File | Purpose | When to modify |
+| --- | --- | --- |
+| `token.ts` | Token types and utilities | Adding new token types |
+| `provider-utils.ts` | Shared provider logic | Adding provider operations |
+| `container-*.ts` | Container components | Adding container features |
+| `lifecycle-events.ts` | Lifecycle type guards | Adding lifecycle hooks |
+
+### 3. Understand the Task
+
+Before coding, clarify:
+
+- **What** exactly needs to be implemented?
+- **Where** should the code go? (Check [Code Smell Detection](#code-smell-detection))
+- **How** will it be tested?
+
+Example:
+
+```text
+Task: "Fix error handling in container-initializer"
+
+Analysis:
+- What: Replace String(token) with tokenToString(token)
+- Where: container-initializer.ts, line 73
+- Why: String() doesn't handle TypedToken correctly
+- Test: Update error message expectations in tests
+```
 
 ## Implementation Workflow
 
@@ -295,6 +525,64 @@ describe('<Feature>', () => {
 - Nest `describe()` blocks for better organization (feature → scenario → test)
 - Use empty classes (no properties) for test fixtures
 - Imports are auto-sorted by eslint
+
+### Testing Best Practices
+
+#### When to Use `as any` in Tests
+
+**✅ ACCEPTABLE:** Accessing private members for testing
+
+```typescript
+// Testing internal state
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const { context } = container as any
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+expect(context.singletonMap.has(token)).toBe(true)
+```
+
+**✅ ACCEPTABLE:** Mocking container structure
+
+```typescript
+const parent = { context: { children: new Set() } } as any
+const initializer = new ContainerInitializer(container, {
+  providers: [],
+  parent,
+})
+```
+
+**❌ AVOID:** Using `as any` to hide type errors in production code logic
+
+#### Type Assertions in Tests
+
+When using non-null assertion (`!`), ensure you've checked existence first:
+
+```typescript
+expect(context.providerMap.has('my-service')).toBe(true)
+const normalized = context.providerMap.get('my-service')!  // Safe!
+```
+
+#### Test Naming Convention
+
+```typescript
+describe('<Feature>', () => {
+  describe('<Scenario>', () => {
+    it('should <expected behavior>', () => {
+      // test implementation
+    })
+  })
+})
+```
+
+Example:
+
+```typescript
+describe('container-initializer', () => {
+  describe('provider registration', () => {
+    it('should register value provider', () => { ... })
+    it('should throw when registering duplicate token', () => { ... })
+  })
+})
+```
 
 ## Commit Workflow
 
