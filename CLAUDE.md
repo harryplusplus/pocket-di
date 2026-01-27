@@ -87,12 +87,19 @@ When implementing a feature:
 4. **Verify**
    - Run `pnpm test:ts` or `pnpm test:js`
    - Check type errors: `pnpm check-types`
+   - Run lint: `pnpm lint`
 
 ## Test File Structure
 
 ```typescript
 // tests/<feature>.test.ts
 import { describe, it, expect } from 'vitest'
+import { inject } from '../src/symbols.ts'
+
+// Use static [inject] for dependency declarations
+class TestService {
+  static [inject] = { dep: 'dependency-token' as any }
+}
 
 describe('<Feature>', () => {
   describe('<Scenario>', () => {
@@ -109,6 +116,11 @@ describe('<Feature>', () => {
   })
 })
 ```
+
+**Key Patterns:**
+- Use `static [inject]` for dependency declarations (not instance properties)
+- Use `as any` for token values when type compatibility is an issue
+- Nest `describe()` blocks for better organization (feature → scenario → test)
 
 ## Immutable (Constitution)
 
