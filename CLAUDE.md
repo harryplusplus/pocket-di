@@ -114,6 +114,7 @@ Check files in `src/` directory. Read JSDoc @file documentation in each source f
 ### Workflow
 
 1. **Single file testing** (Quick feedback loop)
+
    ```bash
    # Test a single file (TypeScript)
    pnpm test:item src/<file>.ts
