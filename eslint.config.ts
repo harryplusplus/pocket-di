@@ -59,7 +59,11 @@ export default defineConfig([
   },
   {
     files: ['**/*.test.ts'],
-    rules: { '@typescript-eslint/unbound-method': 'off' },
+    rules: {
+      '@typescript-eslint/unbound-method': 'off',
+      'max-lines': 'off',
+      'max-lines-per-function': 'off',
+    },
   },
   prettierRecommended,
 ])
