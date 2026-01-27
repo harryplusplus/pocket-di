@@ -59,6 +59,57 @@ packages/
 - **Source of Truth**: Data should have ONE authoritative source (e.g., `providerMap.keys()`, not separate `validTokens`)
 - **Derive, Don't Store**: Compute values from source of truth, don't cache unless absolutely necessary
 
+## Testing Principles
+
+- **TDD**: Write tests BEFORE implementation (Red → Green → Refactor)
+- **Test Isolation**: Each test should be independent (no shared state)
+- **Test Coverage**: Cover happy path + edge cases + error cases
+- **Unit Tests**: Test individual classes/functions in isolation
+- **Integration Tests**: Test component interactions
+- **Descriptive Names**: Test names should describe what they test
+
+## Testing Workflow
+
+When implementing a feature:
+
+1. **Write test first** (Red)
+   - Create test file: `tests/<feature>.test.ts`
+   - Describe expected behavior with test cases
+
+2. **Implement minimal code** (Green)
+   - Write just enough to pass tests
+   - Don't over-engineer
+
+3. **Refactor** (Refactor)
+   - Improve code quality
+   - Ensure tests still pass
+
+4. **Verify**
+   - Run `pnpm test:ts` or `pnpm test:js`
+   - Check type errors: `pnpm check-types`
+
+## Test File Structure
+
+```typescript
+// tests/<feature>.test.ts
+import { describe, it, expect } from 'vitest'
+
+describe('<Feature>', () => {
+  describe('<Scenario>', () => {
+    it('should <expected behavior>', () => {
+      // Arrange
+      const input = ...
+
+      // Act
+      const result = ...
+
+      // Assert
+      expect(result).toBe(...)
+    })
+  })
+})
+```
+
 ## Immutable (Constitution)
 
 NEVER modify without asking:
