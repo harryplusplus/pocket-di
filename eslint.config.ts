@@ -60,6 +60,8 @@ export default defineConfig([
   {
     files: ['**/*.test.ts'],
     rules: {
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/unbound-method': 'off',
       'max-lines': 'off',
       'max-lines-per-function': 'off',
