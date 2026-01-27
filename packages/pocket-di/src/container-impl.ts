@@ -1,6 +1,7 @@
 import { AsyncLock } from './async-lock.ts'
 import type { Container, CreateChildOptions } from './container.ts'
 import type { ContainerContext } from './container-context.ts'
+import { ContainerInitializer } from './container-initializer.ts'
 import type { Injectable } from './injectable.ts'
 import type { Provider } from './provider.ts'
 import type { InjectionToken } from './token.ts'
@@ -20,14 +21,11 @@ interface ContainerImplOptions {
 export class ContainerImpl implements Container {
   readonly lock = new AsyncLock()
   private destroyed = false
-  readonly context: ContainerContext
+  readonly context!: ContainerContext
 
   constructor(options: ContainerImplOptions) {
-    const { providers, parent } = options
-
-    // TODO: context를 초기화합니다.
-    // TODO: parent에 자식으로 본인을 추가합니다.
-    // TODO: provider들의 dependency declaration을 검사합니다. resolve 가능 유무를 확인해야 합니다.
+    const initializer = new ContainerInitializer(this, options)
+    this.context = initializer.initialize()
   }
 
   async destroy(): Promise<void> {

@@ -46,6 +46,19 @@ packages/
 - Keep imports realistic: `from 'pocket-di'` not `from '../dist'`
 - examples verifies public API from `pocket-di/src/index.ts`
 
+## Software Development Principles
+
+- **KISS**: Prefer simple, readable code over clever solutions
+- **YAGNI**: Build only what's needed now, not what might be needed later
+- **DRY**: Every piece of knowledge should have a single representation (don't over-abstract)
+- **SRP**: A class should have one reason to change (one job)
+- **OCP**: Open for extension, closed for modification
+- **LSP**: Subtypes must be substitutable for their base types
+- **ISP**: Prefer many small interfaces over one large interface
+- **DIP**: Depend on abstractions, not concretions
+- **Source of Truth**: Data should have ONE authoritative source (e.g., `providerMap.keys()`, not separate `validTokens`)
+- **Derive, Don't Store**: Compute values from source of truth, don't cache unless absolutely necessary
+
 ## Immutable (Constitution)
 
 NEVER modify without asking:
@@ -54,3 +67,13 @@ NEVER modify without asking:
 - `tsconfig.json`
 - `prettier.config.*`
 - `eslint.config.*`
+
+## Session Resumption
+
+To resume a previous session after a crash or restart:
+
+1. **Check plan file**: Look at `/Users/harry/.claude/plans/calm-dancing-kahan.md` for the current implementation plan
+2. **Use `/context` command**: Check current context usage and memory files
+3. **Reference recent work**: The plan file contains detailed implementation steps that can be continued
+
+The plan file is automatically managed by Claude and persists across sessions.

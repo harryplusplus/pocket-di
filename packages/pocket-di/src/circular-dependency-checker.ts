@@ -1,15 +1,22 @@
-import type { Key } from './types/token.ts'
+/**
+ * @file 순환 의존성을 검사하는 클래스입니다.
+ */
+
+import type { InjectionToken } from './token.ts'
 
 export class CircularDependencyChecker {
-  chain = new Set<Key>()
+  readonly chain = new Set<InjectionToken>()
 
-  push(key: Key): void {
-    if (this.chain.has(key)) {
-      const chain = [...this.chain.values(), key].join(' -> ')
-
-      throw new Error(`Circular dependency detected: ${chain}`)
+  push(token: InjectionToken): void {
+    if (this.chain.has(token)) {
+      const chainArray = [...this.chain.values(), token]
+      const chainStr = chainArray.map(String).join(' -> ')
+      throw new Error(`Circular dependency detected: ${chainStr}`)
     }
+    this.chain.add(token)
+  }
 
-    this.chain.add(key)
+  pop(token: InjectionToken): void {
+    this.chain.delete(token)
   }
 }

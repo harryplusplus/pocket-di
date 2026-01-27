@@ -1,0 +1,119 @@
+/**
+ * @file Provider를 통일된 형태로 변환하기 위한 interface와 utility 함수입니다.
+ */
+
+import type { ClassProvider } from './class-provider.ts'
+import type { FactoryProvider } from './factory-provider.ts'
+import type { InjectableConstructor } from './injectable-constructor.ts'
+import type { Injectable } from './injectable.ts'
+import type { DependencyDeclaration } from './dependency-declaration.ts'
+import {
+  isPlainToken,
+  isTokenWithTypeToken,
+  type InjectionToken,
+} from './token.ts'
+import type { ValueProvider } from './value-provider.ts'
+import { isClassProvider, isFactoryProvider, isValueProvider, type Provider } from './provider.ts'
+import type { MaybePromise } from './utils.ts'
+import { inject } from './symbols.ts'
+
+export interface NormalizedProvider {
+  token: InjectionToken
+  type: 'value' | 'class' | 'factory'
+  scope: 'singleton' | 'transient'
+  value?: Injectable
+  classConstructor?: InjectableConstructor
+  factory?: FactoryProvider['useFactory']
+  inject?: DependencyDeclaration
+  preDestroy?: (instance: Injectable) => MaybePromise<void>
+}
+
+export function normalizeProvider(provider: Provider): NormalizedProvider {
+  if (isValueProvider(provider)) {
+    return normalizeValueProvider(provider)
+  }
+
+  if (isClassProvider(provider)) {
+    return normalizeClassProvider(provider)
+  }
+
+  if (isFactoryProvider(provider)) {
+    return normalizeFactoryProvider(provider)
+  }
+
+  // Constructor provider (InjectableConstructor)
+  return normalizeConstructorProvider(provider)
+}
+
+function normalizeValueProvider(provider: ValueProvider): NormalizedProvider {
+  return {
+    token: normalizeToken(provider.provide),
+    type: 'value',
+    scope: 'singleton',
+    value: provider.useValue,
+  }
+}
+
+function normalizeClassProvider(provider: ClassProvider): NormalizedProvider {
+  const { inject, preDestroy } = extractClassMetadata(provider.useClass)
+
+  return {
+    token: normalizeToken(provider.provide),
+    type: 'class',
+    scope: provider.scope,
+    classConstructor: provider.useClass,
+    inject,
+    preDestroy,
+  }
+}
+
+function normalizeFactoryProvider(provider: FactoryProvider): NormalizedProvider {
+  return {
+    token: normalizeToken(provider.provide),
+    type: 'factory',
+    scope: provider.scope,
+    factory: provider.useFactory,
+    inject: provider.inject,
+    preDestroy: provider.preDestroy,
+  }
+}
+
+function normalizeConstructorProvider(
+  provider: InjectableConstructor,
+): NormalizedProvider {
+  const { inject, preDestroy } = extractClassMetadata(provider)
+
+  return {
+    token: normalizeToken(provider),
+    type: 'class',
+    scope: 'singleton',
+    classConstructor: provider,
+    inject,
+    preDestroy,
+  }
+}
+
+function extractClassMetadata(constructor: InjectableConstructor): {
+  inject: DependencyDeclaration
+  preDestroy: ((instance: Injectable) => MaybePromise<void>) | undefined
+} {
+  const declaration = constructor[inject] ?? {}
+
+  // preDestroy는 나중에 lifecycle-events 모듈에서 추출
+  const preDestroy = undefined
+
+  return { inject: declaration, preDestroy }
+}
+
+export function normalizeToken(token: InjectionToken): InjectionToken {
+  if (isPlainToken(token)) {
+    return token
+  }
+
+  if (isTokenWithTypeToken(token)) {
+    return token.token
+  }
+
+  // Constructor tokens are returned as-is
+  return token
+}
