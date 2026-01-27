@@ -89,9 +89,7 @@ describe('token', () => {
     it('should return true for constructor functions', () => {
       expect(isConstructorToken(TestService)).toBe(true)
 
-      class AnotherService {
-        value = 42
-      }
+      class AnotherService {}
       expect(isConstructorToken(AnotherService)).toBe(true)
     })
 
