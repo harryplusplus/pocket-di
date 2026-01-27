@@ -216,6 +216,8 @@ Check files in `src/` directory. Read JSDoc @file documentation in each source f
 
 - `erasableSyntaxOnly: true` - No constructor parameter properties
 - Use field declarations + constructor assignment instead
+- **NO definite assignment assertions**: Do not use `!` operator (e.g., `field!: Type`)
+  - Use proper initialization, optional types, or assertion functions instead
 
 **Documentation:**
 

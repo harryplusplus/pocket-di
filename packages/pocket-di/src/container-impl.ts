@@ -28,7 +28,7 @@ interface ContainerImplOptions {
 export class ContainerImpl implements Container {
   readonly lock = new AsyncLock()
   private destroyed = false
-  readonly context!: ContainerContext
+  readonly context: ContainerContext
 
   // Lazy initialization of resolvers and destroyer
   private _asyncResolver?: ContainerAsyncResolver

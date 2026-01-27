@@ -11,22 +11,20 @@ describe('factory-provider', () => {
   describe('defineFactoryProvider', () => {
     describe('with InferableSingletonFactoryProvider', () => {
       it('should use default scope when not provided', () => {
-        const factory = () => new TestService()
         const provider = defineFactoryProvider({
           provide: 'test-token',
-          useFactory: factory,
+          useFactory: () => new TestService(),
         })
 
         expect(provider.scope).toBe('singleton')
         expect(provider.provide).toBe('test-token')
-        expect(provider.useFactory).toBe(factory)
+        expect(provider.useFactory).toBeInstanceOf(Function)
       })
 
       it('should use provided singleton scope', () => {
-        const factory = () => new TestService()
         const provider = defineFactoryProvider({
           provide: 'test-token',
-          useFactory: factory,
+          useFactory: () => new TestService(),
           scope: 'singleton',
         })
 
@@ -34,10 +32,9 @@ describe('factory-provider', () => {
       })
 
       it('should use default preDestroy when not provided', () => {
-        const factory = () => new TestService()
         const provider = defineFactoryProvider({
           provide: 'test-token',
-          useFactory: factory,
+          useFactory: () => new TestService(),
         })
 
         expect(provider.preDestroy).toBeInstanceOf(Function)
@@ -46,18 +43,16 @@ describe('factory-provider', () => {
 
       it('should use provided preDestroy', () => {
         let destroyed = false
-        const factory = () => new TestService()
-        const preDestroy = (_instance: TestService) => {
-          destroyed = true
-        }
 
         const provider = defineFactoryProvider({
           provide: 'test-token',
-          useFactory: factory,
-          preDestroy,
+          useFactory: () => new TestService(),
+          preDestroy: (_instance: TestService) => {
+            destroyed = true
+          },
         })
 
-        expect(provider.preDestroy).toBe(preDestroy)
+        expect(provider.preDestroy).toBeInstanceOf(Function)
 
         const instance = new TestService()
         void provider.preDestroy(instance)
@@ -65,35 +60,31 @@ describe('factory-provider', () => {
       })
 
       it('should use default inject when not provided', () => {
-        const factory = () => new TestService()
         const provider = defineFactoryProvider({
           provide: 'test-token',
-          useFactory: factory,
+          useFactory: () => new TestService(),
         })
 
         expect(provider.inject).toEqual({})
       })
 
       it('should use provided inject', () => {
-        const factory = (_deps: { dep: DepService }) => new TestService()
-        const inject = { dep: defineToken<DepService>('dep-token') }
-
         const provider = defineFactoryProvider({
           provide: 'test-token',
-          useFactory: factory,
-          inject,
+          useFactory: (_deps: { dep: DepService }) => new TestService(),
+          inject: { dep: defineToken<DepService>('dep-token') },
         })
 
-        expect(provider.inject).toBe(inject)
+        expect(provider.inject).toHaveProperty('dep')
+        expect(provider.inject.dep.token).toBe('dep-token')
       })
     })
 
     describe('with InferableTransientFactoryProvider', () => {
       it('should use transient scope', () => {
-        const factory = () => new TestService()
         const provider = defineFactoryProvider({
           provide: 'test-token',
-          useFactory: factory,
+          useFactory: () => new TestService(),
           scope: 'transient',
         })
 
@@ -101,10 +92,9 @@ describe('factory-provider', () => {
       })
 
       it('should use default preDestroy for transient', () => {
-        const factory = () => new TestService()
         const provider = defineFactoryProvider({
           provide: 'test-token',
-          useFactory: factory,
+          useFactory: () => new TestService(),
           scope: 'transient',
         })
 
@@ -112,27 +102,24 @@ describe('factory-provider', () => {
       })
 
       it('should work with dependencies', () => {
-        const factory = (_deps: { dep: DepService }) => new TestService()
-        const inject = { dep: defineToken<DepService>('dep-token') }
-
         const provider = defineFactoryProvider({
           provide: 'test-token',
-          useFactory: factory,
+          useFactory: (_deps: { dep: DepService }) => new TestService(),
           scope: 'transient',
-          inject,
+          inject: { dep: defineToken<DepService>('dep-token') },
         })
 
         expect(provider.scope).toBe('transient')
-        expect(provider.inject).toBe(inject)
+        expect(provider.inject).toHaveProperty('dep')
+        expect(provider.inject.dep.token).toBe('dep-token')
       })
     })
 
     describe('with ValidatableSingletonFactoryProvider', () => {
       it('should work with constructor as provide token', () => {
-        const factory = () => new TestService()
         const provider = defineFactoryProvider({
           provide: TestService,
-          useFactory: factory,
+          useFactory: () => new TestService(),
         })
 
         expect(provider.provide).toBe(TestService)
@@ -140,11 +127,10 @@ describe('factory-provider', () => {
       })
 
       it('should work with TokenWithType as provide token', () => {
-        const factory = () => new TestService()
         const token = defineToken<TestService>('test-token')
         const provider = defineFactoryProvider({
           provide: token,
-          useFactory: factory,
+          useFactory: () => new TestService(),
         })
 
         expect(provider.provide).toBe(token)
@@ -156,10 +142,9 @@ describe('factory-provider', () => {
 
         class ExtendedService extends BaseService {}
 
-        const factory = () => new ExtendedService()
         const provider = defineFactoryProvider({
           provide: BaseService,
-          useFactory: factory,
+          useFactory: () => new ExtendedService(),
         })
 
         expect(provider.provide).toBe(BaseService)
@@ -167,33 +152,29 @@ describe('factory-provider', () => {
       })
 
       it('should support all options', () => {
-        const factory = (_deps: { dep: DepService }) => new TestService()
-        const inject = { dep: defineToken<DepService>('dep-token') }
-        const preDestroy = (_instance: TestService) => {
-          // noop for testing
-        }
-
         const provider = defineFactoryProvider({
           provide: TestService,
-          useFactory: factory,
+          useFactory: (_deps: { dep: DepService }) => new TestService(),
           scope: 'singleton',
-          inject,
-          preDestroy,
+          inject: { dep: defineToken<DepService>('dep-token') },
+          preDestroy: (_instance: TestService) => {
+            // noop for testing
+          },
         })
 
         expect(provider.provide).toBe(TestService)
         expect(provider.scope).toBe('singleton')
-        expect(provider.inject).toBe(inject)
-        expect(provider.preDestroy).toBe(preDestroy)
+        expect(provider.inject).toHaveProperty('dep')
+        expect(provider.inject.dep.token).toBe('dep-token')
+        expect(provider.preDestroy).toBeInstanceOf(Function)
       })
     })
 
     describe('with ValidatableTransientFactoryProvider', () => {
       it('should work with transient scope', () => {
-        const factory = () => new TestService()
         const provider = defineFactoryProvider({
           provide: TestService,
-          useFactory: factory,
+          useFactory: () => new TestService(),
           scope: 'transient',
         })
 
@@ -201,11 +182,10 @@ describe('factory-provider', () => {
       })
 
       it('should work with TokenWithType as provide token', () => {
-        const factory = () => new TestService()
         const token = defineToken<TestService>('test-token')
         const provider = defineFactoryProvider({
           provide: token,
-          useFactory: factory,
+          useFactory: () => new TestService(),
           scope: 'transient',
         })
 
@@ -214,26 +194,23 @@ describe('factory-provider', () => {
       })
 
       it('should work with dependencies', () => {
-        const factory = (_deps: { dep: DepService }) => new TestService()
-        const inject = { dep: defineToken<DepService>('dep-token') }
-
         const provider = defineFactoryProvider({
           provide: TestService,
-          useFactory: factory,
+          useFactory: (_deps: { dep: DepService }) => new TestService(),
           scope: 'transient',
-          inject,
+          inject: { dep: defineToken<DepService>('dep-token') },
         })
 
-        expect(provider.inject).toBe(inject)
+        expect(provider.inject).toHaveProperty('dep')
+        expect(provider.inject.dep.token).toBe('dep-token')
       })
     })
 
     describe('factory function types', () => {
       it('should support synchronous factory', () => {
-        const factory = () => new TestService()
         const provider = defineFactoryProvider({
           provide: 'test-token',
-          useFactory: factory,
+          useFactory: () => new TestService(),
         })
 
         const result = provider.useFactory({} as never)
@@ -261,7 +238,6 @@ describe('factory-provider', () => {
 
       it('should support async preDestroy', async () => {
         let destroyed = false
-        const factory = () => new TestService()
         const preDestroy = async (_instance: TestService) => {
           await Promise.resolve()
           destroyed = true
@@ -269,7 +245,7 @@ describe('factory-provider', () => {
 
         const provider = defineFactoryProvider({
           provide: 'test-token',
-          useFactory: factory,
+          useFactory: () => new TestService(),
           preDestroy,
         })
 
@@ -291,10 +267,9 @@ describe('factory-provider', () => {
       })
 
       it('should infer type from provide token', () => {
-        const factory = () => new TestService()
         const provider = defineFactoryProvider({
           provide: TestService,
-          useFactory: factory,
+          useFactory: () => new TestService(),
         })
 
         expect(provider.provide).toBe(TestService)

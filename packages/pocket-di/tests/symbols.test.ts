@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  inject,
-  postConstruct,
-  preDestroy,
-  type,
-} from '../src/symbols.ts'
+import { inject, postConstruct, preDestroy, type } from '../src/symbols.ts'
 
 describe('symbols', () => {
   describe('symbol uniqueness', () => {

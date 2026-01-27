@@ -63,7 +63,7 @@ export class ContainerCommonResolver {
     }
 
     // Return provider for class/factory provider
-    return { kind: 'provider', provider: provider as ProviderHasDependencies }
+    return { kind: 'provider', provider: provider }
   }
 
   /**
