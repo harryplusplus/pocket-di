@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest'
+
 import { defineClassProvider } from '../src/class-provider.ts'
 import { defineFactoryProvider } from '../src/factory-provider.ts'
+import {
+  normalizeProvider,
+  normalizeToken,
+} from '../src/normalized-provider.ts'
 import { inject } from '../src/symbols.ts'
 import { type } from '../src/symbols.ts'
 import { defineValueProvider } from '../src/value-provider.ts'
-import { normalizeProvider, normalizeToken } from '../src/normalized-provider.ts'
 
 class TestService {
   static [inject] = { dep: 'test-dep' as any }
@@ -25,7 +29,10 @@ describe('normalized-provider', () => {
     it('should extract plain token from TokenWithType', () => {
       const plainToken = 'my-token'
       const typeSymbol = type
-      const tokenWithType = { token: plainToken, [typeSymbol]: undefined as any }
+      const tokenWithType = {
+        token: plainToken,
+        [typeSymbol]: undefined as any,
+      }
       expect(normalizeToken(tokenWithType as any)).toBe(plainToken)
     })
 

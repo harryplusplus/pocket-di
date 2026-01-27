@@ -2,15 +2,15 @@
  * @file Asynchronous instance resolution logic
  */
 
-import { postConstruct } from './symbols.ts'
-import type { ContainerImpl } from './container-impl.ts'
-import type { Injectable } from './injectable.ts'
-import type { InjectionToken } from './token.ts'
 import {
   CommonResolver,
   getProviderDependencies,
   type ProviderHasDependencies,
 } from './common-resolver.ts'
+import type { ContainerImpl } from './container-impl.ts'
+import type { Injectable } from './injectable.ts'
+import { postConstruct } from './symbols.ts'
+import type { InjectionToken } from './token.ts'
 
 /**
  * AsyncResolver handles asynchronous instance resolution
@@ -109,9 +109,7 @@ export class AsyncResolver {
    */
   private isPostConstructable(
     instance: Injectable,
-  ): instance is Injectable & {
-    [postConstruct]: () => void | Promise<void>
-  } {
+  ): instance is Injectable & { [postConstruct]: () => void | Promise<void> } {
     return (
       typeof instance === 'object' &&
       instance !== null &&

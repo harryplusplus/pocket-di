@@ -2,11 +2,11 @@
  * @file Container destruction and resource cleanup logic
  */
 
-import { preDestroy } from './symbols.ts'
 import type { ContainerContext } from './container-context.ts'
 import type { ContainerImpl } from './container-impl.ts'
 import type { Injectable } from './injectable.ts'
 import type { NormalizedProvider } from './normalized-provider.ts'
+import { preDestroy } from './symbols.ts'
 
 /**
  * Destroyer handles container destruction and resource cleanup
@@ -107,9 +107,7 @@ export class Destroyer {
    */
   private isPreDestroyable(
     instance: Injectable,
-  ): instance is Injectable & {
-    [preDestroy]: () => void | Promise<void>
-  } {
+  ): instance is Injectable & { [preDestroy]: () => void | Promise<void> } {
     return (
       typeof instance === 'object' &&
       instance !== null &&
@@ -122,7 +120,7 @@ export class Destroyer {
    * Find provider for token in current or parent containers
    */
   private findProvider(token: InjectionToken): NormalizedProvider | undefined {
-    let provider = this.context.providerMap.get(token)
+    const provider = this.context.providerMap.get(token)
     if (provider) {
       return provider
     }

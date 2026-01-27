@@ -6,12 +6,12 @@ import { CircularDependencyChecker } from './circular-dependency-checker.ts'
 import type { ContainerContext } from './container-context.ts'
 import type { ContainerImpl } from './container-impl.ts'
 import {
+  type NormalizedProvider,
   normalizeProvider,
   normalizeToken,
-  type NormalizedProvider,
 } from './normalized-provider.ts'
-import type { HasTypeToken, InjectionToken } from './token.ts'
 import type { Provider } from './provider.ts'
+import type { HasTypeToken, InjectionToken } from './token.ts'
 
 export interface ContainerInitializerOptions {
   providers: Provider[]
@@ -100,7 +100,10 @@ export class ContainerInitializer {
     }
   }
 
-  private validateDependencyName(name: string, providerToken: InjectionToken): void {
+  private validateDependencyName(
+    name: string,
+    providerToken: InjectionToken,
+  ): void {
     if (
       !name ||
       name === '__proto__' ||

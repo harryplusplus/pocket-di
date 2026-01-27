@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest'
-import { inject } from '../src/symbols.ts'
-import { ContainerImpl } from '../src/container-impl.ts'
-import { defineValueProvider } from '../src/value-provider.ts'
+import { describe, expect, it } from 'vitest'
+
 import { defineClassProvider } from '../src/class-provider.ts'
+import { ContainerImpl } from '../src/container-impl.ts'
+import { inject } from '../src/symbols.ts'
+import { defineValueProvider } from '../src/value-provider.ts'
 
 describe('CommonResolver', () => {
   describe('resolveInstanceOrProvider', () => {
@@ -10,10 +11,7 @@ describe('CommonResolver', () => {
       class TestService {}
       const container = new ContainerImpl({
         providers: [
-          defineClassProvider({
-            provide: TestService,
-            useClass: TestService,
-          }),
+          defineClassProvider({ provide: TestService, useClass: TestService }),
         ],
       })
 
@@ -30,7 +28,9 @@ describe('CommonResolver', () => {
       const value = { test: 'value' }
       class TestService {}
       const container = new ContainerImpl({
-        providers: [defineValueProvider({ provide: TestService, useValue: value })],
+        providers: [
+          defineValueProvider({ provide: TestService, useValue: value }),
+        ],
       })
 
       const instance = container.resolveSync(TestService)
@@ -51,7 +51,10 @@ describe('CommonResolver', () => {
 
       const container = new ContainerImpl({
         providers: [
-          defineValueProvider({ provide: Dependency, useValue: new Dependency() }),
+          defineValueProvider({
+            provide: Dependency,
+            useValue: new Dependency(),
+          }),
           defineClassProvider({ provide: TestService, useClass: TestService }),
         ],
       })
@@ -64,7 +67,9 @@ describe('CommonResolver', () => {
     it('should return empty object for class without inject metadata', () => {
       class TestService {}
       const container = new ContainerImpl({
-        providers: [defineClassProvider({ provide: TestService, useClass: TestService })],
+        providers: [
+          defineClassProvider({ provide: TestService, useClass: TestService }),
+        ],
       })
 
       const instance = container.resolveSync(TestService)
@@ -76,14 +81,18 @@ describe('CommonResolver', () => {
     it('should store singleton instances in singletonMap', () => {
       class TestService {}
       const container = new ContainerImpl({
-        providers: [defineClassProvider({ provide: TestService, useClass: TestService })],
+        providers: [
+          defineClassProvider({ provide: TestService, useClass: TestService }),
+        ],
       })
 
       const instance1 = container.resolveSync(TestService)
       const instance2 = container.resolveSync(TestService)
 
       expect(instance1).toBe(instance2)
-      expect((container as any).context.singletonMap.has(TestService)).toBe(true)
+      expect((container as any).context.singletonMap.has(TestService)).toBe(
+        true,
+      )
     })
 
     it('should not store transient instances in singletonMap', () => {

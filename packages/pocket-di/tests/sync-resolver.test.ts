@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { inject, postConstruct } from '../src/symbols.ts'
-import { ContainerImpl } from '../src/container-impl.ts'
+import { describe, expect, it } from 'vitest'
+
 import { defineClassProvider } from '../src/class-provider.ts'
+import { ContainerImpl } from '../src/container-impl.ts'
+import { inject, postConstruct } from '../src/symbols.ts'
 
 describe('SyncResolver', () => {
   describe('resolve with postConstruct', () => {
@@ -67,7 +68,10 @@ describe('SyncResolver', () => {
 
       const container = new ContainerImpl({
         providers: [
-          defineClassProvider({ provide: DeepDependency, useClass: DeepDependency }),
+          defineClassProvider({
+            provide: DeepDependency,
+            useClass: DeepDependency,
+          }),
           defineClassProvider({ provide: Dependency, useClass: Dependency }),
           defineClassProvider({ provide: TestService, useClass: TestService }),
         ],
@@ -133,7 +137,10 @@ describe('SyncResolver', () => {
         () =>
           new ContainerImpl({
             providers: [
-              defineClassProvider({ provide: TestService, useClass: TestService }),
+              defineClassProvider({
+                provide: TestService,
+                useClass: TestService,
+              }),
             ],
           }),
       ).toThrow('is not registered')
@@ -166,7 +173,9 @@ describe('SyncResolver', () => {
 
       // Destroy the container
       container.destroy().then(() => {
-        expect(() => container.resolveSync(TestService)).toThrow('has been destroyed')
+        expect(() => container.resolveSync(TestService)).toThrow(
+          'has been destroyed',
+        )
       })
     })
   })

@@ -2,15 +2,15 @@
  * @file Synchronous instance resolution logic
  */
 
-import { postConstruct } from './symbols.ts'
-import type { ContainerImpl } from './container-impl.ts'
-import type { Injectable } from './injectable.ts'
-import type { InjectionToken } from './token.ts'
 import {
   CommonResolver,
   getProviderDependencies,
   type ProviderHasDependencies,
 } from './common-resolver.ts'
+import type { ContainerImpl } from './container-impl.ts'
+import type { Injectable } from './injectable.ts'
+import { postConstruct } from './symbols.ts'
+import type { InjectionToken } from './token.ts'
 
 /**
  * SyncResolver handles synchronous instance resolution
@@ -47,10 +47,9 @@ export class SyncResolver {
   /**
    * Resolve provider dependencies synchronously
    */
-  private resolveDependencies(provider: ProviderHasDependencies): Record<
-    string,
-    Injectable
-  > {
+  private resolveDependencies(
+    provider: ProviderHasDependencies,
+  ): Record<string, Injectable> {
     const deps = getProviderDependencies(provider)
     const resolved: Record<string, Injectable> = {}
 
@@ -127,9 +126,7 @@ export class SyncResolver {
    */
   private isPostConstructable(
     instance: Injectable,
-  ): instance is Injectable & {
-    [postConstruct]: () => void | Promise<void>
-  } {
+  ): instance is Injectable & { [postConstruct]: () => void | Promise<void> } {
     return (
       typeof instance === 'object' &&
       instance !== null &&

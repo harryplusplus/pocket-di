@@ -3,19 +3,24 @@
  */
 
 import type { ClassProvider } from './class-provider.ts'
-import type { FactoryProvider } from './factory-provider.ts'
-import type { InjectableConstructor } from './injectable-constructor.ts'
-import type { Injectable } from './injectable.ts'
 import type { DependencyDeclaration } from './dependency-declaration.ts'
+import type { FactoryProvider } from './factory-provider.ts'
+import type { Injectable } from './injectable.ts'
+import type { InjectableConstructor } from './injectable-constructor.ts'
 import {
+  isClassProvider,
+  isFactoryProvider,
+  isValueProvider,
+  type Provider,
+} from './provider.ts'
+import { inject } from './symbols.ts'
+import {
+  type InjectionToken,
   isPlainToken,
   isTokenWithTypeToken,
-  type InjectionToken,
 } from './token.ts'
-import type { ValueProvider } from './value-provider.ts'
-import { isClassProvider, isFactoryProvider, isValueProvider, type Provider } from './provider.ts'
 import type { MaybePromise } from './utils.ts'
-import { inject } from './symbols.ts'
+import type { ValueProvider } from './value-provider.ts'
 
 export interface NormalizedProvider {
   token: InjectionToken
@@ -67,7 +72,9 @@ function normalizeClassProvider(provider: ClassProvider): NormalizedProvider {
   }
 }
 
-function normalizeFactoryProvider(provider: FactoryProvider): NormalizedProvider {
+function normalizeFactoryProvider(
+  provider: FactoryProvider,
+): NormalizedProvider {
   return {
     token: normalizeToken(provider.provide),
     type: 'factory',

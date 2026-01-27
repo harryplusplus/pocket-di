@@ -10,8 +10,8 @@ import { ContainerInitializer } from './container-initializer.ts'
 import { Destroyer } from './destroyer.ts'
 import type { Injectable } from './injectable.ts'
 import type { Provider } from './provider.ts'
-import type { InjectionToken } from './token.ts'
 import { SyncResolver } from './sync-resolver.ts'
+import type { InjectionToken } from './token.ts'
 
 /**
  * Internal options for creating a container

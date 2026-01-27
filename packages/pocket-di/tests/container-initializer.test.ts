@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
+
 import { defineClassProvider } from '../src/class-provider.ts'
+import { ContainerInitializer } from '../src/container-initializer.ts'
 import { defineFactoryProvider } from '../src/factory-provider.ts'
 import { inject } from '../src/symbols.ts'
 import { defineValueProvider } from '../src/value-provider.ts'
-import { ContainerInitializer } from '../src/container-initializer.ts'
 
 class ServiceA {
   static [inject] = { serviceB: 'ServiceB' as any }
@@ -51,11 +52,7 @@ describe('container-initializer', () => {
 
     it('should register container with parent', () => {
       const container = {} as any
-      const parent = {
-        context: {
-          children: new Set(),
-        },
-      } as any
+      const parent = { context: { children: new Set() } } as any
 
       const initializer = new ContainerInitializer(container, {
         providers: [],

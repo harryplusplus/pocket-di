@@ -2,11 +2,11 @@
  * @file Common resolution logic shared between async/sync resolvers
  */
 
-import { inject } from './symbols.ts'
 import type { ContainerContext } from './container-context.ts'
 import type { ContainerImpl } from './container-impl.ts'
 import type { Injectable } from './injectable.ts'
 import type { NormalizedProvider } from './normalized-provider.ts'
+import { inject } from './symbols.ts'
 import type { InjectionToken } from './token.ts'
 
 export type ProviderHasDependencies = NormalizedProvider & {
@@ -83,9 +83,7 @@ export class CommonResolver {
   /**
    * Find provider in current or parent containers
    */
-  private findProvider(
-    token: InjectionToken,
-  ): NormalizedProvider | undefined {
+  private findProvider(token: InjectionToken): NormalizedProvider | undefined {
     // Search in current container
     const provider = this.context.providerMap.get(token)
     if (provider) {

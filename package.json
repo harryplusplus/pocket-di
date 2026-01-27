@@ -10,6 +10,7 @@
     "format:md:toc": "doctoc README.md README.ko.md",
     "format:package-json": "sort-package-json package.json packages/*/package.json",
     "lint": "eslint --fix",
+    "precommit": "run-s format:all check-types lint test:ts test:js",
     "test:js": "pnpm -r test:js",
     "test:ts": "pnpm -r test:ts"
   },

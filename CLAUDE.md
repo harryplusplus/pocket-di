@@ -264,19 +264,158 @@ NEVER modify without asking:
 - `prettier.config.*`
 - `eslint.config.*`
 
+## Commit Workflow
+
+CRITICAL: Run from repository ROOT directory before every commit
+
+```bash
+# Always from /Users/harry/repo/pocket-di
+cd /Users/harry/repo/pocket-di
+
+# 1. Format everything (MUST PASS before commit)
+pnpm format:all
+
+# 2. Check status
+git status
+
+# 3. Stage and commit
+git add -A
+git commit -m "..."
+
+# 4. Push
+git push
+```
+
+Why root directory?
+
+- `format:all` is only available in root package.json
+- It runs: TOC update + markdown lint + package.json sort
+- Must pass all checks before commit is allowed
+- Precommit hooks verify formatting
+
+If format:all fails:
+
+- Fix markdown errors in CLAUDE.md, README.md
+- DO NOT bypass with `--no-verify`
+- Commit should only succeed after clean format:all run
+
 ## Session Resumption
 
-When handing over to next session or resuming after crash:
+For new sessions or resuming after crash, follow this checklist:
 
-1. **Run format:all**: `pnpm format:all`
-   - Sort package.json files
-   - Update README TOCs
-   - Fix markdown linting
+### 1. Quick Start (5 minutes)
 
-2. **Check plan file**: Look at `/Users/harry/.claude/plans/calm-dancing-kahan.md` for the current implementation plan
+```bash
+# From repository root
+cd /Users/harry/repo/pocket-di
 
-3. **Use `/context` command**: Check current context usage and memory files
+# Verify formatting is clean
+pnpm format:all
 
-4. **Reference recent work**: The plan file contains detailed implementation steps that can be continued
+# Run tests to verify current state
+pnpm test:ts
 
-The plan file is automatically managed by Claude and persists across sessions.
+# Check what's been done
+git log --oneline -10
+```
+
+### 2. Understand Current State
+
+**Read CLAUDE.md "Implementation Status" section:**
+
+- **Completed Components**: What's already built
+- **Test Coverage**: What's tested (47 tests, 64%)
+- **Next Steps**: What needs to be done next
+- **Key Patterns**: How to write code correctly
+
+**Current Architecture:**
+
+```text
+ContainerImpl
+  ├── context: ContainerContext
+  │   ├── providerMap: Map<token, NormalizedProvider>
+  │   ├── singletonMap: Map<token, Injectable>
+  │   ├── parent?: ContainerImpl
+  │   └── children: Set<ContainerImpl>
+  │
+  ├── AsyncResolver → CommonResolver (lazy init)
+  ├── SyncResolver → CommonResolver (lazy init)
+  └── Destroyer (lazy init)
+```
+
+**Dependency Injection Pattern:**
+
+```typescript
+// Declare dependencies with static [inject]
+class Service {
+  static [inject] = { dep: Dependency as any }
+  dep: any
+  constructor(deps: any) {
+    this.dep = deps.dep  // Extract from dependencies object
+  }
+}
+```
+
+### 3. Continue Implementation
+
+**Next Test Files to Write:**
+
+1. `tests/async-resolver.test.ts` (0% coverage)
+   - Copy pattern from `sync-resolver.test.ts`
+   - Change to async/await
+   - Test async postConstruct
+
+2. `tests/destroyer.test.ts` (0% coverage)
+   - Test child container destruction
+   - Test preDestroy hooks
+   - Test reverse order destruction
+
+3. `tests/container-impl.test.ts` (partial coverage)
+   - Test hasSingleton(), get(), destroy()
+   - Test destroyed container errors
+
+### 4. File Organization
+
+**Source Files** (`packages/pocket-di/src/`):
+
+- Type definitions: `*.ts` (container, provider, token, etc.)
+- Implementation: `*-impl.ts`, `*-resolver.ts`, `*-initializer.ts`
+- Utilities: `utils.ts`, `symbols.ts`
+
+**Test Files** (`packages/pocket-di/tests/`):
+
+- One test file per implementation file
+- Name: `<feature>.test.ts`
+- Use vitest: `describe`, `it`, `expect`
+
+### 5. Common Pitfalls
+
+**TypeScript Configuration:**
+
+- `erasableSyntaxOnly: true` - No constructor parameter properties
+- Use field declarations + constructor assignment instead
+
+**Test Patterns:**
+
+- Dependencies are passed as object: `{ dep: Dependency }`
+- Constructor receives full object, extract what you need
+- Use `as any` for type compatibility issues
+
+**Import Order:**
+
+- Prettier auto-fixes imports (alphabetical, grouped)
+- Don't fight the linter
+
+### 6. Verification Before Commit
+
+```bash
+# From root
+pnpm format:all  # MUST PASS
+pnpm test:ts     # All tests pass
+pnpm lint        # No errors
+
+# Only then commit
+git add -A && git commit -m "..."
+```
+
+The plan file at `/Users/harry/.claude/plans/calm-dancing-kahan.md` contains old architecture details and should be ignored. Current implementation is documented in this CLAUDE.md file.
