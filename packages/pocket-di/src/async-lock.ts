@@ -1,6 +1,6 @@
 /**
- * @file async lock을 구현하는 class입니다.
- * container의 async method들이 container의 context에 접근할 때 사용합니다.
+ * @file Implements an async lock for serializing access to shared resources.
+ * Used by container's async methods when accessing container's context.
  */
 
 export class AsyncLock {
